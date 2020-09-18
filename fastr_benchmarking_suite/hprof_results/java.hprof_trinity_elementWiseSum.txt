@@ -1,0 +1,2324 @@
+JAVA PROFILE 1.0.1, created Sat Jun 27 22:17:40 2020
+
+Copyright (c) 2003, 2005, Oracle and/or its affiliates. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+  - Neither the name of Oracle nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Header for -agentlib:hprof (or -Xrunhprof) ASCII Output (JDK 5.0 JVMTI based)
+
+WARNING!  This file format is under development, and is subject to
+change without notice.
+
+This file contains the following types of records:
+
+THREAD START
+THREAD END      mark the lifetime of Java threads
+
+TRACE           represents a Java stack trace.  Each trace consists
+                of a series of stack frames.  Other records refer to
+                TRACEs to identify (1) where object allocations have
+                taken place, (2) the frames in which GC roots were
+                found, and (3) frequently executed methods.
+
+HEAP DUMP       is a complete snapshot of all live objects in the Java
+                heap.  Following distinctions are made:
+
+                ROOT    root set as determined by GC
+                CLS     classes 
+                OBJ     instances
+                ARR     arrays
+
+SITES           is a sorted list of allocation sites.  This identifies
+                the most heavily allocated object types, and the TRACE
+                at which those allocations occurred.
+
+CPU SAMPLES     is a statistical profile of program execution.  The VM
+                periodically samples all running threads, and assigns
+                a quantum to active TRACEs in those threads.  Entries
+                in this record are TRACEs ranked by the percentage of
+                total quanta they consumed; top-ranked TRACEs are
+                typically hot spots in the program.
+
+CPU TIME        is a profile of program execution obtained by measuring
+                the time spent in individual methods (excluding the time
+                spent in callees), as well as by counting the number of
+                times each method is called. Entries in this record are
+                TRACEs ranked by the percentage of total CPU time. The
+                "count" field indicates the number of times each TRACE 
+                is invoked.
+
+MONITOR TIME    is a profile of monitor contention obtained by measuring
+                the time spent by a thread waiting to enter a monitor.
+                Entries in this record are TRACEs ranked by the percentage
+                of total monitor contention time and a brief description
+                of the monitor.  The "count" field indicates the number of 
+                times the monitor was contended at that TRACE.
+
+MONITOR DUMP    is a complete snapshot of all the monitors and threads in 
+                the System.
+
+HEAP DUMP, SITES, CPU SAMPLES|TIME and MONITOR DUMP|TIME records are generated 
+at program exit.  They can also be obtained during program execution by typing 
+Ctrl-\ (on Solaris) or by typing Ctrl-Break (on Win32).
+
+--------
+
+THREAD START (obj=5000018c, id = 200001, name="main", group="main")
+THREAD START (obj=5000018c, id = 200004, name="nfi-gc", group="main")
+THREAD START (obj=500008c9, id = 200005, name="TruffleCompilerThread-28", group="main")
+THREAD START (obj=5000092b, id = 200006, name="HotSpotGraalManagement Bean Registration", group="main")
+THREAD START (obj=5000018c, id = 200007, name="Native-Reference-Queue-Worker", group="main")
+THREAD START (obj=5000018c, id = 200008, name="process reaper", group="system")
+THREAD START (obj=50002d58, id = 200009, name="system", group="main")
+THREAD END (id = 200009)
+THREAD START (obj=50002d58, id = 200010, name="system", group="main")
+THREAD END (id = 200010)
+THREAD START (obj=500008c9, id = 200011, name="TruffleCompilerThread-34", group="main")
+THREAD START (obj=50002d58, id = 200012, name="Thread-7", group="main")
+THREAD START (obj=5000018c, id = 200013, name="pool-1-thread-1", group="main")
+THREAD END (id = 200008)
+THREAD END (id = 200012)
+THREAD START (obj=5000018c, id = 200014, name="Thread-1", group="main")
+THREAD START (obj=500008c9, id = 200015, name="Thread-0", group="main")
+THREAD START (obj=5000018c, id = 200016, name="Thread-3", group="main")
+THREAD END (id = 200016)
+THREAD END (id = 200014)
+THREAD END (id = 200015)
+THREAD END (id = 200001)
+TRACE 301607:
+	java.io.FileInputStream.open0(FileInputStream.java:Unknown line)
+	java.io.FileInputStream.open(FileInputStream.java:195)
+	java.io.FileInputStream.<init>(FileInputStream.java:138)
+	com.oracle.truffle.r.launcher.REPL$EventLoopThread.run(REPL.java:283)
+TRACE 302074:
+	com.oracle.truffle.nfi.impl.NFIContext.executePrimitive(NFIContext.java:Unknown line)
+	com.oracle.truffle.nfi.impl.NFIContext.executePrimitive(NFIContext.java:286)
+	com.oracle.truffle.nfi.impl.LibFFISignature.execute(LibFFISignature.java:186)
+	com.oracle.truffle.nfi.impl.FunctionExecuteNode$SignatureExecuteNode.execute(FunctionExecuteNode.java:133)
+TRACE 304669:
+	com.oracle.truffle.api.library.LibraryFactory.getUncached(LibraryFactory.java:291)
+	com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibraryGen$UncachedDispatch.getDoubleAt(RDoubleVectorDataLibraryGen.java:1178)
+	com.oracle.truffle.r.runtime.data.RDoubleVector.transferElementSameType(RDoubleVector.java:280)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.processContentElement(Combine.java:361)
+TRACE 305298:
+	com.oracle.truffle.r.runtime.data.nodes.VectorAccess.setFromSameType(VectorAccess.java:388)
+	com.oracle.truffle.r.nodes.builtin.base.Array.arrayCached(Array.java:110)
+	com.oracle.truffle.r.nodes.builtin.base.ArrayNodeGen.executeAndSpecialize(ArrayNodeGen.java:115)
+	com.oracle.truffle.r.nodes.builtin.base.ArrayNodeGen.execute(ArrayNodeGen.java:58)
+TRACE 304668:
+	com.oracle.truffle.api.library.LibraryFactory.getUncached(LibraryFactory.java:291)
+	com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibraryGen$UncachedDispatch.setDoubleAt(RDoubleVectorDataLibraryGen.java:1196)
+	com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibrary.setDoubleAt(RDoubleVectorDataLibrary.java:122)
+	com.oracle.truffle.r.runtime.data.RDoubleVector.transferElementSameType(RDoubleVector.java:281)
+TRACE 304277:
+	com.oracle.truffle.api.profiles.ValueProfile$Equality.profile(ValueProfile.java:212)
+	com.oracle.truffle.r.runtime.nmath.distr.Unif$Runif.exec(Unif.java:50)
+	com.oracle.truffle.r.runtime.nmath.distr.UnifFactory$RunifNodeGen.execute(UnifFactory.java:37)
+	com.oracle.truffle.r.runtime.nmath.RandomFunctions$RandFunction2_Double.execute(RandomFunctions.java:55)
+TRACE 304676:
+	com.oracle.truffle.r.nodes.builtin.base.Combine.processContentElement(Combine.java:361)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.foldContents(Combine.java:352)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.combineCached(Combine.java:181)
+	com.oracle.truffle.r.nodes.builtin.base.CombineNodeGen.executeAndSpecialize(CombineNodeGen.java:202)
+TRACE 302207:
+	jdk.vm.ci.hotspot.CompilerToVM.interpreterFrameSize(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotCodeCacheProvider.interpreterFrameSize(HotSpotCodeCacheProvider.java:195)
+	org.graalvm.compiler.hotspot.HotSpotDebugInfoBuilder.computeFrameForState(HotSpotDebugInfoBuilder.java:132)
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.computeFrameForState(DebugInfoBuilder.java:281)
+TRACE 305244:
+	com.oracle.truffle.r.runtime.data.NativeDataAccess.getData(NativeDataAccess.java:846)
+	com.oracle.truffle.r.runtime.data.RDoubleNativeVectorData.getDoubleAt(RDoubleNativeVectorData.java:98)
+	com.oracle.truffle.r.runtime.data.RDoubleNativeVectorDataGen$RDoubleVectorDataLibraryExports$Uncached.getDoubleAt(RDoubleNativeVectorDataGen.java:239)
+	com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibraryGen$UncachedDispatch.getDoubleAt(RDoubleVectorDataLibraryGen.java:1178)
+TRACE 301683:
+	jdk.vm.ci.hotspot.CompilerToVM.hasNeverInlineDirective(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.hasNeverInlineDirective(HotSpotResolvedJavaMethodImpl.java:598)
+	org.graalvm.compiler.replacements.PEGraphDecoder.tryInline(PEGraphDecoder.java:859)
+	org.graalvm.compiler.replacements.PEGraphDecoder.trySimplifyInvoke(PEGraphDecoder.java:744)
+TRACE 304673:
+	com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibraryGen$UncachedDispatch.setDoubleAt(RDoubleVectorDataLibraryGen.java:1196)
+	com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibrary.setDoubleAt(RDoubleVectorDataLibrary.java:122)
+	com.oracle.truffle.r.runtime.data.RDoubleVector.transferElementSameType(RDoubleVector.java:281)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.processContentElement(Combine.java:361)
+TRACE 304275:
+	com.oracle.truffle.api.profiles.ValueProfile$Equality.profile(ValueProfile.java:212)
+	com.oracle.truffle.r.runtime.nmath.distr.Unif$Runif.exec(Unif.java:51)
+	com.oracle.truffle.r.runtime.nmath.distr.UnifFactory$RunifNodeGen.execute(UnifFactory.java:37)
+	com.oracle.truffle.r.runtime.nmath.RandomFunctions$RandFunction2_Double.execute(RandomFunctions.java:55)
+TRACE 304670:
+	com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibraryGen$UncachedDispatch.getDoubleAt(RDoubleVectorDataLibraryGen.java:1178)
+	com.oracle.truffle.r.runtime.data.RDoubleVector.transferElementSameType(RDoubleVector.java:280)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.processContentElement(Combine.java:361)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.foldContents(Combine.java:352)
+TRACE 302000:
+	jdk.vm.ci.hotspot.CompilerToVM.installCode(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotCodeCacheProvider.installCode(HotSpotCodeCacheProvider.java:137)
+	org.graalvm.compiler.core.target.Backend.createInstalledCode(Backend.java:194)
+	org.graalvm.compiler.core.target.Backend.createInstalledCode(Backend.java:147)
+TRACE 304286:
+	com.oracle.truffle.r.runtime.nmath.RandomFunctions$RandomNumberProvider.unifRand(RandomFunctions.java:89)
+	com.oracle.truffle.r.runtime.nmath.distr.Unif$Runif.exec(Unif.java:59)
+	com.oracle.truffle.r.runtime.nmath.distr.UnifFactory$RunifNodeGen.execute(UnifFactory.java:37)
+	com.oracle.truffle.r.runtime.nmath.RandomFunctions$RandFunction2_Double.execute(RandomFunctions.java:55)
+TRACE 304649:
+	com.oracle.truffle.r.runtime.data.nodes.VectorAccess.getDouble(VectorAccess.java:327)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode$3.perform(BinaryMapNode.java:315)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doVectorScalar(BinaryMapNode.java:484)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.executeAndSpecialize(VectorMapBinaryInternalNodeGen.java:120)
+TRACE 305245:
+	com.oracle.truffle.r.runtime.data.RDoubleVector.getLength(RDoubleVector.java:202)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.processContentElement(Combine.java:360)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.foldContents(Combine.java:352)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.combineCached(Combine.java:181)
+TRACE 304652:
+	com.oracle.truffle.r.nodes.binary.BinaryMapBooleanFunctionNode.applyLogical(BinaryMapBooleanFunctionNode.java:75)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode$1.perform(BinaryMapNode.java:301)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doSameLength(BinaryMapNode.java:500)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.executeAndSpecialize(VectorMapBinaryInternalNodeGen.java:128)
+TRACE 302574:
+	org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt(Range.java:90)
+	org.graalvm.compiler.lir.alloc.lsra.Interval.currentIntersectsAt(Interval.java:720)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.freeCollectInactiveAny(LinearScanWalker.java:205)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocFreeRegister(LinearScanWalker.java:711)
+TRACE 301844:
+	jdk.vm.ci.hotspot.CompilerToVM.getComponentType(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getComponentType(HotSpotResolvedObjectTypeImpl.java:157)
+	jdk.vm.ci.meta.ResolvedJavaType.getElementalType(ResolvedJavaType.java:206)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getModifiers(HotSpotResolvedObjectTypeImpl.java:144)
+TRACE 304594:
+	com.oracle.truffle.r.runtime.data.nodes.VectorAccess.setFromSameType(VectorAccess.java:388)
+	com.oracle.truffle.r.ffi.impl.common.JavaUpCallsRFFIImpl.Rf_copyMatrix(JavaUpCallsRFFIImpl.java:958)
+	com.oracle.truffle.r.ffi.impl.upcalls.Rf_copyMatrixCall.execute(Rf_copyMatrixCall.java:63)
+	com.oracle.truffle.r.ffi.impl.upcalls.Rf_copyMatrixCallGen$InteropLibraryExports$Cached.executeAndSpecialize(Rf_copyMatrixCallGen.java:125)
+TRACE 301974:
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processFixedGuard(ConditionalEliminationPhase.java:357)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNode(ConditionalEliminationPhase.java:500)
+TRACE 305315:
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doDouble(UnaryArithmeticReduceNode.java:317)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doDoubleCached(UnaryArithmeticReduceNode.java:330)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeAndSpecialize(UnaryArithmeticReduceNodeGen.java:477)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeReduce(UnaryArithmeticReduceNodeGen.java:283)
+TRACE 305020:
+	com.oracle.truffle.r.nodes.binary.BinaryMapBooleanFunctionNode.applyLogical(BinaryMapBooleanFunctionNode.java:127)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode$3.perform(BinaryMapNode.java:315)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doVectorScalar(BinaryMapNode.java:484)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.execute(VectorMapBinaryInternalNodeGen.java:53)
+TRACE 301691:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupMethodInPool(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupMethod(HotSpotConstantPool.java:581)
+	org.graalvm.compiler.java.BytecodeParser.lookupMethodInPool(BytecodeParser.java:4297)
+	org.graalvm.compiler.java.BytecodeParser.lookupMethod(BytecodeParser.java:4291)
+TRACE 304658:
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt(UnaryArithmeticReduceNode.java:249)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doLogicalCached(UnaryArithmeticReduceNode.java:285)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeAndSpecialize(UnaryArithmeticReduceNodeGen.java:429)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeReduce(UnaryArithmeticReduceNodeGen.java:283)
+TRACE 304647:
+	com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached(IsNA.java:145)
+	com.oracle.truffle.r.nodes.builtin.base.IsNANodeGen.executeAndSpecialize(IsNANodeGen.java:257)
+	com.oracle.truffle.r.nodes.builtin.base.IsNANodeGen.execute(IsNANodeGen.java:167)
+	com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg1.call(RBuiltinNode.java:174)
+TRACE 304650:
+	com.oracle.truffle.r.nodes.binary.BinaryMapBooleanFunctionNode.applyLogical(BinaryMapBooleanFunctionNode.java:127)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode$3.perform(BinaryMapNode.java:315)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doVectorScalar(BinaryMapNode.java:484)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.executeAndSpecialize(VectorMapBinaryInternalNodeGen.java:120)
+TRACE 301631:
+	java.lang.Throwable.fillInStackTrace(Throwable.java:Unknown line)
+	java.lang.Throwable.fillInStackTrace(Throwable.java:784)
+	java.lang.Throwable.<init>(Throwable.java:251)
+	java.lang.Exception.<init>(Exception.java:54)
+TRACE 301170:
+	java.lang.Throwable.fillInStackTrace(Throwable.java:Unknown line)
+	java.lang.Throwable.fillInStackTrace(Throwable.java:784)
+	java.lang.Throwable.<init>(Throwable.java:266)
+	java.lang.Exception.<init>(Exception.java:66)
+TRACE 304671:
+	com.oracle.truffle.r.nodes.builtin.base.Combine.processContentElement(Combine.java:360)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.foldContents(Combine.java:352)
+	com.oracle.truffle.r.nodes.builtin.base.Combine.combineCached(Combine.java:181)
+	com.oracle.truffle.r.nodes.builtin.base.CombineNodeGen.executeAndSpecialize(CombineNodeGen.java:202)
+TRACE 304276:
+	com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionDoubleExecutorNode.cached(RandFunctionsNodes.java:264)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodesFactory$RandFunctionDoubleExecutorNodeGen.executeAndSpecialize(RandFunctionsNodesFactory.java:447)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodesFactory$RandFunctionDoubleExecutorNodeGen.execute(RandFunctionsNodesFactory.java:402)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionExecutorBase.evaluateWithCached(RandFunctionsNodes.java:147)
+TRACE 305022:
+	com.oracle.truffle.r.nodes.binary.BinaryMapBooleanFunctionNode.applyLogical(BinaryMapBooleanFunctionNode.java:75)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode$1.perform(BinaryMapNode.java:301)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doSameLength(BinaryMapNode.java:500)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.execute(VectorMapBinaryInternalNodeGen.java:59)
+TRACE 301771:
+	jdk.vm.ci.hotspot.CompilerToVM.getResolvedJavaType0(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.CompilerToVM.getResolvedJavaType(CompilerToVM.java:711)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getSubklass(HotSpotResolvedObjectTypeImpl.java:250)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.findLeafConcreteSubtype(HotSpotResolvedObjectTypeImpl.java:207)
+TRACE 301837:
+	org.graalvm.collections.EconomicMapImpl.findLinear(EconomicMapImpl.java:261)
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:256)
+	org.graalvm.collections.EconomicMapImpl.get(EconomicMapImpl.java:245)
+	org.graalvm.compiler.options.OptionValues.get(OptionValues.java:115)
+TRACE 301988:
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processIf(ConditionalEliminationPhase.java:431)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNode(ConditionalEliminationPhase.java:506)
+TRACE 302833:
+	org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt(Range.java:90)
+	org.graalvm.compiler.lir.alloc.lsra.Range.intersects(Range.java:48)
+	org.graalvm.compiler.lir.alloc.lsra.Interval.currentIntersects(Interval.java:716)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.spillCollectInactiveAny(LinearScanWalker.java:261)
+TRACE 305012:
+	com.oracle.truffle.r.runtime.data.nodes.VectorAccess.setFromSameType(VectorAccess.java:388)
+	com.oracle.truffle.r.ffi.impl.common.JavaUpCallsRFFIImpl.Rf_copyMatrix(JavaUpCallsRFFIImpl.java:958)
+	com.oracle.truffle.r.ffi.impl.upcalls.Rf_copyMatrixCall.execute(Rf_copyMatrixCall.java:63)
+	com.oracle.truffle.r.ffi.impl.upcalls.Rf_copyMatrixCallGen$InteropLibraryExports$Cached.execute(Rf_copyMatrixCallGen.java:92)
+TRACE 301819:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupNameAndTypeRefIndexInPool(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.getNameAndTypeRefIndexAt(HotSpotConstantPool.java:392)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupField(HotSpotConstantPool.java:618)
+	org.graalvm.compiler.java.BytecodeParser.lookupField(BytecodeParser.java:4302)
+TRACE 301327:
+	sun.nio.fs.UnixNativeDispatcher.access0(UnixNativeDispatcher.java:Unknown line)
+	sun.nio.fs.UnixNativeDispatcher.access(UnixNativeDispatcher.java:449)
+	sun.nio.fs.UnixFileSystemProvider.checkAccess(UnixFileSystemProvider.java:306)
+	com.oracle.truffle.polyglot.FileSystems$NIOFileSystem.checkAccess(FileSystems.java:626)
+TRACE 302495:
+	org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt(Range.java:80)
+	org.graalvm.compiler.lir.alloc.lsra.Interval.currentIntersectsAt(Interval.java:720)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.freeCollectInactiveFixed(LinearScanWalker.java:196)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocFreeRegister(LinearScanWalker.java:710)
+TRACE 301985:
+	org.graalvm.compiler.nodes.java.InstanceOfNode.implies(InstanceOfNode.java:255)
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processFixedGuard(ConditionalEliminationPhase.java:357)
+TRACE 300069:
+	java.lang.ClassLoader.defineClass1(ClassLoader.java:Unknown line)
+	java.lang.ClassLoader.defineClass(ClassLoader.java:757)
+	java.security.SecureClassLoader.defineClass(SecureClassLoader.java:142)
+	java.net.URLClassLoader.defineClass(URLClassLoader.java:468)
+TRACE 304651:
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doVectorScalar(BinaryMapNode.java:484)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.executeAndSpecialize(VectorMapBinaryInternalNodeGen.java:120)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.execute(VectorMapBinaryInternalNodeGen.java:83)
+	com.oracle.truffle.r.nodes.primitive.BinaryMapVectorNode.apply(BinaryMapNode.java:258)
+TRACE 304645:
+	com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached(IsNA.java:119)
+	com.oracle.truffle.r.nodes.builtin.base.IsNANodeGen.executeAndSpecialize(IsNANodeGen.java:257)
+	com.oracle.truffle.r.nodes.builtin.base.IsNANodeGen.execute(IsNANodeGen.java:167)
+	com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg1.call(RBuiltinNode.java:174)
+TRACE 301694:
+	jdk.vm.ci.hotspot.CompilerToVM.getResolvedJavaType0(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.CompilerToVM.getResolvedJavaType(CompilerToVM.java:719)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.getHolder(HotSpotResolvedJavaMethodImpl.java:98)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.fromMetaspace(HotSpotResolvedJavaMethodImpl.java:116)
+TRACE 304654:
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doSameLength(BinaryMapNode.java:500)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.executeAndSpecialize(VectorMapBinaryInternalNodeGen.java:128)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.execute(VectorMapBinaryInternalNodeGen.java:83)
+	com.oracle.truffle.r.nodes.primitive.BinaryMapVectorNode.apply(BinaryMapNode.java:247)
+TRACE 303691:
+	java.lang.ThreadLocal$ThreadLocalMap.access$000(ThreadLocal.java:298)
+	java.lang.ThreadLocal.get(ThreadLocal.java:163)
+	com.oracle.truffle.polyglot.ContextThreadLocal.getTL(ContextThreadLocal.java:150)
+	com.oracle.truffle.polyglot.ContextThreadLocal.isSet(ContextThreadLocal.java:74)
+TRACE 302031:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processInputs(SchedulePhase.java:1152)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processStack(SchedulePhase.java:951)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processNodes(SchedulePhase.java:906)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative(SchedulePhase.java:815)
+TRACE 301131:
+	java.lang.String.intern(String.java:Unknown line)
+	com.oracle.truffle.r.runtime.Utils.intern(Utils.java:726)
+	com.oracle.truffle.r.runtime.RSerialize$Input.setAttributes(RSerialize.java:1074)
+	com.oracle.truffle.r.runtime.RSerialize$Input.readItem(RSerialize.java:1002)
+TRACE 302407:
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.findHash(EconomicMapImpl.java:285)
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:254)
+	org.graalvm.collections.EconomicMapImpl.put(EconomicMapImpl.java:426)
+TRACE 300972:
+	java.lang.String.intern(String.java:Unknown line)
+	com.oracle.truffle.r.runtime.Utils.intern(Utils.java:726)
+	com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.<init>(ReadVariableNode.java:234)
+	com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.<init>(ReadVariableNode.java:229)
+TRACE 304282:
+	com.oracle.truffle.r.runtime.rng.mt.MersenneTwister.genrandDouble(MersenneTwister.java:185)
+	com.oracle.truffle.r.runtime.nmath.RandomFunctions$RandomNumberProvider.unifRand(RandomFunctions.java:89)
+	com.oracle.truffle.r.runtime.nmath.distr.Unif$Runif.exec(Unif.java:59)
+	com.oracle.truffle.r.runtime.nmath.distr.UnifFactory$RunifNodeGen.execute(UnifFactory.java:37)
+TRACE 301641:
+	jdk.vm.ci.hotspot.CompilerToVM.resolveMethod(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.resolveMethod(HotSpotResolvedObjectTypeImpl.java:457)
+	jdk.vm.ci.meta.ResolvedJavaType.resolveConcreteMethod(ResolvedJavaType.java:238)
+	org.graalvm.compiler.nodes.java.MethodCallTargetNode.devirtualizeCall(MethodCallTargetNode.java:150)
+TRACE 302147:
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processGuard(ConditionalEliminationPhase.java:326)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNode(ConditionalEliminationPhase.java:502)
+TRACE 301788:
+	java.lang.System.identityHashCode(System.java:Unknown line)
+	jdk.vm.ci.hotspot.DirectHotSpotObjectConstantImpl.getIdentityHashCode(DirectHotSpotObjectConstantImpl.java:66)
+	jdk.vm.ci.hotspot.HotSpotObjectConstantImpl.hashCode(HotSpotObjectConstantImpl.java:152)
+	org.graalvm.compiler.graph.NodeClass.deepHashCode0(NodeClass.java:570)
+TRACE 302834:
+	org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt(Range.java:80)
+	org.graalvm.compiler.lir.alloc.lsra.Interval.currentIntersectsAt(Interval.java:720)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.freeCollectInactiveAny(LinearScanWalker.java:205)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocFreeRegister(LinearScanWalker.java:711)
+TRACE 301817:
+	org.graalvm.compiler.graph.NodeClass.deepHashCode0(NodeClass.java:570)
+	org.graalvm.compiler.graph.NodeClass.valueNumber(NodeClass.java:633)
+	org.graalvm.compiler.graph.Graph$1.hashCode(Graph.java:142)
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:411)
+TRACE 302141:
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.findHash(EconomicMapImpl.java:285)
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:254)
+	org.graalvm.collections.EconomicMapImpl.get(EconomicMapImpl.java:245)
+TRACE 302792:
+	org.graalvm.compiler.lir.ValueConsumer.visitValue(ValueConsumer.java:51)
+	org.graalvm.compiler.lir.LIRIntrospection.visitEach(LIRIntrospection.java:282)
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachDef(LIRInstructionClass.java:275)
+	org.graalvm.compiler.lir.LIRInstruction.visitEachOutput(LIRInstruction.java:336)
+TRACE 304279:
+	com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionDoubleExecutorNode.cached(RandFunctionsNodes.java:268)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodesFactory$RandFunctionDoubleExecutorNodeGen.executeAndSpecialize(RandFunctionsNodesFactory.java:447)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodesFactory$RandFunctionDoubleExecutorNodeGen.execute(RandFunctionsNodesFactory.java:402)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionExecutorBase.evaluateWithCached(RandFunctionsNodes.java:147)
+TRACE 305025:
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt(UnaryArithmeticReduceNode.java:249)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doLogicalCached(UnaryArithmeticReduceNode.java:285)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeReduce(UnaryArithmeticReduceNodeGen.java:183)
+	com.oracle.truffle.r.nodes.builtin.base.Sum.sumLengthOne(Sum.java:120)
+TRACE 304945:
+	com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionDoubleExecutorNode.cached(RandFunctionsNodes.java:264)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodesFactory$RandFunctionDoubleExecutorNodeGen.execute(RandFunctionsNodesFactory.java:392)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionExecutorBase.evaluateWithCached(RandFunctionsNodes.java:147)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodesFactory$RandFunctionExecutorBaseNodeGen.execute(RandFunctionsNodesFactory.java:130)
+TRACE 305014:
+	com.oracle.truffle.r.runtime.data.nodes.VectorAccess.getDouble(VectorAccess.java:327)
+	com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached(IsNA.java:121)
+	com.oracle.truffle.r.nodes.builtin.base.IsNANodeGen.execute(IsNANodeGen.java:139)
+	com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg1.call(RBuiltinNode.java:174)
+TRACE 302386:
+	org.graalvm.compiler.nodes.java.InstanceOfNode.implies(InstanceOfNode.java:255)
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processIf(ConditionalEliminationPhase.java:431)
+TRACE 302550:
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.computeLocals(DebugInfoBuilder.java:300)
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.computeFrameForState(DebugInfoBuilder.java:275)
+	org.graalvm.compiler.hotspot.HotSpotDebugInfoBuilder.computeFrameForState(HotSpotDebugInfoBuilder.java:131)
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.computeFrameForState(DebugInfoBuilder.java:281)
+TRACE 304883:
+	com.oracle.truffle.r.runtime.data.nodes.VectorAccess.getInt(VectorAccess.java:323)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode$8.perform(BinaryMapNode.java:350)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doVectorScalar(BinaryMapNode.java:484)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.executeAndSpecialize(VectorMapBinaryInternalNodeGen.java:120)
+TRACE 301665:
+	com.oracle.truffle.api.TruffleFile.checkAccess(TruffleFile.java:1939)
+	com.oracle.truffle.api.TruffleFile.exists(TruffleFile.java:282)
+	com.oracle.truffle.r.runtime.context.RContext.getSafeTruffleFile(RContext.java:982)
+	com.oracle.truffle.r.runtime.RSource.fromSrcfile(RSource.java:188)
+TRACE 301748:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupType(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotJVMCIRuntime.lookupTypeInternal(HotSpotJVMCIRuntime.java:635)
+	jdk.vm.ci.hotspot.HotSpotJVMCIRuntime.lookupType(HotSpotJVMCIRuntime.java:622)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupField(HotSpotConstantPool.java:621)
+TRACE 303112:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveCollectMappings(LinearScanResolveDataFlowPhase.java:75)
+	org.graalvm.compiler.lir.alloc.lsra.ssa.SSALinearScanResolveDataFlowPhase.resolveCollectMappings(SSALinearScanResolveDataFlowPhase.java:58)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveDataFlow0(LinearScanResolveDataFlowPhase.java:202)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveDataFlow(LinearScanResolveDataFlowPhase.java:136)
+TRACE 302439:
+	org.graalvm.compiler.graph.Graph.findNextLiveiterable(Graph.java:1013)
+	org.graalvm.compiler.graph.Graph.getIterableNodeNext(Graph.java:1007)
+	org.graalvm.compiler.graph.TypedGraphNodeIterator.forward(TypedGraphNodeIterator.java:73)
+	org.graalvm.compiler.graph.TypedGraphNodeIterator.findNext(TypedGraphNodeIterator.java:49)
+TRACE 301041:
+	sun.nio.fs.UnixNativeDispatcher.realpath0(UnixNativeDispatcher.java:Unknown line)
+	sun.nio.fs.UnixNativeDispatcher.realpath(UnixNativeDispatcher.java:257)
+	sun.nio.fs.UnixPath.toRealPath(UnixPath.java:834)
+	com.oracle.truffle.polyglot.FileSystems$NIOFileSystem.toRealPath(FileSystems.java:736)
+TRACE 301832:
+	java.lang.Object.hashCode(Object.java:Unknown line)
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.findHash(EconomicMapImpl.java:285)
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:254)
+TRACE 301312:
+	sun.nio.fs.UnixNativeDispatcher.access(UnixNativeDispatcher.java:451)
+	sun.nio.fs.UnixFileSystemProvider.checkAccess(UnixFileSystemProvider.java:306)
+	com.oracle.truffle.polyglot.FileSystems$NIOFileSystem.checkAccess(FileSystems.java:626)
+	com.oracle.truffle.api.TruffleFile.checkAccess(TruffleFile.java:1937)
+TRACE 302057:
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:298)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processFixedGuard(ConditionalEliminationPhase.java:357)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNode(ConditionalEliminationPhase.java:500)
+TRACE 304946:
+	com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionDoubleExecutorNode.cached(RandFunctionsNodes.java:268)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodesFactory$RandFunctionDoubleExecutorNodeGen.execute(RandFunctionsNodesFactory.java:392)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionExecutorBase.evaluateWithCached(RandFunctionsNodes.java:147)
+	com.oracle.truffle.r.library.stats.RandFunctionsNodesFactory$RandFunctionExecutorBaseNodeGen.execute(RandFunctionsNodesFactory.java:130)
+TRACE 301729:
+	jdk.vm.ci.hotspot.CompilerToVM.getResolvedJavaType0(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.CompilerToVM.getResolvedJavaType(CompilerToVM.java:711)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.getHolder(HotSpotConstantPool.java:230)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupField(HotSpotConstantPool.java:621)
+TRACE 302695:
+	org.graalvm.compiler.lir.dfa.LocationMarker.processInstructionBottomUp(LocationMarker.java:140)
+	org.graalvm.compiler.lir.dfa.LocationMarker.processBlock(LocationMarker.java:113)
+	org.graalvm.compiler.lir.dfa.LocationMarker.build(LocationMarker.java:83)
+	org.graalvm.compiler.lir.dfa.LocationMarkerPhase.run(LocationMarkerPhase.java:54)
+TRACE 301672:
+	jdk.vm.ci.hotspot.CompilerToVM.hasNeverInlineDirective(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.hasNeverInlineDirective(HotSpotResolvedJavaMethodImpl.java:598)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.canBeInlined(HotSpotResolvedJavaMethodImpl.java:590)
+	org.graalvm.compiler.java.BytecodeParser.tryInline(BytecodeParser.java:2232)
+TRACE 302011:
+	java.lang.System.identityHashCode(System.java:Unknown line)
+	org.graalvm.compiler.virtual.phases.ea.PEReadEliminationBlockState$ReadCacheEntry.hashCode(PEReadEliminationBlockState.java:71)
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.findHash(EconomicMapImpl.java:285)
+TRACE 302998:
+	org.graalvm.compiler.graph.Graph.findDuplicate(Graph.java:778)
+	org.graalvm.compiler.graph.Graph.uniqueHelper(Graph.java:677)
+	org.graalvm.compiler.graph.Graph.unique(Graph.java:672)
+	org.graalvm.compiler.virtual.phases.ea.GraphEffectList.lambda$replaceAtUsages$8(GraphEffectList.java:250)
+TRACE 301831:
+	jdk.vm.ci.hotspot.CompilerToVM.getComponentType(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getComponentType(HotSpotResolvedObjectTypeImpl.java:157)
+	jdk.vm.ci.meta.ResolvedJavaType.getElementalType(ResolvedJavaType.java:206)
+	jdk.vm.ci.meta.ResolvedJavaType.isLeaf(ResolvedJavaType.java:79)
+TRACE 303103:
+	org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt(Range.java:80)
+	org.graalvm.compiler.lir.alloc.lsra.Range.intersects(Range.java:48)
+	org.graalvm.compiler.lir.alloc.lsra.Interval.currentIntersects(Interval.java:716)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.spillCollectInactiveAny(LinearScanWalker.java:261)
+TRACE 301336:
+	com.oracle.truffle.r.runtime.env.frame.FrameSlotChangeMonitor.getObject(FrameSlotChangeMonitor.java:1014)
+	com.oracle.truffle.r.nodes.access.variables.ReadVariableNodeBase.profiledGetValue(ReadVariableNodeBase.java:67)
+	com.oracle.truffle.r.nodes.access.variables.ReadVariableNode$Match.execute(ReadVariableNode.java:410)
+	com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.executeInternal(ReadVariableNode.java:270)
+TRACE 302477:
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.putHashEntry(EconomicMapImpl.java:577)
+	org.graalvm.collections.EconomicMapImpl.put(EconomicMapImpl.java:451)
+	org.graalvm.collections.EconomicMapImpl.add(EconomicMapImpl.java:866)
+TRACE 302383:
+	org.graalvm.compiler.nodes.UnaryOpLogicNode.skipThroughPisAndProxies(UnaryOpLogicNode.java:103)
+	org.graalvm.compiler.nodes.UnaryOpLogicNode.implies(UnaryOpLogicNode.java:88)
+	org.graalvm.compiler.nodes.java.InstanceOfNode.implies(InstanceOfNode.java:255)
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+TRACE 302826:
+	org.graalvm.compiler.lir.ValueConsumer.visitValue(ValueConsumer.java:51)
+	org.graalvm.compiler.lir.LIRIntrospection.visitEach(LIRIntrospection.java:292)
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachAlive(LIRInstructionClass.java:267)
+	org.graalvm.compiler.lir.LIRInstruction.visitEachAlive(LIRInstruction.java:328)
+TRACE 301829:
+	jdk.vm.ci.hotspot.CompilerToVM.resolveFieldInPool(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupField(HotSpotConstantPool.java:630)
+	org.graalvm.compiler.java.BytecodeParser.lookupField(BytecodeParser.java:4302)
+	org.graalvm.compiler.java.BytecodeParser.genGetField(BytecodeParser.java:4667)
+TRACE 302296:
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:254)
+	org.graalvm.collections.EconomicMapImpl.get(EconomicMapImpl.java:245)
+	org.graalvm.compiler.nodes.GraphDecoder.allocateFloatingNode(GraphDecoder.java:1379)
+	org.graalvm.compiler.nodes.GraphDecoder.decodeFloatingNode(GraphDecoder.java:1357)
+TRACE 302904:
+	org.graalvm.compiler.phases.common.inlining.walker.ComputeInliningRelevance$Scope.process(ComputeInliningRelevance.java:238)
+	org.graalvm.compiler.phases.common.inlining.walker.ComputeInliningRelevance.compute(ComputeInliningRelevance.java:100)
+	org.graalvm.compiler.phases.common.inlining.walker.CallsiteHolderExplorable.computeProbabilities(CallsiteHolderExplorable.java:206)
+	org.graalvm.compiler.phases.common.inlining.walker.InliningData.doInline(InliningData.java:431)
+TRACE 301642:
+	jdk.vm.ci.hotspot.CompilerToVM.findUniqueConcreteMethod(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.uniqueConcreteMethod(HotSpotResolvedJavaMethodImpl.java:427)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.findUniqueConcreteMethod(HotSpotResolvedObjectTypeImpl.java:571)
+	org.graalvm.compiler.nodes.java.MethodCallTargetNode.devirtualizeCall(MethodCallTargetNode.java:155)
+TRACE 302952:
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachState(LIRInstructionClass.java:288)
+	org.graalvm.compiler.lir.LIRInstruction.visitEachState(LIRInstruction.java:340)
+	org.graalvm.compiler.lir.dfa.LocationMarker.processInstructionBottomUp(LocationMarker.java:149)
+	org.graalvm.compiler.lir.dfa.LocationMarker.processBlock(LocationMarker.java:113)
+TRACE 302373:
+	org.graalvm.compiler.nodes.LogicNegationNode.implies(LogicNegationNode.java:89)
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processFixedGuard(ConditionalEliminationPhase.java:357)
+TRACE 302773:
+	org.graalvm.compiler.nodes.UnaryOpLogicNode.skipThroughPisAndProxies(UnaryOpLogicNode.java:103)
+	org.graalvm.compiler.nodes.UnaryOpLogicNode.implies(UnaryOpLogicNode.java:88)
+	org.graalvm.compiler.nodes.java.InstanceOfNode.implies(InstanceOfNode.java:255)
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+TRACE 303174:
+	org.graalvm.compiler.nodes.FrameState.applyToNonVirtual(FrameState.java:614)
+	org.graalvm.compiler.nodes.FrameState.applyToNonVirtual(FrameState.java:633)
+	org.graalvm.compiler.nodes.FrameState.applyToNonVirtual(FrameState.java:633)
+	org.graalvm.compiler.nodes.FrameState.applyToNonVirtual(FrameState.java:633)
+TRACE 302380:
+	org.graalvm.compiler.nodes.UnaryOpLogicNode.skipThroughPisAndProxies(UnaryOpLogicNode.java:103)
+	org.graalvm.compiler.nodes.UnaryOpLogicNode.implies(UnaryOpLogicNode.java:88)
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+TRACE 302988:
+	org.graalvm.compiler.nodes.UnaryOpLogicNode.skipThroughPisAndProxies(UnaryOpLogicNode.java:103)
+	org.graalvm.compiler.nodes.UnaryOpLogicNode.implies(UnaryOpLogicNode.java:88)
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+TRACE 303052:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative(SchedulePhase.java:790)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:196)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+	org.graalvm.compiler.phases.Phase.run(Phase.java:49)
+TRACE 303085:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.computeGlobalLiveSets(LinearScanLifetimeAnalysisPhase.java:381)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.run(LinearScanLifetimeAnalysisPhase.java:94)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAllocationPhase.apply(LinearScanAllocationPhase.java:53)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAllocationPhase.apply(LinearScanAllocationPhase.java:46)
+TRACE 302211:
+	java.lang.Object.hashCode(Object.java:Unknown line)
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.putHashEntry(EconomicMapImpl.java:577)
+	org.graalvm.collections.EconomicMapImpl.createHash(EconomicMapImpl.java:571)
+TRACE 302993:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative(SchedulePhase.java:896)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:196)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+	org.graalvm.compiler.phases.Phase.run(Phase.java:49)
+TRACE 300914:
+	java.lang.System.identityHashCode(System.java:Unknown line)
+	java.util.IdentityHashMap.hash(IdentityHashMap.java:295)
+	java.util.IdentityHashMap.get(IdentityHashMap.java:329)
+	org.antlr.v4.runtime.atn.PredictionContext.getCachedContext(PredictionContext.java:551)
+TRACE 302250:
+	org.graalvm.compiler.lir.alloc.lsra.Interval$RegisterBindingLists.addToListSortedByStartAndUsePositions(Interval.java:164)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitBeforeUsage(LinearScanWalker.java:483)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitAndSpillInterval(LinearScanWalker.java:695)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocLockedRegister(LinearScanWalker.java:875)
+TRACE 303053:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.calcLatestBlock(SchedulePhase.java:557)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.calcLatestBlocks(SchedulePhase.java:273)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:205)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+TRACE 300957:
+	org.antlr.v4.runtime.atn.ParserATNSimulator.canDropLoopEntryEdgeInLeftRecursiveRule(ParserATNSimulator.java:1687)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closure_(ParserATNSimulator.java:1536)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closureCheckingStopState(ParserATNSimulator.java:1513)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closure_(ParserATNSimulator.java:1586)
+TRACE 302321:
+	org.graalvm.compiler.graph.NodeClass.deepEquals0(NodeClass.java:647)
+	org.graalvm.compiler.graph.NodeClass.dataEquals(NodeClass.java:747)
+	org.graalvm.compiler.graph.Node.valueEquals(Node.java:1358)
+	org.graalvm.compiler.graph.Graph$1.equals(Graph.java:137)
+TRACE 303109:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveCollectMappings(LinearScanResolveDataFlowPhase.java:75)
+	org.graalvm.compiler.lir.alloc.lsra.ssa.SSALinearScanResolveDataFlowPhase.resolveCollectMappings(SSALinearScanResolveDataFlowPhase.java:58)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.optimizeEmptyBlocks(LinearScanResolveDataFlowPhase.java:168)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveDataFlow(LinearScanResolveDataFlowPhase.java:134)
+TRACE 304659:
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt(UnaryArithmeticReduceNode.java:256)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doLogicalCached(UnaryArithmeticReduceNode.java:285)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeAndSpecialize(UnaryArithmeticReduceNodeGen.java:429)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeReduce(UnaryArithmeticReduceNodeGen.java:283)
+TRACE 303023:
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:254)
+	org.graalvm.collections.EconomicMapImpl.put(EconomicMapImpl.java:426)
+	org.graalvm.collections.EconomicMapImpl.add(EconomicMapImpl.java:866)
+	org.graalvm.compiler.phases.common.util.EconomicSetNodeEventListener.add(EconomicSetNodeEventListener.java:91)
+TRACE 300956:
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closure_(ParserATNSimulator.java:1573)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closureCheckingStopState(ParserATNSimulator.java:1513)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closure_(ParserATNSimulator.java:1586)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closureCheckingStopState(ParserATNSimulator.java:1513)
+TRACE 301810:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupType(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotJVMCIRuntime.lookupTypeInternal(HotSpotJVMCIRuntime.java:635)
+	jdk.vm.ci.hotspot.HotSpotJVMCIRuntime.lookupType(HotSpotJVMCIRuntime.java:622)
+	jdk.vm.ci.hotspot.HotSpotSignature.getParameterType(HotSpotSignature.java:166)
+TRACE 302478:
+	org.graalvm.compiler.graph.NodeClass.applyEdges(NodeClass.java:1289)
+	org.graalvm.compiler.graph.NodeClass.applyInputs(NodeClass.java:1270)
+	org.graalvm.compiler.graph.Node.applyInputs(Node.java:355)
+	org.graalvm.compiler.phases.common.DeadCodeEliminationPhase.iterateSuccessorsAndInputs(DeadCodeEliminationPhase.java:122)
+TRACE 304902:
+	sun.misc.Unsafe.copyMemory(Unsafe.java:Unknown line)
+	com.oracle.truffle.r.runtime.ffi.util.NativeMemory.copyMemory(NativeMemory.java:137)
+	com.oracle.truffle.r.runtime.ffi.util.NativeMemory.copyMemory(NativeMemory.java:128)
+	com.oracle.truffle.r.runtime.data.NativeDataAccess$NativeMirror.allocateNative(NativeDataAccess.java:326)
+TRACE 305021:
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doVectorScalar(BinaryMapNode.java:484)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.execute(VectorMapBinaryInternalNodeGen.java:53)
+	com.oracle.truffle.r.nodes.primitive.BinaryMapVectorNode.apply(BinaryMapNode.java:258)
+	com.oracle.truffle.r.nodes.binary.BinaryBooleanNode.doNumericVectorCached(BinaryBooleanNode.java:118)
+TRACE 300940:
+	org.antlr.v4.runtime.misc.Array2DHashSet.getOrAdd(Array2DHashSet.java:59)
+	org.antlr.v4.runtime.atn.ATNConfigSet.add(ATNConfigSet.java:146)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closure_(ParserATNSimulator.java:1529)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closureCheckingStopState(ParserATNSimulator.java:1513)
+TRACE 301757:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupKlassInPool(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupType(HotSpotConstantPool.java:606)
+	org.graalvm.compiler.java.BytecodeParser.lookupType(BytecodeParser.java:4248)
+	org.graalvm.compiler.java.BytecodeParser.genInstanceOf(BytecodeParser.java:4435)
+TRACE 302622:
+	jdk.vm.ci.hotspot.CompilerToVM.getComponentType(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getComponentType(HotSpotResolvedObjectTypeImpl.java:157)
+	jdk.vm.ci.meta.ResolvedJavaType.getElementalType(ResolvedJavaType.java:206)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.isDefinitelyResolvedWithRespectTo(HotSpotResolvedObjectTypeImpl.java:841)
+TRACE 304884:
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt(UnaryArithmeticReduceNode.java:249)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doIntCached(UnaryArithmeticReduceNode.java:274)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeAndSpecialize(UnaryArithmeticReduceNodeGen.java:383)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeReduce(UnaryArithmeticReduceNodeGen.java:283)
+TRACE 300933:
+	org.antlr.v4.runtime.atn.ParserATNSimulator.getEpsilonTarget(ParserATNSimulator.java:1765)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closure_(ParserATNSimulator.java:1541)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closureCheckingStopState(ParserATNSimulator.java:1513)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closure_(ParserATNSimulator.java:1586)
+TRACE 305015:
+	com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached(IsNA.java:119)
+	com.oracle.truffle.r.nodes.builtin.base.IsNANodeGen.execute(IsNANodeGen.java:139)
+	com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg1.call(RBuiltinNode.java:174)
+	com.oracle.truffle.r.nodes.function.RCallNode$BuiltinCallNode.execute(RCallNode.java:1158)
+TRACE 302450:
+	org.graalvm.compiler.nodes.FrameState.applyToNonVirtual(FrameState.java:616)
+	org.graalvm.compiler.nodes.FrameState.applyToNonVirtual(FrameState.java:633)
+	org.graalvm.compiler.nodes.FrameState.applyToNonVirtual(FrameState.java:633)
+	org.graalvm.compiler.nodes.FrameState.applyToNonVirtual(FrameState.java:633)
+TRACE 302621:
+	org.graalvm.compiler.virtual.phases.ea.PEReadEliminationClosure.processNode(PEReadEliminationClosure.java:103)
+	org.graalvm.compiler.virtual.phases.ea.PEReadEliminationClosure.processNode(PEReadEliminationClosure.java:80)
+	org.graalvm.compiler.virtual.phases.ea.EffectsClosure.processBlock(EffectsClosure.java:254)
+	org.graalvm.compiler.virtual.phases.ea.EffectsClosure.processBlock(EffectsClosure.java:69)
+TRACE 302636:
+	org.graalvm.compiler.graph.NodeClass$RawEdgesIterator.forward(NodeClass.java:1028)
+	org.graalvm.compiler.graph.NodeClass$RawEdgesIterator.hasNext(NodeClass.java:1016)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processInputs(SchedulePhase.java:1144)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processStack(SchedulePhase.java:951)
+TRACE 301809:
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processNode(CanonicalizerPhase.java:324)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processWorkSet(CanonicalizerPhase.java:302)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.run(CanonicalizerPhase.java:264)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase.run(CanonicalizerPhase.java:177)
+TRACE 302493:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.buildIntervals(LinearScanLifetimeAnalysisPhase.java:809)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.run(LinearScanLifetimeAnalysisPhase.java:95)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAllocationPhase.apply(LinearScanAllocationPhase.java:53)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAllocationPhase.apply(LinearScanAllocationPhase.java:46)
+TRACE 302720:
+	org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs(GraphUtil.java:351)
+	org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs(GraphUtil.java:321)
+	org.graalvm.compiler.nodes.util.GraphUtil.tryKillUnused(GraphUtil.java:885)
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.cleanupGraph(SimplifyingGraphDecoder.java:162)
+TRACE 303106:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanOptimizeSpillPositionPhase.optimizeInterval(LinearScanOptimizeSpillPositionPhase.java:109)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanOptimizeSpillPositionPhase.optimizeSpillPosition(LinearScanOptimizeSpillPositionPhase.java:71)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanOptimizeSpillPositionPhase.run(LinearScanOptimizeSpillPositionPhase.java:62)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAllocationPhase.apply(LinearScanAllocationPhase.java:53)
+TRACE 302810:
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.putHashEntry(EconomicMapImpl.java:577)
+	org.graalvm.collections.EconomicMapImpl.createHash(EconomicMapImpl.java:571)
+	org.graalvm.collections.EconomicMapImpl.putHashEntry(EconomicMapImpl.java:580)
+TRACE 302868:
+	com.oracle.truffle.r.nodes.function.RCallSpecialNode.execute(RCallSpecialNode.java:326)
+	com.oracle.truffle.r.nodes.function.RCallSpecialNode.execute(RCallSpecialNode.java:388)
+	com.oracle.truffle.r.runtime.nodes.RNode.voidExecute(RNode.java:66)
+	com.oracle.truffle.r.nodes.control.IfNode.voidExecute(IfNode.java:69)
+TRACE 302809:
+	org.graalvm.compiler.phases.common.LoweringPhase$Round.process(LoweringPhase.java:508)
+	org.graalvm.compiler.phases.common.LoweringPhase$Round.access$200(LoweringPhase.java:355)
+	org.graalvm.compiler.phases.common.LoweringPhase$Round$ProcessFrame.preprocess(LoweringPhase.java:419)
+	org.graalvm.compiler.phases.common.LoweringPhase.processBlock(LoweringPhase.java:578)
+TRACE 302822:
+	jdk.vm.ci.hotspot.CompilerToVM.interpreterFrameSize(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotCodeCacheProvider.interpreterFrameSize(HotSpotCodeCacheProvider.java:195)
+	org.graalvm.compiler.hotspot.HotSpotDebugInfoBuilder.computeFrameForState(HotSpotDebugInfoBuilder.java:132)
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.build(DebugInfoBuilder.java:105)
+TRACE 301394:
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:79)
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:35)
+	org.graalvm.compiler.truffle.runtime.OptimizedBlockNode.executeVoid(OptimizedBlockNode.java:118)
+	com.oracle.truffle.r.nodes.control.RBlockNode.voidExecute(RBlockNode.java:57)
+TRACE 301976:
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:298)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processIf(ConditionalEliminationPhase.java:431)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNode(ConditionalEliminationPhase.java:506)
+TRACE 300955:
+	org.antlr.v4.runtime.misc.Array2DHashSet.getOrAdd(Array2DHashSet.java:58)
+	org.antlr.v4.runtime.atn.ATNConfigSet.add(ATNConfigSet.java:146)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closure_(ParserATNSimulator.java:1529)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closureCheckingStopState(ParserATNSimulator.java:1513)
+TRACE 302465:
+	org.graalvm.compiler.graph.NodeClass.applyHelper(NodeClass.java:1295)
+	org.graalvm.compiler.graph.NodeClass.applyEdges(NodeClass.java:1286)
+	org.graalvm.compiler.graph.NodeClass.applyInputs(NodeClass.java:1270)
+	org.graalvm.compiler.graph.Node.applyInputs(Node.java:355)
+TRACE 302686:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScan.allocate(LinearScan.java:694)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanPhase.run(LinearScanPhase.java:42)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanPhase.run(LinearScanPhase.java:35)
+	org.graalvm.compiler.lir.phases.LIRPhase.apply(LIRPhase.java:117)
+TRACE 302942:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative(SchedulePhase.java:880)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:196)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+	org.graalvm.compiler.phases.Phase.run(Phase.java:49)
+TRACE 303472:
+	org.graalvm.compiler.lir.LIRInstruction.visitEachState(LIRInstruction.java:340)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.computeLocalLiveSets(LinearScanLifetimeAnalysisPhase.java:241)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.run(LinearScanLifetimeAnalysisPhase.java:93)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAllocationPhase.apply(LinearScanAllocationPhase.java:53)
+TRACE 301764:
+	jdk.vm.ci.hotspot.CompilerToVM.hasNeverInlineDirective(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.hasNeverInlineDirective(HotSpotResolvedJavaMethodImpl.java:598)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.canBeInlined(HotSpotResolvedJavaMethodImpl.java:590)
+	org.graalvm.compiler.replacements.InlineDuringParsingPlugin.shouldInlineInvoke(InlineDuringParsingPlugin.java:64)
+TRACE 302413:
+	jdk.vm.ci.hotspot.CompilerToVM.getComponentType(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getComponentType(HotSpotResolvedObjectTypeImpl.java:157)
+	org.graalvm.compiler.nodes.java.StoreIndexedNode.virtualize(StoreIndexedNode.java:106)
+	org.graalvm.compiler.virtual.phases.ea.PartialEscapeClosure.virtualize(PartialEscapeClosure.java:259)
+TRACE 302770:
+	org.graalvm.compiler.core.common.Fields.copy(Fields.java:125)
+	org.graalvm.compiler.core.common.Fields.copy(Fields.java:112)
+	org.graalvm.compiler.graph.Node.clone(Node.java:1064)
+	org.graalvm.compiler.graph.NodeClass.createNodeDuplicates(NodeClass.java:933)
+TRACE 305370:
+	com.oracle.truffle.r.runtime.data.RIntVector.getDataAt(RIntVector.java:181)
+	com.oracle.truffle.r.runtime.data.RIntVector$1.getIntImpl(RIntVector.java:410)
+	com.oracle.truffle.r.runtime.data.nodes.VectorAccess.getInt(VectorAccess.java:323)
+	com.oracle.truffle.r.runtime.data.nodes.SlowPathVectorAccess$SlowPathFromIntAccess.setFromSameTypeImpl(SlowPathVectorAccess.java:117)
+TRACE 301906:
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processNode(CanonicalizerPhase.java:324)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processWorkSet(CanonicalizerPhase.java:302)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.run(CanonicalizerPhase.java:264)
+	org.graalvm.compiler.phases.Phase.run(Phase.java:49)
+TRACE 302221:
+	jdk.vm.ci.hotspot.CompilerToVM.getSymbol(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupUtf8(HotSpotConstantPool.java:549)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupField(HotSpotConstantPool.java:620)
+	org.graalvm.compiler.java.BytecodeParser.lookupField(BytecodeParser.java:4302)
+TRACE 302535:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processNodes(SchedulePhase.java:908)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative(SchedulePhase.java:815)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:196)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+TRACE 302226:
+	org.graalvm.compiler.lir.ValueConsumer.visitValue(ValueConsumer.java:51)
+	org.graalvm.compiler.lir.LIRFrameState.visitValues(LIRFrameState.java:157)
+	org.graalvm.compiler.lir.LIRFrameState.visitEachState(LIRFrameState.java:105)
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachState(LIRInstructionClass.java:291)
+TRACE 302316:
+	org.graalvm.compiler.graph.NodeClass.dataEquals(NodeClass.java:687)
+	org.graalvm.compiler.graph.Node.valueEquals(Node.java:1358)
+	org.graalvm.compiler.graph.Graph$1.equals(Graph.java:137)
+	org.graalvm.collections.EconomicMapImpl.compareKeys(EconomicMapImpl.java:278)
+TRACE 302668:
+	org.graalvm.compiler.graph.NodeClass.applyEdges(NodeClass.java:1289)
+	org.graalvm.compiler.graph.NodeClass.applySuccessors(NodeClass.java:1266)
+	org.graalvm.compiler.graph.Node.applySuccessors(Node.java:364)
+	org.graalvm.compiler.phases.common.DeadCodeEliminationPhase.iterateSuccessorsAndInputs(DeadCodeEliminationPhase.java:121)
+TRACE 304326:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveCollectMappings(LinearScanResolveDataFlowPhase.java:76)
+	org.graalvm.compiler.lir.alloc.lsra.ssa.SSALinearScanResolveDataFlowPhase.resolveCollectMappings(SSALinearScanResolveDataFlowPhase.java:58)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveDataFlow0(LinearScanResolveDataFlowPhase.java:202)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveDataFlow(LinearScanResolveDataFlowPhase.java:136)
+TRACE 304849:
+	com.oracle.truffle.r.runtime.rng.RRNG.unifRand(RRNG.java:288)
+	com.oracle.truffle.r.runtime.rng.RRNG.rbits(RRNG.java:319)
+	com.oracle.truffle.r.runtime.rng.RRNG.unifIndex(RRNG.java:344)
+	com.oracle.truffle.r.runtime.rng.RRNG.unifIndex(RRNG.java:329)
+TRACE 305016:
+	com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached(IsNA.java:121)
+	com.oracle.truffle.r.nodes.builtin.base.IsNANodeGen.execute(IsNANodeGen.java:139)
+	com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg1.call(RBuiltinNode.java:174)
+	com.oracle.truffle.r.nodes.function.RCallNode$BuiltinCallNode.execute(RCallNode.java:1158)
+TRACE 301021:
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.findHash(EconomicMapImpl.java:285)
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:254)
+	org.graalvm.collections.EconomicMapImpl.containsKey(EconomicMapImpl.java:608)
+TRACE 302355:
+	com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.executeInternal(ReadVariableNode.java:270)
+	com.oracle.truffle.r.nodes.access.variables.LookupNode.execute(ReadVariableNode.java:107)
+	com.oracle.truffle.r.nodes.function.RCallNodeGen.execute(RCallNodeGen.java:168)
+	com.oracle.truffle.r.nodes.access.WriteLocalFrameVariableNodeGen.execute_generic3(WriteLocalFrameVariableNodeGen.java:114)
+TRACE 302597:
+	org.graalvm.compiler.replacements.PEGraphDecoder.canonicalizeFixedNode(PEGraphDecoder.java:1277)
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.handleFixedNode(SimplifyingGraphDecoder.java:188)
+	org.graalvm.compiler.replacements.PEGraphDecoder.handleFixedNode(PEGraphDecoder.java:1167)
+	org.graalvm.compiler.nodes.GraphDecoder.processNextNode(GraphDecoder.java:761)
+TRACE 302680:
+	org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.process(ConstantTreeAnalyzer.java:126)
+	org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.analyzeBlocks(ConstantTreeAnalyzer.java:99)
+	org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.analyze(ConstantTreeAnalyzer.java:50)
+	org.graalvm.compiler.lir.constopt.ConstantLoadOptimization$Optimization.createConstantTree(ConstantLoadOptimization.java:291)
+TRACE 304842:
+	com.oracle.truffle.r.runtime.rng.RRNG.getContextState(RRNG.java:253)
+	com.oracle.truffle.r.runtime.rng.RRNG.currentGenerator(RRNG.java:273)
+	com.oracle.truffle.r.runtime.rng.RRNG.unifRand(RRNG.java:288)
+	com.oracle.truffle.r.runtime.rng.RRNG.rbits(RRNG.java:319)
+TRACE 302203:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks(ControlFlowGraph.java:547)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:82)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:187)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+TRACE 302484:
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:298)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processGuard(ConditionalEliminationPhase.java:326)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNode(ConditionalEliminationPhase.java:502)
+TRACE 303095:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.freeCollectInactiveAny(LinearScanWalker.java:206)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocFreeRegister(LinearScanWalker.java:711)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.activateCurrent(LinearScanWalker.java:1059)
+	org.graalvm.compiler.lir.alloc.lsra.IntervalWalker.walkTo(IntervalWalker.java:241)
+TRACE 303306:
+	org.graalvm.compiler.graph.iterators.PredicatedProxyNodeIterator.forward(PredicatedProxyNodeIterator.java:44)
+	org.graalvm.compiler.graph.iterators.NodeIterator.hasNext(NodeIterator.java:40)
+	org.graalvm.compiler.virtual.phases.ea.PartialEscapeClosure$MergeProcessor.merge(PartialEscapeClosure.java:795)
+	org.graalvm.compiler.virtual.phases.ea.PEReadEliminationClosure$ReadEliminationMergeProcessor.merge(PEReadEliminationClosure.java:368)
+TRACE 303307:
+	org.graalvm.compiler.virtual.phases.ea.PartialEscapeClosure.collectLockedVirtualObjects(PartialEscapeClosure.java:420)
+	org.graalvm.compiler.virtual.phases.ea.PartialEscapeClosure.processNodeWithState(PartialEscapeClosure.java:376)
+	org.graalvm.compiler.virtual.phases.ea.PartialEscapeClosure.processNodeInputs(PartialEscapeClosure.java:367)
+	org.graalvm.compiler.virtual.phases.ea.PartialEscapeClosure.processNodeInternal(PartialEscapeClosure.java:238)
+TRACE 303442:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks(ControlFlowGraph.java:465)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:82)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:187)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+TRACE 300945:
+	org.antlr.v4.runtime.atn.PredictionMode.getConflictingAltSubsets(PredictionMode.java:552)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.execATNWithFullContext(ParserATNSimulator.java:684)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.execATN(ParserATNSimulator.java:505)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.adaptivePredict(ParserATNSimulator.java:393)
+TRACE 303078:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative(SchedulePhase.java:886)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:196)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+	org.graalvm.compiler.phases.Phase.run(Phase.java:49)
+TRACE 303633:
+	org.graalvm.compiler.nodes.java.InstanceOfNode.implies(InstanceOfNode.java:255)
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processGuard(ConditionalEliminationPhase.java:326)
+TRACE 305017:
+	com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached(IsNA.java:145)
+	com.oracle.truffle.r.nodes.builtin.base.IsNANodeGen.execute(IsNANodeGen.java:139)
+	com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg1.call(RBuiltinNode.java:174)
+	com.oracle.truffle.r.nodes.function.RCallNode$BuiltinCallNode.execute(RCallNode.java:1158)
+TRACE 305101:
+	com.oracle.truffle.r.runtime.data.RDoubleVector.<init>(RDoubleVector.java:58)
+	com.oracle.truffle.r.runtime.data.RDataFactory.createDoubleVector(RDataFactory.java:830)
+	com.oracle.truffle.r.runtime.data.RDataFactory.createDoubleVector(RDataFactory.java:826)
+	com.oracle.truffle.r.runtime.data.RDataFactory.createDoubleVector(RDataFactory.java:822)
+TRACE 300942:
+	org.antlr.v4.runtime.misc.FlexibleHashMap.expand(FlexibleHashMap.java:194)
+	org.antlr.v4.runtime.misc.FlexibleHashMap.put(FlexibleHashMap.java:98)
+	org.antlr.v4.runtime.misc.FlexibleHashMap.expand(FlexibleHashMap.java:194)
+	org.antlr.v4.runtime.misc.FlexibleHashMap.put(FlexibleHashMap.java:98)
+TRACE 302451:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processStack(SchedulePhase.java:969)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processNodes(SchedulePhase.java:906)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative(SchedulePhase.java:815)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:196)
+TRACE 302791:
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNodes(ConditionalEliminationPhase.java:456)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.enter(ConditionalEliminationPhase.java:448)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.enter(ConditionalEliminationPhase.java:263)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.visitDominatorTreeDeferLoopExits(ControlFlowGraph.java:256)
+TRACE 304085:
+	com.oracle.truffle.api.library.LibraryFactory.getUncached(LibraryFactory.java:291)
+	com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibraryGen$UncachedDispatch.isWriteable(RDoubleVectorDataLibraryGen.java:1118)
+	com.oracle.truffle.r.runtime.data.RDoubleVector.isMaterialized(RDoubleVector.java:111)
+	com.oracle.truffle.r.nodes.attributes.CopyAttributesNode.containsMetadata(CopyAttributesNode.java:72)
+TRACE 305023:
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doSameLength(BinaryMapNode.java:500)
+	com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNodeGen.execute(VectorMapBinaryInternalNodeGen.java:59)
+	com.oracle.truffle.r.nodes.primitive.BinaryMapVectorNode.apply(BinaryMapNode.java:247)
+	com.oracle.truffle.r.nodes.binary.BinaryBooleanNode.doNumericVectorCached(BinaryBooleanNode.java:118)
+TRACE 301492:
+	com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.executeInternal(ReadVariableNode.java:270)
+	com.oracle.truffle.r.nodes.access.variables.LookupNode.execute(ReadVariableNode.java:107)
+	com.oracle.truffle.r.nodes.function.RCallNodeGen.execute(RCallNodeGen.java:168)
+	com.oracle.truffle.r.runtime.nodes.RNode.executeByte(RNode.java:94)
+TRACE 302449:
+	java.lang.System.identityHashCode(System.java:Unknown line)
+	org.graalvm.compiler.virtual.phases.ea.PEReadEliminationBlockState$ReadCacheEntry.hashCode(PEReadEliminationBlockState.java:71)
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.putHashEntry(EconomicMapImpl.java:577)
+TRACE 303331:
+	org.graalvm.compiler.graph.NodeClass$RawEdgesIterator.forward(NodeClass.java:1028)
+	org.graalvm.compiler.graph.NodeClass$RawEdgesIterator.hasNext(NodeClass.java:1016)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processNodes(SchedulePhase.java:904)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative(SchedulePhase.java:815)
+TRACE 301162:
+	java.lang.String.intern(String.java:Unknown line)
+	com.oracle.truffle.r.runtime.Utils.intern(Utils.java:726)
+	com.oracle.truffle.r.runtime.ArgumentsSignature.<init>(ArgumentsSignature.java:112)
+	com.oracle.truffle.r.runtime.ArgumentsSignature.get(ArgumentsSignature.java:88)
+TRACE 302545:
+	org.graalvm.collections.EconomicMapImpl.add(EconomicMapImpl.java:866)
+	org.graalvm.compiler.nodes.util.GraphUtil.markFixedNodes(GraphUtil.java:152)
+	org.graalvm.compiler.nodes.util.GraphUtil.killCFGInner(GraphUtil.java:119)
+	org.graalvm.compiler.nodes.util.GraphUtil.killCFG(GraphUtil.java:267)
+TRACE 302641:
+	org.graalvm.compiler.graph.NodeClass.applyEdges(NodeClass.java:1289)
+	org.graalvm.compiler.graph.NodeClass.applyInputs(NodeClass.java:1270)
+	org.graalvm.compiler.graph.Node.applyInputs(Node.java:355)
+	org.graalvm.compiler.phases.common.DeadCodeEliminationPhase.deleteNodes(DeadCodeEliminationPhase.java:142)
+TRACE 302697:
+	org.graalvm.compiler.lir.LIRFrameState.visitEachState(LIRFrameState.java:104)
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachState(LIRInstructionClass.java:291)
+	org.graalvm.compiler.lir.LIRInstruction.visitEachState(LIRInstruction.java:340)
+	org.graalvm.compiler.lir.dfa.LocationMarker.processInstructionBottomUp(LocationMarker.java:149)
+TRACE 303504:
+	org.graalvm.compiler.lir.alloc.lsra.Interval$RegisterBindingLists.addToListSortedByStartAndUsePositions(Interval.java:164)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitBeforeUsage(LinearScanWalker.java:483)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitAndSpillInterval(LinearScanWalker.java:685)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitAndSpillIntersectingIntervals(LinearScanWalker.java:796)
+TRACE 301761:
+	jdk.vm.ci.hotspot.CompilerToVM.getImplementor(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getSingleImplementor(HotSpotResolvedObjectTypeImpl.java:293)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getSingleImplementor(HotSpotResolvedObjectTypeImpl.java:60)
+	org.graalvm.compiler.nodes.java.MethodCallTargetNode.simplify(MethodCallTargetNode.java:198)
+TRACE 302114:
+	com.oracle.truffle.r.nodes.builtin.base.Return.doReturn(Return.java:96)
+	com.oracle.truffle.r.nodes.builtin.base.ReturnSpecial.execute(Return.java:64)
+	com.oracle.truffle.r.nodes.function.RCallSpecialNode.execute(RCallSpecialNode.java:326)
+	com.oracle.truffle.r.nodes.function.RCallSpecialNode.execute(RCallSpecialNode.java:388)
+TRACE 302716:
+	org.graalvm.compiler.nodes.GraphDecoder.makeFixedNodeInputs(GraphDecoder.java:1247)
+	org.graalvm.compiler.nodes.GraphDecoder.processNextNode(GraphDecoder.java:639)
+	org.graalvm.compiler.nodes.GraphDecoder.decode(GraphDecoder.java:508)
+	org.graalvm.compiler.replacements.PEGraphDecoder.decode(PEGraphDecoder.java:641)
+TRACE 302733:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlock(ControlFlowGraph.java:455)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks(ControlFlowGraph.java:467)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:82)
+	org.graalvm.compiler.loop.LoopsData.<init>(LoopsData.java:52)
+TRACE 302848:
+	org.graalvm.compiler.lir.RedundantMoveElimination$Optimization.updateState(RedundantMoveElimination.java:400)
+	org.graalvm.compiler.lir.RedundantMoveElimination$Optimization.solveDataFlow(RedundantMoveElimination.java:296)
+	org.graalvm.compiler.lir.RedundantMoveElimination$Optimization.doOptimize(RedundantMoveElimination.java:159)
+	org.graalvm.compiler.lir.RedundantMoveElimination$Optimization.access$000(RedundantMoveElimination.java:107)
+TRACE 302886:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.sortNodesLatestWithinBlock(SchedulePhase.java:436)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.sortNodesLatestWithinBlock(SchedulePhase.java:398)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:206)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+TRACE 302956:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.spillCollectInactiveAny(LinearScanWalker.java:264)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocLockedRegister(LinearScanWalker.java:829)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.activateCurrent(LinearScanWalker.java:1062)
+	org.graalvm.compiler.lir.alloc.lsra.IntervalWalker.walkTo(IntervalWalker.java:241)
+TRACE 303267:
+	org.graalvm.compiler.nodes.GraphDecoder.makeFloatingNodeInputs(GraphDecoder.java:1289)
+	org.graalvm.compiler.nodes.GraphDecoder.decodeFloatingNode(GraphDecoder.java:1367)
+	org.graalvm.compiler.nodes.GraphDecoder.ensureNodeCreated(GraphDecoder.java:1318)
+	org.graalvm.compiler.nodes.GraphDecoder.makeFixedNodeInputs(GraphDecoder.java:1247)
+TRACE 304245:
+	org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.processEnd(FixReadsPhase.java:369)
+	org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.processNode(FixReadsPhase.java:281)
+	org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.enter(FixReadsPhase.java:580)
+	org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.enter(FixReadsPhase.java:145)
+TRACE 305380:
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doDoubleCached(UnaryArithmeticReduceNode.java:330)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeAndSpecialize(UnaryArithmeticReduceNodeGen.java:477)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeReduce(UnaryArithmeticReduceNodeGen.java:283)
+	com.oracle.truffle.r.nodes.builtin.base.Sum.sumLengthOne(Sum.java:120)
+TRACE 300635:
+	sun.misc.Unsafe.defineAnonymousClass(Unsafe.java:Unknown line)
+	java.lang.invoke.InnerClassLambdaMetafactory.spinInnerClass(InnerClassLambdaMetafactory.java:326)
+	java.lang.invoke.InnerClassLambdaMetafactory.buildCallSite(InnerClassLambdaMetafactory.java:194)
+	java.lang.invoke.LambdaMetafactory.metafactory(LambdaMetafactory.java:304)
+TRACE 302729:
+	org.graalvm.compiler.core.common.spi.JavaConstantFieldProvider.isStableField(JavaConstantFieldProvider.java:122)
+	org.graalvm.compiler.hotspot.meta.HotSpotConstantFieldProvider.isStableField(HotSpotConstantFieldProvider.java:60)
+	org.graalvm.compiler.core.common.spi.JavaConstantFieldProvider.readConstantField(JavaConstantFieldProvider.java:77)
+	org.graalvm.compiler.truffle.compiler.TruffleConstantFieldProvider.readConstantFieldFast(TruffleConstantFieldProvider.java:103)
+TRACE 302843:
+	org.graalvm.compiler.lir.stackslotalloc.FixPointIntervalBuilder.markOutInterval(FixPointIntervalBuilder.java:168)
+	org.graalvm.compiler.lir.stackslotalloc.FixPointIntervalBuilder.processBlock(FixPointIntervalBuilder.java:124)
+	org.graalvm.compiler.lir.stackslotalloc.FixPointIntervalBuilder.build(FixPointIntervalBuilder.java:94)
+	org.graalvm.compiler.lir.stackslotalloc.LSStackSlotAllocator$Allocator.buildIntervals(LSStackSlotAllocator.java:219)
+TRACE 303227:
+	org.graalvm.compiler.phases.graph.ScheduledNodeIterator.processNodes(ScheduledNodeIterator.java:66)
+	org.graalvm.compiler.phases.common.FixReadsPhase.run(FixReadsPhase.java:610)
+	org.graalvm.compiler.phases.common.FixReadsPhase.run(FixReadsPhase.java:92)
+	org.graalvm.compiler.phases.BasePhase.apply(BasePhase.java:209)
+TRACE 300158:
+	java.util.zip.ZipFile.read(ZipFile.java:Unknown line)
+	java.util.zip.ZipFile.access$1400(ZipFile.java:60)
+	java.util.zip.ZipFile$ZipFileInputStream.read(ZipFile.java:734)
+	sun.misc.Resource.getBytes(Resource.java:124)
+TRACE 301322:
+	java.lang.String.intern(String.java:Unknown line)
+	com.oracle.truffle.r.runtime.Utils.intern(Utils.java:726)
+	com.oracle.truffle.r.runtime.RSerialize$Input.setAttributes(RSerialize.java:1074)
+	com.oracle.truffle.r.runtime.RSerialize$Input.readItem(RSerialize.java:735)
+TRACE 301656:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupType(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotJVMCIRuntime.lookupTypeInternal(HotSpotJVMCIRuntime.java:635)
+	jdk.vm.ci.hotspot.HotSpotJVMCIRuntime.lookupType(HotSpotJVMCIRuntime.java:622)
+	jdk.vm.ci.hotspot.HotSpotSignature.getReturnType(HotSpotSignature.java:198)
+TRACE 302001:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlock(ControlFlowGraph.java:455)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks(ControlFlowGraph.java:467)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:82)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:187)
+TRACE 302685:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase.colorLirOperand(LinearScanAssignLocationsPhase.java:109)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase.debugInfoProcedure(LinearScanAssignLocationsPhase.java:149)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase.access$000(LinearScanAssignLocationsPhase.java:59)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase$2.doValue(LinearScanAssignLocationsPhase.java:189)
+TRACE 300257:
+	java.lang.Class.forName0(Class.java:Unknown line)
+	java.lang.Class.forName(Class.java:348)
+	sun.reflect.generics.factory.CoreReflectionFactory.makeNamedType(CoreReflectionFactory.java:114)
+	sun.reflect.generics.visitor.Reifier.visitClassTypeSignature(Reifier.java:125)
+TRACE 301134:
+	com.oracle.truffle.nfi.impl.NFIContext.executePrimitive(NFIContext.java:Unknown line)
+	com.oracle.truffle.nfi.impl.NFIContext.executePrimitive(NFIContext.java:286)
+	com.oracle.truffle.nfi.impl.LibFFISignature.execute(LibFFISignature.java:186)
+	com.oracle.truffle.nfi.impl.FunctionExecuteNode$SlowPathExecuteNode.slowPathExecute(FunctionExecuteNode.java:265)
+TRACE 301200:
+	java.lang.String.intern(String.java:Unknown line)
+	com.oracle.truffle.r.runtime.Utils.intern(Utils.java:726)
+	com.oracle.truffle.r.runtime.data.RDataFactory.createSymbolInterned(RDataFactory.java:1200)
+	com.oracle.truffle.r.runtime.RSerialize$Input.readItem(RSerialize.java:949)
+TRACE 301617:
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:79)
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:35)
+	org.graalvm.compiler.truffle.runtime.OptimizedBlockNode.executeGeneric(OptimizedBlockNode.java:77)
+	com.oracle.truffle.r.nodes.control.RBlockNode.visibleExecute(RBlockNode.java:62)
+TRACE 301657:
+	jdk.vm.ci.hotspot.CompilerToVM.getImplementor(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getSingleImplementor(HotSpotResolvedObjectTypeImpl.java:293)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.findLeafConcreteSubtype(HotSpotResolvedObjectTypeImpl.java:182)
+	org.graalvm.compiler.core.common.type.TypeReference.createTrusted(TypeReference.java:105)
+TRACE 302302:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupKlassInPool(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupType(HotSpotConstantPool.java:606)
+	org.graalvm.compiler.java.BytecodeParser.lookupType(BytecodeParser.java:4248)
+	org.graalvm.compiler.java.BytecodeParser.genCheckCast(BytecodeParser.java:4372)
+TRACE 302527:
+	org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.replaceConstantInputs(FixReadsPhase.java:253)
+	org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.processNode(FixReadsPhase.java:261)
+	org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.enter(FixReadsPhase.java:580)
+	org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.enter(FixReadsPhase.java:145)
+TRACE 302927:
+	com.oracle.truffle.r.nodes.builtin.base.S3DispatchFunctions$UseMethod.execute(S3DispatchFunctions.java:198)
+	com.oracle.truffle.r.nodes.builtin.base.S3DispatchFunctionsFactory$UseMethodNodeGen.execute(S3DispatchFunctionsFactory.java:32)
+	com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg2.call(RBuiltinNode.java:187)
+	com.oracle.truffle.r.nodes.function.RCallNode$BuiltinCallNode.execute(RCallNode.java:1158)
+TRACE 303148:
+	org.graalvm.compiler.nodes.GraphDecoder.readProperties(GraphDecoder.java:1216)
+	org.graalvm.compiler.nodes.GraphDecoder.processNextNode(GraphDecoder.java:640)
+	org.graalvm.compiler.nodes.GraphDecoder.decode(GraphDecoder.java:508)
+	org.graalvm.compiler.replacements.PEGraphDecoder.decode(PEGraphDecoder.java:641)
+TRACE 303302:
+	org.graalvm.compiler.nodes.StructuredGraph.maybeCompress(StructuredGraph.java:447)
+	org.graalvm.compiler.truffle.compiler.PartialEvaluator.fastPartialEvaluation(PartialEvaluator.java:652)
+	org.graalvm.compiler.truffle.compiler.PartialEvaluator.createGraph(PartialEvaluator.java:284)
+	org.graalvm.compiler.truffle.compiler.TruffleCompilerImpl.compileAST(TruffleCompilerImpl.java:467)
+TRACE 303396:
+	org.graalvm.compiler.virtual.phases.ea.EffectList.apply(EffectList.java:179)
+	org.graalvm.compiler.virtual.phases.ea.EffectsClosure.applyEffects(EffectsClosure.java:189)
+	org.graalvm.compiler.virtual.phases.ea.EffectsPhase.runAnalysis(EffectsPhase.java:100)
+	org.graalvm.compiler.virtual.phases.ea.PartialEscapePhase.run(PartialEscapePhase.java:82)
+TRACE 303469:
+	org.graalvm.compiler.lir.LIRIntrospection.visitEach(LIRIntrospection.java:273)
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachAlive(LIRInstructionClass.java:267)
+	org.graalvm.compiler.lir.LIRInstruction.visitEachAlive(LIRInstruction.java:328)
+	org.graalvm.compiler.lir.dfa.LocationMarker.processInstructionBottomUp(LocationMarker.java:148)
+TRACE 303518:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveCollectMappings(LinearScanResolveDataFlowPhase.java:76)
+	org.graalvm.compiler.lir.alloc.lsra.ssa.SSALinearScanResolveDataFlowPhase.resolveCollectMappings(SSALinearScanResolveDataFlowPhase.java:58)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.optimizeEmptyBlocks(LinearScanResolveDataFlowPhase.java:168)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveDataFlow(LinearScanResolveDataFlowPhase.java:134)
+TRACE 304845:
+	com.oracle.truffle.r.nodes.builtin.base.Sample.doSample(Sample.java:148)
+	com.oracle.truffle.r.nodes.builtin.base.SampleNodeGen.executeAndSpecialize(SampleNodeGen.java:131)
+	com.oracle.truffle.r.nodes.builtin.base.SampleNodeGen.execute(SampleNodeGen.java:77)
+	com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg4.call(RBuiltinNode.java:213)
+TRACE 300962:
+	org.antlr.v4.runtime.misc.FlexibleHashMap.expand(FlexibleHashMap.java:195)
+	org.antlr.v4.runtime.misc.FlexibleHashMap.put(FlexibleHashMap.java:98)
+	org.antlr.v4.runtime.atn.PredictionMode.getConflictingAltSubsets(PredictionMode.java:552)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.execATNWithFullContext(ParserATNSimulator.java:684)
+TRACE 302110:
+	com.oracle.truffle.r.nodes.function.FunctionBodyNode.visibleExecute(FunctionBodyNode.java:68)
+	com.oracle.truffle.r.nodes.function.FunctionDefinitionNode.execute(FunctionDefinitionNode.java:282)
+	org.graalvm.compiler.truffle.runtime.OptimizedCallTarget.callProxy(OptimizedCallTarget.java:474)
+	org.graalvm.compiler.truffle.runtime.OptimizedCallTarget.callRoot(OptimizedCallTarget.java:449)
+TRACE 302253:
+	com.oracle.truffle.r.nodes.function.RCallNode$BuiltinCallNode.forceArgPromises(RCallNode.java:1078)
+	com.oracle.truffle.r.nodes.function.RCallNode$BuiltinCallNode.execute(RCallNode.java:1158)
+	com.oracle.truffle.r.nodes.function.RCallNode$FunctionDispatch.dispatch(RCallNode.java:920)
+	com.oracle.truffle.r.nodes.function.RCallNodeGen$FunctionDispatchNodeGen.execute(RCallNodeGen.java:858)
+TRACE 302736:
+	org.graalvm.compiler.virtual.phases.ea.PEReadEliminationClosure.processNode(PEReadEliminationClosure.java:80)
+	org.graalvm.compiler.virtual.phases.ea.EffectsClosure.processBlock(EffectsClosure.java:254)
+	org.graalvm.compiler.virtual.phases.ea.EffectsClosure.processBlock(EffectsClosure.java:69)
+	org.graalvm.compiler.phases.graph.ReentrantBlockIterator.apply(ReentrantBlockIterator.java:125)
+TRACE 302794:
+	com.oracle.truffle.r.nodes.control.IfNode.voidExecute(IfNode.java:69)
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:79)
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:35)
+	org.graalvm.compiler.truffle.runtime.OptimizedBlockNode.executeVoid(OptimizedBlockNode.java:118)
+TRACE 303164:
+	org.graalvm.compiler.phases.common.inlining.walker.ComputeInliningRelevance$Scope.process(ComputeInliningRelevance.java:238)
+	org.graalvm.compiler.phases.common.inlining.walker.ComputeInliningRelevance.compute(ComputeInliningRelevance.java:102)
+	org.graalvm.compiler.phases.common.inlining.walker.CallsiteHolderExplorable.computeProbabilities(CallsiteHolderExplorable.java:206)
+	org.graalvm.compiler.phases.common.inlining.walker.InliningData.doInline(InliningData.java:431)
+TRACE 303416:
+	org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.analyzeBlocks(ConstantTreeAnalyzer.java:99)
+	org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.analyze(ConstantTreeAnalyzer.java:50)
+	org.graalvm.compiler.lir.constopt.ConstantLoadOptimization$Optimization.createConstantTree(ConstantLoadOptimization.java:291)
+	org.graalvm.compiler.lir.constopt.ConstantLoadOptimization$Optimization$$Lambda$19.531239822.accept(<Unknown Source>:Unknown line)
+TRACE 302023:
+	com.oracle.truffle.r.nodes.function.call.PrepareArguments$PrepareArgumentsDefault.executeArgs(PrepareArguments.java:103)
+	com.oracle.truffle.r.nodes.function.call.PrepareArguments$PrepareArgumentsDefault.prepare(PrepareArguments.java:129)
+	com.oracle.truffle.r.nodes.function.call.PrepareArgumentsFactory$PrepareArgumentsDefaultNodeGen.execute(PrepareArgumentsFactory.java:47)
+	com.oracle.truffle.r.nodes.function.RCallNode$FunctionDispatch.dispatch(RCallNode.java:919)
+TRACE 302554:
+	com.oracle.truffle.api.TruffleFile.checkAccess(TruffleFile.java:1937)
+	com.oracle.truffle.api.TruffleFile.exists(TruffleFile.java:282)
+	com.oracle.truffle.r.runtime.context.RContext.getSafeTruffleFile(RContext.java:982)
+	com.oracle.truffle.r.runtime.RSource.fromSrcfile(RSource.java:188)
+TRACE 302568:
+	com.oracle.truffle.r.runtime.RSource.fromSrcfile(RSource.java:196)
+	com.oracle.truffle.r.runtime.RSerialize.handleSrcrefAttr(RSerialize.java:3008)
+	com.oracle.truffle.r.runtime.RSerialize.handleSrcrefAttr(RSerialize.java:2987)
+	com.oracle.truffle.r.runtime.RSerialize.access$2700(RSerialize.java:135)
+TRACE 302675:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.calcLatestBlock(SchedulePhase.java:587)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.calcLatestBlocks(SchedulePhase.java:273)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:205)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+TRACE 303006:
+	jdk.vm.ci.hotspot.HotSpotJVMCIRuntime.fromClass0(HotSpotJVMCIRuntime.java:500)
+	jdk.vm.ci.hotspot.HotSpotJVMCIRuntime.fromClass(HotSpotJVMCIRuntime.java:513)
+	jdk.vm.ci.hotspot.HotSpotJDKReflection.getType(HotSpotJDKReflection.java:187)
+	jdk.vm.ci.hotspot.HotSpotObjectConstantImpl.getType(HotSpotObjectConstantImpl.java:62)
+TRACE 303013:
+	org.graalvm.compiler.graph.NodeWorkList$IterativeNodeWorkList.inflateToBitMap(NodeWorkList.java:194)
+	org.graalvm.compiler.graph.NodeWorkList$IterativeNodeWorkList.add(NodeWorkList.java:135)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance$Tool.addToWorkList(CanonicalizerPhase.java:556)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.performReplacement(CanonicalizerPhase.java:473)
+TRACE 303238:
+	org.graalvm.compiler.lir.ValueConsumer.visitValue(ValueConsumer.java:51)
+	org.graalvm.compiler.lir.LIRIntrospection.visitEach(LIRIntrospection.java:292)
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachDef(LIRInstructionClass.java:275)
+	org.graalvm.compiler.lir.LIRInstruction.visitEachOutput(LIRInstruction.java:336)
+TRACE 303425:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative(SchedulePhase.java:815)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:196)
+	org.graalvm.compiler.phases.schedule.SchedulePhase.run(SchedulePhase.java:155)
+	org.graalvm.compiler.phases.Phase.run(Phase.java:49)
+TRACE 301646:
+	org.graalvm.compiler.graph.NodeWorkList.<init>(NodeWorkList.java:43)
+	org.graalvm.compiler.graph.NodeWorkList.<init>(NodeWorkList.java:34)
+	org.graalvm.compiler.graph.NodeWorkList$IterativeNodeWorkList.<init>(NodeWorkList.java:87)
+	org.graalvm.compiler.graph.Graph.createIterativeNodeWorkList(Graph.java:1045)
+TRACE 301675:
+	sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:103)
+	sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:107)
+	sun.nio.fs.UnixFileSystemProvider.checkAccess(UnixFileSystemProvider.java:308)
+	com.oracle.truffle.polyglot.FileSystems$NIOFileSystem.checkAccess(FileSystems.java:626)
+TRACE 302332:
+	org.graalvm.compiler.graph.NodeClass.unregisterAtInputsAsUsage(NodeClass.java:1443)
+	org.graalvm.compiler.graph.Node.clearInputs(Node.java:955)
+	org.graalvm.compiler.graph.Node.safeDelete(Node.java:980)
+	org.graalvm.compiler.graph.Node.replaceAndDelete(Node.java:924)
+TRACE 302901:
+	java.lang.System.identityHashCode(System.java:Unknown line)
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:409)
+	org.graalvm.collections.EconomicMapImpl.putHashEntry(EconomicMapImpl.java:577)
+	org.graalvm.collections.EconomicMapImpl.createHash(EconomicMapImpl.java:571)
+TRACE 302986:
+	org.graalvm.compiler.graph.iterators.PredicatedProxyNodeIterator.forward(PredicatedProxyNodeIterator.java:44)
+	org.graalvm.compiler.graph.iterators.NodeIterator.hasNext(NodeIterator.java:40)
+	org.graalvm.compiler.graph.iterators.NodeIterable.snapshotTo(NodeIterable.java:52)
+	org.graalvm.compiler.graph.iterators.NodeIterable.snapshot(NodeIterable.java:47)
+TRACE 303223:
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance$1.inputChanged(CanonicalizerPhase.java:279)
+	org.graalvm.compiler.graph.Graph$NodeEventListener.event(Graph.java:553)
+	org.graalvm.compiler.graph.Node.maybeNotifyInputChanged(Node.java:890)
+	org.graalvm.compiler.graph.Node.updateUsages(Node.java:585)
+TRACE 303448:
+	org.graalvm.compiler.core.gen.NodeLIRBuilder.matchComplexExpressions(NodeLIRBuilder.java:454)
+	org.graalvm.compiler.core.gen.NodeLIRBuilder.matchBlock(NodeLIRBuilder.java:426)
+	org.graalvm.compiler.core.LIRGenerationPhase.matchBlock(LIRGenerationPhase.java:92)
+	org.graalvm.compiler.core.LIRGenerationPhase.run(LIRGenerationPhase.java:72)
+TRACE 301652:
+	sun.nio.fs.UnixNativeDispatcher.access(UnixNativeDispatcher.java:449)
+	sun.nio.fs.UnixFileSystemProvider.checkAccess(UnixFileSystemProvider.java:306)
+	com.oracle.truffle.polyglot.FileSystems$NIOFileSystem.checkAccess(FileSystems.java:626)
+	com.oracle.truffle.api.TruffleFile.checkAccess(TruffleFile.java:1937)
+TRACE 301870:
+	com.oracle.truffle.r.runtime.data.RSharingAttributeStorage.isShareable(RSharingAttributeStorage.java:134)
+	com.oracle.truffle.r.nodes.function.WrapArgumentBaseNode.execute(WrapArgumentBaseNode.java:68)
+	com.oracle.truffle.r.nodes.function.PromiseHelperNode$GenerateValueForEagerPromiseNode.getEagerValue(PromiseHelperNode.java:624)
+	com.oracle.truffle.r.nodes.function.PromiseHelperNode$GenerateValueForEagerPromiseNode.generateValue(PromiseHelperNode.java:577)
+TRACE 302013:
+	org.graalvm.compiler.graph.NodeClass.registerAtInputsAsUsage(NodeClass.java:1410)
+	org.graalvm.compiler.graph.Node.initialize(Node.java:625)
+	org.graalvm.compiler.graph.Graph.addHelper(Graph.java:507)
+	org.graalvm.compiler.graph.Graph.add(Graph.java:446)
+TRACE 302134:
+	org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs(GraphUtil.java:351)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.performReplacement(CanonicalizerPhase.java:458)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.tryCanonicalize(CanonicalizerPhase.java:399)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processNode(CanonicalizerPhase.java:325)
+TRACE 302392:
+	org.graalvm.compiler.graph.TypedGraphNodeIterator.forward(TypedGraphNodeIterator.java:88)
+	org.graalvm.compiler.graph.TypedGraphNodeIterator.findNext(TypedGraphNodeIterator.java:49)
+	org.graalvm.compiler.graph.TypedGraphNodeIterator.hasNext(TypedGraphNodeIterator.java:101)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks(ControlFlowGraph.java:465)
+TRACE 302640:
+	org.graalvm.compiler.phases.common.DeadCodeEliminationPhase.deleteNodes(DeadCodeEliminationPhase.java:145)
+	org.graalvm.compiler.phases.common.DeadCodeEliminationPhase.run(DeadCodeEliminationPhase.java:103)
+	org.graalvm.compiler.phases.Phase.run(Phase.java:49)
+	org.graalvm.compiler.phases.BasePhase.apply(BasePhase.java:209)
+TRACE 303217:
+	org.graalvm.compiler.graph.NodeClass$RawEdgesIterator.forward(NodeClass.java:1028)
+	org.graalvm.compiler.graph.NodeClass$RawEdgesIterator.hasNext(NodeClass.java:1016)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.sortIntoList(SchedulePhase.java:526)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.sortNodesLatestWithinBlock(SchedulePhase.java:436)
+TRACE 300534:
+	java.lang.Throwable.fillInStackTrace(Throwable.java:Unknown line)
+	java.lang.Throwable.fillInStackTrace(Throwable.java:784)
+	java.lang.Throwable.<init>(Throwable.java:288)
+	java.lang.Exception.<init>(Exception.java:84)
+TRACE 300784:
+	java.lang.ClassLoader.loadClass(ClassLoader.java:431)
+	java.lang.ClassLoader.loadClass(ClassLoader.java:406)
+	sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:352)
+	java.lang.ClassLoader.loadClass(ClassLoader.java:352)
+TRACE 300866:
+	java.lang.invoke.MethodHandleNatives.resolve(MethodHandleNatives.java:Unknown line)
+	java.lang.invoke.MemberName$Factory.resolve(MemberName.java:975)
+	java.lang.invoke.MemberName$Factory.resolveOrFail(MemberName.java:1000)
+	java.lang.invoke.MethodHandles$Lookup.resolveOrFail(MethodHandles.java:1394)
+TRACE 301079:
+	java.lang.String.intern(String.java:Unknown line)
+	com.oracle.truffle.r.runtime.Utils.intern(Utils.java:726)
+	com.oracle.truffle.r.nodes.RASTBuilder.constant(RASTBuilder.java:364)
+	com.oracle.truffle.r.nodes.RASTBuilder.constant(RASTBuilder.java:86)
+TRACE 301172:
+	java.lang.Object.hashCode(Object.java:Unknown line)
+	java.util.concurrent.ConcurrentHashMap.computeIfAbsent(ConcurrentHashMap.java:1646)
+	com.oracle.truffle.r.runtime.data.ClosureCache.getOrCreateClosure(ClosureCache.java:64)
+	com.oracle.truffle.r.runtime.data.ClosureCache.getOrCreatePromiseClosure(ClosureCache.java:47)
+TRACE 301799:
+	sun.misc.Unsafe.getAddress(Unsafe.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaFieldImpl.hasAnnotations(HotSpotResolvedJavaFieldImpl.java:180)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaFieldImpl.getAnnotations(HotSpotResolvedJavaFieldImpl.java:194)
+	org.graalvm.compiler.truffle.runtime.GraalTruffleRuntime.getAnnotations(GraalTruffleRuntime.java:1074)
+TRACE 301853:
+	jdk.vm.ci.hotspot.CompilerToVM.getComponentType(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getComponentType(HotSpotResolvedObjectTypeImpl.java:157)
+	org.graalvm.compiler.nodes.java.LoadIndexedNode.createStamp(LoadIndexedNode.java:101)
+	org.graalvm.compiler.nodes.java.LoadIndexedNode.inferStamp(LoadIndexedNode.java:120)
+TRACE 302191:
+	org.graalvm.compiler.graph.NodeWorkList.addAll(NodeWorkList.java:53)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.run(CanonicalizerPhase.java:257)
+	org.graalvm.compiler.phases.Phase.run(Phase.java:49)
+	org.graalvm.compiler.phases.BasePhase.apply(BasePhase.java:209)
+TRACE 302192:
+	com.oracle.truffle.r.runtime.data.RBaseObject.<init>(RBaseObject.java:34)
+	com.oracle.truffle.r.runtime.data.RAttributable.<init>(RAttributable.java:40)
+	com.oracle.truffle.r.runtime.data.RSharingAttributeStorage.<init>(RSharingAttributeStorage.java:39)
+	com.oracle.truffle.r.runtime.data.model.RAbstractContainer.<init>(RAbstractContainer.java:32)
+TRACE 302199:
+	org.graalvm.compiler.nodes.GraphDecoder.readProperties(GraphDecoder.java:1216)
+	org.graalvm.compiler.nodes.GraphDecoder.decodeFloatingNode(GraphDecoder.java:1370)
+	org.graalvm.compiler.nodes.GraphDecoder.ensureNodeCreated(GraphDecoder.java:1318)
+	org.graalvm.compiler.nodes.GraphDecoder.makeFixedNodeInputs(GraphDecoder.java:1247)
+TRACE 302218:
+	jdk.vm.ci.hotspot.CompilerToVM.findUniqueConcreteMethod(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.uniqueConcreteMethod(HotSpotResolvedJavaMethodImpl.java:427)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.findUniqueConcreteMethod(HotSpotResolvedObjectTypeImpl.java:592)
+	org.graalvm.compiler.nodes.java.MethodCallTargetNode.devirtualizeCall(MethodCallTargetNode.java:155)
+TRACE 302624:
+	org.graalvm.compiler.graph.NodeClass.replaceFirstEdge(NodeClass.java:1392)
+	org.graalvm.compiler.graph.NodeClass.replaceFirstInput(NodeClass.java:1368)
+	org.graalvm.compiler.graph.Node.replaceAtUsage(Node.java:806)
+	org.graalvm.compiler.graph.Node.replaceAtAllUsages(Node.java:785)
+TRACE 302632:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks(ControlFlowGraph.java:547)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:82)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase.run(ConditionalEliminationPhase.java:134)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase.run(ConditionalEliminationPhase.java:111)
+TRACE 302709:
+	org.graalvm.collections.EconomicMapImpl.compareKeys(EconomicMapImpl.java:276)
+	org.graalvm.collections.EconomicMapImpl.findHash(EconomicMapImpl.java:288)
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:254)
+	org.graalvm.collections.EconomicMapImpl.get(EconomicMapImpl.java:245)
+TRACE 303466:
+	org.graalvm.compiler.lir.LIRIntrospection.visitEach(LIRIntrospection.java:273)
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachDef(LIRInstructionClass.java:275)
+	org.graalvm.compiler.lir.LIRInstruction.visitEachOutput(LIRInstruction.java:315)
+	org.graalvm.compiler.lir.constopt.ConstantLoadOptimization$Optimization.analyzeBlock(ConstantLoadOptimization.java:257)
+TRACE 305026:
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt(UnaryArithmeticReduceNode.java:256)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doLogicalCached(UnaryArithmeticReduceNode.java:285)
+	com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNodeGen.executeReduce(UnaryArithmeticReduceNodeGen.java:183)
+	com.oracle.truffle.r.nodes.builtin.base.Sum.sumLengthOne(Sum.java:120)
+TRACE 301655:
+	java.lang.String.intern(String.java:Unknown line)
+	com.oracle.truffle.r.runtime.Utils.intern(Utils.java:726)
+	com.oracle.truffle.r.runtime.RSerialize$Input.setAttributes(RSerialize.java:1074)
+	com.oracle.truffle.r.runtime.RSerialize$Input.readItem(RSerialize.java:811)
+TRACE 301973:
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processBlock(ConditionalEliminationPhase.java:474)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNodes(ConditionalEliminationPhase.java:460)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.enter(ConditionalEliminationPhase.java:448)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.enter(ConditionalEliminationPhase.java:263)
+TRACE 302077:
+	org.graalvm.compiler.lir.alloc.lsra.IntervalWalker.walkTo(IntervalWalker.java:242)
+	org.graalvm.compiler.lir.alloc.lsra.IntervalWalker.walk(IntervalWalker.java:79)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanRegisterAllocationPhase.allocateRegisters(LinearScanRegisterAllocationPhase.java:66)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanRegisterAllocationPhase.run(LinearScanRegisterAllocationPhase.java:45)
+TRACE 302089:
+	org.graalvm.compiler.lir.alloc.lsra.IntervalWalker.walkTo(IntervalWalker.java:241)
+	org.graalvm.compiler.lir.alloc.lsra.IntervalWalker.walk(IntervalWalker.java:79)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanRegisterAllocationPhase.allocateRegisters(LinearScanRegisterAllocationPhase.java:66)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanRegisterAllocationPhase.run(LinearScanRegisterAllocationPhase.java:45)
+TRACE 302187:
+	jdk.vm.ci.hotspot.CompilerToVM.isCompilable(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaMethodImpl.canBeInlined(HotSpotResolvedJavaMethodImpl.java:593)
+	org.graalvm.compiler.java.BytecodeParser.tryInline(BytecodeParser.java:2232)
+	org.graalvm.compiler.java.BytecodeParser.appendInvoke(BytecodeParser.java:1922)
+TRACE 302228:
+	org.graalvm.compiler.graph.spi.Canonicalizable$Binary.canonical(Canonicalizable.java:137)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.tryCanonicalize(CanonicalizerPhase.java:391)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processNode(CanonicalizerPhase.java:325)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processWorkSet(CanonicalizerPhase.java:302)
+TRACE 302548:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupAppendixInPool(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupAppendix(HotSpotConstantPool.java:561)
+	org.graalvm.compiler.java.BytecodeParser.genDynamicInvokeHelper(BytecodeParser.java:1762)
+	org.graalvm.compiler.java.BytecodeParser.genInvokeVirtual(BytecodeParser.java:1738)
+TRACE 302656:
+	org.graalvm.collections.EconomicMapImpl.put(EconomicMapImpl.java:451)
+	org.graalvm.collections.EconomicMapImpl.add(EconomicMapImpl.java:866)
+	org.graalvm.compiler.phases.common.util.EconomicSetNodeEventListener.add(EconomicSetNodeEventListener.java:91)
+	org.graalvm.compiler.phases.common.util.EconomicSetNodeEventListener.changed(EconomicSetNodeEventListener.java:75)
+TRACE 302832:
+	org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt(Range.java:80)
+	org.graalvm.compiler.lir.alloc.lsra.Interval.currentIntersectsAt(Interval.java:720)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.spillBlockInactiveFixed(LinearScanWalker.java:241)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocLockedRegister(LinearScanWalker.java:827)
+TRACE 302841:
+	org.graalvm.compiler.lir.LIRFrameState.forEachState(LIRFrameState.java:85)
+	org.graalvm.compiler.lir.LIRInstructionClass.forEachState(LIRInstructionClass.java:282)
+	org.graalvm.compiler.lir.LIRInstruction.forEachState(LIRInstruction.java:268)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase.assignLocations(LinearScanAssignLocationsPhase.java:221)
+TRACE 302966:
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.handleFloatingNodeBeforeAdd(SimplifyingGraphDecoder.java:306)
+	org.graalvm.compiler.replacements.PEGraphDecoder.handleFloatingNodeBeforeAdd(PEGraphDecoder.java:1302)
+	org.graalvm.compiler.nodes.GraphDecoder.ensureNodeCreated(GraphDecoder.java:1327)
+	org.graalvm.compiler.nodes.GraphDecoder.makeFixedNodeInputs(GraphDecoder.java:1247)
+TRACE 303080:
+	org.graalvm.compiler.nodes.ValueNode.getStackKind(ValueNode.java:105)
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.toSlotKind(DebugInfoBuilder.java:332)
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.computeLocals(DebugInfoBuilder.java:301)
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.computeFrameForState(DebugInfoBuilder.java:275)
+TRACE 303563:
+	org.graalvm.compiler.nodes.GraphDecoder.makeFloatingNodeInputs(GraphDecoder.java:1294)
+	org.graalvm.compiler.nodes.GraphDecoder.decodeFloatingNode(GraphDecoder.java:1367)
+	org.graalvm.compiler.replacements.PEGraphDecoder.handleInvoke(PEGraphDecoder.java:706)
+	org.graalvm.compiler.nodes.GraphDecoder.processNextNode(GraphDecoder.java:757)
+TRACE 305011:
+	com.oracle.truffle.r.ffi.impl.common.JavaUpCallsRFFIImpl.Rf_allocMatrix(JavaUpCallsRFFIImpl.java:495)
+	com.oracle.truffle.r.ffi.impl.upcalls.Rf_allocMatrixCall.execute(Rf_allocMatrixCall.java:70)
+	com.oracle.truffle.r.ffi.impl.upcalls.Rf_allocMatrixCallGen$InteropLibraryExports$Cached.execute(Rf_allocMatrixCallGen.java:92)
+	com.oracle.truffle.nfi.impl.LibFFIClosure$CallClosureNode.execute(LibFFIClosure.java:169)
+TRACE 301651:
+	sun.misc.Unsafe.allocateInstance(Unsafe.java:Unknown line)
+	org.graalvm.compiler.graph.NodeClass.allocateInstance(NodeClass.java:845)
+	org.graalvm.compiler.nodes.GraphDecoder.allocateFloatingNode(GraphDecoder.java:1386)
+	org.graalvm.compiler.nodes.GraphDecoder.decodeFloatingNode(GraphDecoder.java:1357)
+TRACE 301699:
+	jdk.vm.ci.hotspot.CompilerToVM.getImplementor(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getSingleImplementor(HotSpotResolvedObjectTypeImpl.java:293)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.getSingleImplementor(HotSpotResolvedObjectTypeImpl.java:60)
+	org.graalvm.compiler.core.common.type.StampFactory.forDeclaredType(StampFactory.java:309)
+TRACE 301703:
+	com.oracle.truffle.r.nodes.function.RCallSpecialNode.execute(RCallSpecialNode.java:388)
+	com.oracle.truffle.r.runtime.nodes.RNode.voidExecute(RNode.java:66)
+	com.oracle.truffle.r.nodes.control.IfNode.voidExecute(IfNode.java:69)
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:79)
+TRACE 301739:
+	com.oracle.truffle.r.runtime.nodes.RNode.voidExecute(RNode.java:66)
+	com.oracle.truffle.r.nodes.control.IfNode.voidExecute(IfNode.java:69)
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:79)
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:35)
+TRACE 302066:
+	com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.executeInternal(ReadVariableNode.java:270)
+	com.oracle.truffle.r.nodes.access.variables.LookupNode.execute(ReadVariableNode.java:107)
+	com.oracle.truffle.r.nodes.function.RCallNodeGen.execute(RCallNodeGen.java:168)
+	com.oracle.truffle.r.nodes.function.PromiseNode$InlinedSuppliedArgumentNode.execute(PromiseNode.java:235)
+TRACE 302184:
+	org.graalvm.compiler.graph.InputEdges.update(InputEdges.java:66)
+	org.graalvm.compiler.nodes.GraphDecoder.makeFixedNodeInputs(GraphDecoder.java:1250)
+	org.graalvm.compiler.nodes.GraphDecoder.processNextNode(GraphDecoder.java:639)
+	org.graalvm.compiler.nodes.GraphDecoder.decode(GraphDecoder.java:508)
+TRACE 302246:
+	com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.executeInternal(ReadVariableNode.java:270)
+	com.oracle.truffle.r.nodes.access.variables.LookupNode.execute(ReadVariableNode.java:107)
+	com.oracle.truffle.r.nodes.function.RCallNodeGen.execute(RCallNodeGen.java:168)
+	com.oracle.truffle.r.runtime.nodes.RNode.visibleExecute(RNode.java:74)
+TRACE 302267:
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:254)
+	org.graalvm.collections.EconomicMapImpl.get(EconomicMapImpl.java:245)
+	org.graalvm.compiler.core.common.util.FrequencyEncoder.getIndex(FrequencyEncoder.java:101)
+	org.graalvm.compiler.nodes.GraphEncoder.encode(GraphEncoder.java:239)
+TRACE 302389:
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.handleCanonicalization(SimplifyingGraphDecoder.java:294)
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.handleFixedNode(SimplifyingGraphDecoder.java:190)
+	org.graalvm.compiler.replacements.PEGraphDecoder.handleFixedNode(PEGraphDecoder.java:1167)
+	org.graalvm.compiler.nodes.GraphDecoder.processNextNode(GraphDecoder.java:761)
+TRACE 302603:
+	org.graalvm.compiler.nodes.GraphDecoder.processNextNode(GraphDecoder.java:756)
+	org.graalvm.compiler.nodes.GraphDecoder.decode(GraphDecoder.java:508)
+	org.graalvm.compiler.replacements.PEGraphDecoder.decode(PEGraphDecoder.java:641)
+	org.graalvm.compiler.truffle.compiler.PartialEvaluator.doGraphPE(PartialEvaluator.java:604)
+TRACE 302719:
+	org.graalvm.compiler.nodes.ValueNode.stamp(ValueNode.java:63)
+	org.graalvm.compiler.nodes.calc.IntegerEqualsNode$IntegerEqualsOp.canonical(IntegerEqualsNode.java:143)
+	org.graalvm.compiler.nodes.calc.IntegerEqualsNode.canonical(IntegerEqualsNode.java:102)
+	org.graalvm.compiler.nodes.calc.IntegerEqualsNode.canonical(IntegerEqualsNode.java:54)
+TRACE 302732:
+	org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs(GraphUtil.java:351)
+	org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs(GraphUtil.java:321)
+	org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs(GraphUtil.java:338)
+	org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs(GraphUtil.java:321)
+TRACE 303099:
+	org.graalvm.compiler.lir.alloc.lsra.Interval$RegisterBindingLists.addToListSortedByStartAndUsePositions(Interval.java:164)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitBeforeUsage(LinearScanWalker.java:483)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitAndSpillInterval(LinearScanWalker.java:695)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitAndSpillIntersectingIntervals(LinearScanWalker.java:796)
+TRACE 303140:
+	org.graalvm.compiler.graph.Node.safeDelete(Node.java:982)
+	org.graalvm.compiler.graph.Node.replaceAtUsagesAndDelete(Node.java:764)
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.handleCanonicalization(SimplifyingGraphDecoder.java:295)
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.handleFixedNode(SimplifyingGraphDecoder.java:190)
+TRACE 303328:
+	com.oracle.truffle.r.nodes.access.AccessArgumentNode.execute(AccessArgumentNode.java:94)
+	com.oracle.truffle.r.nodes.access.WriteLocalFrameVariableNodeGen.execute_generic3(WriteLocalFrameVariableNodeGen.java:114)
+	com.oracle.truffle.r.nodes.access.WriteLocalFrameVariableNodeGen.execute(WriteLocalFrameVariableNodeGen.java:48)
+	com.oracle.truffle.r.nodes.function.SaveArgumentsNode.execute(SaveArgumentsNode.java:56)
+TRACE 303363:
+	com.oracle.truffle.r.nodes.function.FunctionBodyNode.visibleExecute(FunctionBodyNode.java:65)
+	com.oracle.truffle.r.nodes.function.FunctionDefinitionNode.execute(FunctionDefinitionNode.java:282)
+	org.graalvm.compiler.truffle.runtime.OptimizedCallTarget.callProxy(OptimizedCallTarget.java:474)
+	org.graalvm.compiler.truffle.runtime.OptimizedCallTarget.callRoot(OptimizedCallTarget.java:449)
+TRACE 303604:
+	org.graalvm.compiler.phases.common.inlining.walker.ComputeInliningRelevance.createLoopScope(ComputeInliningRelevance.java:145)
+	org.graalvm.compiler.phases.common.inlining.walker.ComputeInliningRelevance.compute(ComputeInliningRelevance.java:97)
+	org.graalvm.compiler.phases.common.inlining.walker.CallsiteHolderExplorable.computeProbabilities(CallsiteHolderExplorable.java:206)
+	org.graalvm.compiler.phases.common.inlining.walker.InliningData.doInline(InliningData.java:431)
+TRACE 303889:
+	org.graalvm.compiler.core.gen.NodeLIRBuilder.doBlock(NodeLIRBuilder.java:375)
+	org.graalvm.compiler.core.LIRGenerationPhase.emitBlock(LIRGenerationPhase.java:85)
+	org.graalvm.compiler.core.LIRGenerationPhase.run(LIRGenerationPhase.java:75)
+	org.graalvm.compiler.core.LIRGenerationPhase.run(LIRGenerationPhase.java:46)
+TRACE 300989:
+	org.antlr.v4.runtime.misc.FlexibleHashMap.expand(FlexibleHashMap.java:184)
+	org.antlr.v4.runtime.misc.FlexibleHashMap.put(FlexibleHashMap.java:98)
+	org.antlr.v4.runtime.misc.FlexibleHashMap.expand(FlexibleHashMap.java:194)
+	org.antlr.v4.runtime.misc.FlexibleHashMap.put(FlexibleHashMap.java:98)
+TRACE 301159:
+	jdk.vm.ci.hotspot.CompilerToVM.iterateFrames(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotStackIntrospection.iterateFrames(HotSpotStackIntrospection.java:40)
+	org.graalvm.compiler.truffle.runtime.GraalTruffleRuntime.iterateImpl(GraalTruffleRuntime.java:556)
+	org.graalvm.compiler.truffle.runtime.GraalTruffleRuntime.iterateFrames(GraalTruffleRuntime.java:510)
+TRACE 301205:
+	java.lang.Class.isArray(Class.java:Unknown line)
+	java.lang.Class.getSimpleName(Class.java:1306)
+	com.oracle.truffle.r.runtime.env.frame.FrameSlotChangeMonitor$LookupResult.<init>(FrameSlotChangeMonitor.java:81)
+	com.oracle.truffle.r.runtime.env.frame.FrameSlotChangeMonitor$LookupResult.<init>(FrameSlotChangeMonitor.java:77)
+TRACE 301840:
+	org.graalvm.compiler.nodes.GraphEncoder.writeProperties(GraphEncoder.java:393)
+	org.graalvm.compiler.nodes.GraphEncoder.encode(GraphEncoder.java:241)
+	org.graalvm.compiler.nodes.GraphEncoder.encodeSingleGraph(GraphEncoder.java:164)
+	org.graalvm.compiler.replacements.CachingPEGraphDecoder.createGraph(CachingPEGraphDecoder.java:113)
+TRACE 301941:
+	java.lang.Class.isAssignableFrom(Class.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotJDKReflection.isAssignableFrom(HotSpotJDKReflection.java:69)
+	jdk.vm.ci.hotspot.HotSpotResolvedObjectTypeImpl.isAssignableFrom(HotSpotResolvedObjectTypeImpl.java:414)
+	jdk.vm.ci.hotspot.HotSpotResolvedJavaFieldImpl.isInObject(HotSpotResolvedJavaFieldImpl.java:114)
+TRACE 301960:
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.cleanupGraph(SimplifyingGraphDecoder.java:159)
+	org.graalvm.compiler.replacements.PEGraphDecoder.cleanupGraph(PEGraphDecoder.java:660)
+	org.graalvm.compiler.replacements.PEGraphDecoder.decode(PEGraphDecoder.java:642)
+	org.graalvm.compiler.truffle.compiler.PartialEvaluator.doGraphPE(PartialEvaluator.java:604)
+TRACE 302153:
+	org.graalvm.compiler.nodes.GraphEncoder.writeOrderId(GraphEncoder.java:438)
+	org.graalvm.compiler.nodes.GraphEncoder.writeEdges(GraphEncoder.java:429)
+	org.graalvm.compiler.nodes.GraphEncoder.encode(GraphEncoder.java:240)
+	org.graalvm.compiler.nodes.GraphEncoder.encodeSingleGraph(GraphEncoder.java:164)
+TRACE 302227:
+	com.oracle.truffle.r.nodes.control.IfNode.voidExecute(IfNode.java:69)
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:79)
+	com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid(RBlockNode.java:35)
+	org.graalvm.compiler.truffle.runtime.OptimizedBlockNode.executeGeneric(OptimizedBlockNode.java:77)
+TRACE 302265:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase.assignLocations(LinearScanAssignLocationsPhase.java:240)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase.run(LinearScanAssignLocationsPhase.java:69)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAllocationPhase.apply(LinearScanAllocationPhase.java:53)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAllocationPhase.apply(LinearScanAllocationPhase.java:46)
+TRACE 302317:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupKlassInPool(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupType(HotSpotConstantPool.java:606)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupField(HotSpotConstantPool.java:624)
+	org.graalvm.compiler.java.BytecodeParser.lookupField(BytecodeParser.java:4302)
+TRACE 302325:
+	com.oracle.truffle.r.nodes.function.ArgumentMatcher.permuteArguments(ArgumentMatcher.java:192)
+	com.oracle.truffle.r.nodes.function.ArgumentMatcher.matchArgumentsEvaluated(ArgumentMatcher.java:186)
+	com.oracle.truffle.r.nodes.function.call.PrepareArguments$PrepareArgumentsExplicit.prepare(PrepareArguments.java:211)
+	com.oracle.truffle.r.nodes.function.call.PrepareArgumentsFactory$PrepareArgumentsExplicitNodeGen.execute(PrepareArgumentsFactory.java:170)
+TRACE 302430:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlock(ControlFlowGraph.java:455)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks(ControlFlowGraph.java:467)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:82)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase.run(ConditionalEliminationPhase.java:134)
+TRACE 302583:
+	jdk.vm.ci.hotspot.CompilerToVM.lookupKlassRefIndexInPool(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.getKlassRefIndexAt(HotSpotConstantPool.java:450)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupField(HotSpotConstantPool.java:623)
+	org.graalvm.compiler.java.BytecodeParser.lookupField(BytecodeParser.java:4302)
+TRACE 302670:
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.sortIntoList(SchedulePhase.java:530)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.sortNodesLatestWithinBlock(SchedulePhase.java:460)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.sortNodesLatestWithinBlock(SchedulePhase.java:398)
+	org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.run(SchedulePhase.java:206)
+TRACE 302902:
+	org.graalvm.collections.EconomicMapImpl.createHash(EconomicMapImpl.java:571)
+	org.graalvm.collections.EconomicMapImpl.putHashEntry(EconomicMapImpl.java:580)
+	org.graalvm.collections.EconomicMapImpl.put(EconomicMapImpl.java:451)
+	org.graalvm.collections.EconomicMapImpl.add(EconomicMapImpl.java:866)
+TRACE 303086:
+	java.util.ArrayList.forEach(ArrayList.java:1257)
+	org.graalvm.compiler.lir.constopt.DefUseTree.forEach(DefUseTree.java:84)
+	org.graalvm.compiler.lir.constopt.ConstantTree.<init>(ConstantTree.java:109)
+	org.graalvm.compiler.lir.constopt.ConstantLoadOptimization$Optimization.createConstantTree(ConstantLoadOptimization.java:279)
+TRACE 303117:
+	org.graalvm.compiler.lir.ValueConsumer.visitValue(ValueConsumer.java:51)
+	org.graalvm.compiler.lir.LIRIntrospection.visitEach(LIRIntrospection.java:282)
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachUse(LIRInstructionClass.java:263)
+	org.graalvm.compiler.lir.LIRInstruction.visitEachInput(LIRInstruction.java:324)
+TRACE 303369:
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processBlock(ConditionalEliminationPhase.java:478)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNodes(ConditionalEliminationPhase.java:460)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.enter(ConditionalEliminationPhase.java:448)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.enter(ConditionalEliminationPhase.java:263)
+TRACE 303447:
+	org.graalvm.compiler.lir.ValueConsumer.visitValue(ValueConsumer.java:51)
+	org.graalvm.compiler.lir.LIRFrameState.visitValues(LIRFrameState.java:157)
+	org.graalvm.compiler.lir.LIRFrameState.visitEachState(LIRFrameState.java:109)
+	org.graalvm.compiler.lir.LIRInstructionClass.visitEachState(LIRInstructionClass.java:291)
+TRACE 303485:
+	org.graalvm.compiler.lir.alloc.lsra.Interval.calcTo(Interval.java:776)
+	org.graalvm.compiler.lir.alloc.lsra.Interval.to(Interval.java:597)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.freeCollectInactiveFixed(LinearScanWalker.java:192)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocFreeRegister(LinearScanWalker.java:710)
+TRACE 303835:
+	java.util.ArrayList.addAll(ArrayList.java:581)
+	org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.process(ConstantTreeAnalyzer.java:122)
+	org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.analyzeBlocks(ConstantTreeAnalyzer.java:99)
+	org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.analyze(ConstantTreeAnalyzer.java:50)
+TRACE 300825:
+	java.util.zip.ZipFile.read(ZipFile.java:Unknown line)
+	java.util.zip.ZipFile.access$1400(ZipFile.java:60)
+	java.util.zip.ZipFile$ZipFileInputStream.read(ZipFile.java:734)
+	java.util.zip.ZipFile$ZipFileInputStream.read(ZipFile.java:749)
+TRACE 300831:
+	java.security.AccessController.doPrivileged(AccessController.java:Unknown line)
+	sun.reflect.annotation.AnnotationParser.annotationForMap(AnnotationParser.java:303)
+	sun.reflect.annotation.AnnotationParser.parseAnnotation2(AnnotationParser.java:293)
+	sun.reflect.annotation.AnnotationParser.parseAnnotations2(AnnotationParser.java:120)
+TRACE 301658:
+	java.lang.Object.clone(Object.java:Unknown line)
+	org.graalvm.compiler.java.FrameStateBuilder.<init>(FrameStateBuilder.java:263)
+	org.graalvm.compiler.java.FrameStateBuilder.copy(FrameStateBuilder.java:383)
+	org.graalvm.compiler.java.BytecodeParser.handleException(BytecodeParser.java:1318)
+TRACE 301908:
+	org.graalvm.compiler.phases.common.DeoptimizationGroupingPhase.run(DeoptimizationGroupingPhase.java:62)
+	org.graalvm.compiler.phases.common.DeoptimizationGroupingPhase.run(DeoptimizationGroupingPhase.java:55)
+	org.graalvm.compiler.phases.BasePhase.apply(BasePhase.java:209)
+	org.graalvm.compiler.phases.BasePhase.apply(BasePhase.java:146)
+TRACE 302172:
+	com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg1.call(RBuiltinNode.java:174)
+	com.oracle.truffle.r.nodes.function.RCallNode$BuiltinCallNode.execute(RCallNode.java:1158)
+	com.oracle.truffle.r.nodes.function.RCallNode$FunctionDispatch.dispatch(RCallNode.java:920)
+	com.oracle.truffle.r.nodes.function.RCallNodeGen$FunctionDispatchNodeGen.execute(RCallNodeGen.java:858)
+TRACE 302521:
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance$1.inputChanged(CanonicalizerPhase.java:279)
+	org.graalvm.compiler.graph.Graph$NodeEventListener.event(Graph.java:553)
+	org.graalvm.compiler.graph.Node.maybeNotifyInputChanged(Node.java:890)
+	org.graalvm.compiler.graph.Node.updatePredecessor(Node.java:616)
+TRACE 302531:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks(ControlFlowGraph.java:465)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:82)
+	org.graalvm.compiler.loop.LoopsData.<init>(LoopsData.java:52)
+	org.graalvm.compiler.hotspot.amd64.AMD64HotSpotAddressLowering.preProcess(AMD64HotSpotAddressLowering.java:129)
+TRACE 302613:
+	org.graalvm.compiler.nodes.GraphDecoder.makeSuccessorStubs(GraphDecoder.java:1432)
+	org.graalvm.compiler.nodes.GraphDecoder.processNextNode(GraphDecoder.java:641)
+	org.graalvm.compiler.nodes.GraphDecoder.decode(GraphDecoder.java:508)
+	org.graalvm.compiler.replacements.PEGraphDecoder.decode(PEGraphDecoder.java:641)
+TRACE 302742:
+	org.graalvm.compiler.graph.iterators.PredicatedProxyNodeIterator.forward(PredicatedProxyNodeIterator.java:44)
+	org.graalvm.compiler.graph.iterators.NodeIterator.hasNext(NodeIterator.java:40)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.computeLoopInformation(ControlFlowGraph.java:626)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:86)
+TRACE 302757:
+	java.lang.Object.clone(Object.java:Unknown line)
+	java.util.Arrays$ArrayList.toArray(Arrays.java:3823)
+	java.util.ArrayList.<init>(ArrayList.java:178)
+	org.graalvm.compiler.nodes.virtual.CommitAllocationNode.<init>(CommitAllocationNode.java:77)
+TRACE 302786:
+	org.graalvm.compiler.nodes.StructuredGraph.maybeCompress(StructuredGraph.java:447)
+	org.graalvm.compiler.core.GraalCompiler.emitFrontEnd(GraalCompiler.java:219)
+	org.graalvm.compiler.core.GraalCompiler.compile(GraalCompiler.java:144)
+	org.graalvm.compiler.core.GraalCompiler.compileGraph(GraalCompiler.java:129)
+TRACE 302812:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.commonDominatorRawSameDepth(ControlFlowGraph.java:393)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.commonDominatorRaw(ControlFlowGraph.java:384)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.computeDominators(ControlFlowGraph.java:318)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:89)
+TRACE 302869:
+	org.graalvm.compiler.nodes.IfNode.simplify(IfNode.java:292)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.tryCanonicalize(CanonicalizerPhase.java:411)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processNode(CanonicalizerPhase.java:325)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processWorkSet(CanonicalizerPhase.java:302)
+TRACE 302933:
+	org.graalvm.collections.EconomicMapImpl.findLinear(EconomicMapImpl.java:261)
+	org.graalvm.collections.EconomicMapImpl.find(EconomicMapImpl.java:256)
+	org.graalvm.collections.EconomicMapImpl.get(EconomicMapImpl.java:245)
+	org.graalvm.compiler.graph.Graph$MapReplacement.replacement(Graph.java:1227)
+TRACE 302963:
+	org.graalvm.compiler.lir.NullCheckOptimizer.foldNullChecks(NullCheckOptimizer.java:56)
+	org.graalvm.compiler.lir.NullCheckOptimizer.run(NullCheckOptimizer.java:43)
+	org.graalvm.compiler.lir.NullCheckOptimizer.run(NullCheckOptimizer.java:37)
+	org.graalvm.compiler.lir.phases.LIRPhase.apply(LIRPhase.java:117)
+TRACE 302996:
+	org.graalvm.compiler.graph.Graph.grow(Graph.java:1073)
+	org.graalvm.compiler.graph.Graph.register(Graph.java:1052)
+	org.graalvm.compiler.graph.Node.initialize(Node.java:623)
+	org.graalvm.compiler.graph.Graph.addHelper(Graph.java:507)
+TRACE 303010:
+	org.graalvm.compiler.nodes.LogicNegationNode.implies(LogicNegationNode.java:89)
+	org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition(ConditionalEliminationUtil.java:294)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.tryProveGuardCondition(ConditionalEliminationPhase.java:808)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processIf(ConditionalEliminationPhase.java:431)
+TRACE 303040:
+	org.graalvm.compiler.graph.Node.copyOrClearEdgesForClone(Node.java:1025)
+	org.graalvm.compiler.graph.Node.clone(Node.java:1065)
+	org.graalvm.compiler.graph.NodeClass.createNodeDuplicates(NodeClass.java:933)
+	org.graalvm.compiler.graph.NodeClass.addGraphDuplicate(NodeClass.java:882)
+TRACE 303105:
+	org.graalvm.compiler.lir.alloc.lsra.Interval$RegisterBindingLists.addToListSortedByStartAndUsePositions(Interval.java:164)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitBeforeUsage(LinearScanWalker.java:483)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.splitWhenPartialRegisterAvailable(LinearScanWalker.java:673)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocFreeRegister(LinearScanWalker.java:783)
+TRACE 303231:
+	org.graalvm.compiler.nodes.spi.NodeWithState.states(NodeWithState.java:37)
+	org.graalvm.compiler.loop.LoopFragment.computeNodes(LoopFragment.java:210)
+	org.graalvm.compiler.loop.LoopFragmentWhole.nodes(LoopFragmentWhole.java:68)
+	org.graalvm.compiler.loop.LoopFragment.contains(LoopFragment.java:98)
+TRACE 303314:
+	org.graalvm.collections.EconomicMapImpl.add(EconomicMapImpl.java:866)
+	org.graalvm.compiler.phases.common.util.EconomicSetNodeEventListener.add(EconomicSetNodeEventListener.java:91)
+	org.graalvm.compiler.phases.common.util.EconomicSetNodeEventListener.changed(EconomicSetNodeEventListener.java:75)
+	org.graalvm.compiler.graph.Graph$NodeEventListener.event(Graph.java:565)
+TRACE 303424:
+	org.graalvm.compiler.lir.alloc.lsra.Interval$UsePosList.<init>(Interval.java:354)
+	org.graalvm.compiler.lir.alloc.lsra.Interval.<init>(Interval.java:734)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScan.createInterval(LinearScan.java:363)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScan.getOrCreateInterval(LinearScan.java:431)
+TRACE 303457:
+	org.graalvm.compiler.graph.NodeClass.unregisterAtSuccessorsAsPredecessor(NodeClass.java:1321)
+	org.graalvm.compiler.graph.Node.clearSuccessors(Node.java:964)
+	org.graalvm.compiler.nodes.StructuredGraph.removeSplit(StructuredGraph.java:725)
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.canonicalizeFixedNode(SimplifyingGraphDecoder.java:230)
+TRACE 303511:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.freeCollectInactiveFixed(LinearScanWalker.java:198)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.allocFreeRegister(LinearScanWalker.java:710)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.activateCurrent(LinearScanWalker.java:1059)
+	org.graalvm.compiler.lir.alloc.lsra.IntervalWalker.walkTo(IntervalWalker.java:241)
+TRACE 303666:
+	org.graalvm.compiler.core.common.util.UnsafeArrayTypeReader.getU1(UnsafeArrayTypeReader.java:131)
+	org.graalvm.compiler.core.common.util.AbstractTypeReader.read(AbstractTypeReader.java:43)
+	org.graalvm.compiler.core.common.util.AbstractTypeReader.getUV(AbstractTypeReader.java:35)
+	org.graalvm.compiler.core.common.util.TypeReader.getUVInt(TypeReader.java:83)
+TRACE 304766:
+	org.graalvm.compiler.graph.iterators.FilteredNodeIterable.filter(FilteredNodeIterable.java:58)
+	org.graalvm.compiler.nodes.AbstractMergeNode.phis(AbstractMergeNode.java:143)
+	org.graalvm.compiler.loop.LoopFragment.computeNodes(LoopFragment.java:261)
+	org.graalvm.compiler.loop.LoopFragmentWhole.nodes(LoopFragmentWhole.java:68)
+TRACE 305214:
+	com.oracle.truffle.r.ffi.impl.nodes.RfAllocVectorNode.allocate(RfAllocVectorNode.java:79)
+	com.oracle.truffle.r.ffi.impl.nodes.RfAllocVectorNode.doIt(RfAllocVectorNode.java:66)
+	com.oracle.truffle.r.ffi.impl.nodes.RfAllocVectorNodeGen.executeObject(RfAllocVectorNodeGen.java:38)
+	com.oracle.truffle.r.ffi.impl.upcalls.Rf_allocVectorCall.execute(Rf_allocVectorCall.java:71)
+TRACE 300072:
+	java.lang.ClassLoader.findBootstrapClass(ClassLoader.java:Unknown line)
+	java.lang.ClassLoader.findBootstrapClassOrNull(ClassLoader.java:1009)
+	java.lang.ClassLoader.loadClass(ClassLoader.java:408)
+	java.lang.ClassLoader.loadClass(ClassLoader.java:406)
+TRACE 300074:
+	java.util.zip.ZipFile.getEntry(ZipFile.java:Unknown line)
+	java.util.zip.ZipFile.getEntry(ZipFile.java:316)
+	java.util.jar.JarFile.getEntry(JarFile.java:240)
+	java.util.jar.JarFile.getJarEntry(JarFile.java:223)
+TRACE 300865:
+	java.util.zip.ZipFile.getNextEntry(ZipFile.java:Unknown line)
+	java.util.zip.ZipFile.access$500(ZipFile.java:60)
+	java.util.zip.ZipFile$ZipEntryIterator.next(ZipFile.java:523)
+	java.util.zip.ZipFile$ZipEntryIterator.nextElement(ZipFile.java:514)
+TRACE 300992:
+	org.antlr.v4.runtime.atn.ParserATNSimulator.canDropLoopEntryEdgeInLeftRecursiveRule(ParserATNSimulator.java:1687)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closure_(ParserATNSimulator.java:1536)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closureCheckingStopState(ParserATNSimulator.java:1513)
+	org.antlr.v4.runtime.atn.ParserATNSimulator.closureCheckingStopState(ParserATNSimulator.java:1496)
+TRACE 301192:
+	com.oracle.truffle.r.nodes.function.call.PrepareArguments$PrepareArgumentsDefault.prepare(PrepareArguments.java:129)
+	com.oracle.truffle.r.nodes.function.call.PrepareArgumentsFactory$PrepareArgumentsDefaultNodeGen.execute(PrepareArgumentsFactory.java:47)
+	com.oracle.truffle.r.nodes.function.RCallNode$FunctionDispatch.dispatch(RCallNode.java:919)
+	com.oracle.truffle.r.nodes.function.RCallNodeGen$FunctionDispatchNodeGen.execute(RCallNodeGen.java:858)
+TRACE 301289:
+	java.lang.Object.clone(Object.java:Unknown line)
+	org.graalvm.collections.EconomicMapImpl.initFrom(EconomicMapImpl.java:204)
+	org.graalvm.collections.EconomicMapImpl.<init>(EconomicMapImpl.java:181)
+	org.graalvm.collections.EconomicMapImpl.create(EconomicMapImpl.java:158)
+TRACE 301490:
+	org.graalvm.compiler.truffle.runtime.OptimizedCallTarget.callBoundary(OptimizedCallTarget.java:416)
+	org.graalvm.compiler.truffle.runtime.OptimizedCallTarget.doInvoke(OptimizedCallTarget.java:403)
+	org.graalvm.compiler.truffle.runtime.OptimizedCallTarget.callDirect(OptimizedCallTarget.java:349)
+	org.graalvm.compiler.truffle.runtime.OptimizedDirectCallNode.call(OptimizedDirectCallNode.java:67)
+TRACE 301786:
+	org.graalvm.compiler.nodes.GraphDecoder.decode(GraphDecoder.java:508)
+	org.graalvm.compiler.replacements.PEGraphDecoder.decode(PEGraphDecoder.java:641)
+	org.graalvm.compiler.truffle.compiler.PartialEvaluator.doGraphPE(PartialEvaluator.java:604)
+	org.graalvm.compiler.truffle.compiler.PartialEvaluator.agnosticInliningOrGraphPE(PartialEvaluator.java:696)
+TRACE 301834:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.calcDominatorRanges(ControlFlowGraph.java:375)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.computeDominators(ControlFlowGraph.java:345)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:89)
+	org.graalvm.compiler.loop.LoopsData.<init>(LoopsData.java:52)
+TRACE 301874:
+	org.graalvm.compiler.phases.common.DeadCodeEliminationPhase.iterateSuccessorsAndInputs(DeadCodeEliminationPhase.java:124)
+	org.graalvm.compiler.phases.common.DeadCodeEliminationPhase.run(DeadCodeEliminationPhase.java:83)
+	org.graalvm.compiler.phases.Phase.run(Phase.java:49)
+	org.graalvm.compiler.phases.BasePhase.apply(BasePhase.java:209)
+TRACE 301961:
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.cleanupGraph(SimplifyingGraphDecoder.java:163)
+	org.graalvm.compiler.replacements.PEGraphDecoder.cleanupGraph(PEGraphDecoder.java:660)
+	org.graalvm.compiler.replacements.PEGraphDecoder.decode(PEGraphDecoder.java:642)
+	org.graalvm.compiler.truffle.compiler.PartialEvaluator.doGraphPE(PartialEvaluator.java:604)
+TRACE 302113:
+	org.graalvm.compiler.nodes.ValueNode.stamp(ValueNode.java:63)
+	org.graalvm.compiler.nodes.calc.IntegerEqualsNode$IntegerEqualsOp.canonicalizeSymmetricConstant(IntegerEqualsNode.java:241)
+	org.graalvm.compiler.nodes.calc.CompareNode$CompareOp.canonical(CompareNode.java:133)
+	org.graalvm.compiler.nodes.calc.IntegerEqualsNode$IntegerEqualsOp.canonical(IntegerEqualsNode.java:233)
+TRACE 302176:
+	org.graalvm.compiler.nodes.graphbuilderconf.InvocationPlugins.isEmpty(InvocationPlugins.java:1089)
+	org.graalvm.compiler.nodes.graphbuilderconf.InvocationPlugins.isEmpty(InvocationPlugins.java:1089)
+	org.graalvm.compiler.replacements.PEGraphDecoder.tryInvocationPlugin(PEGraphDecoder.java:783)
+	org.graalvm.compiler.replacements.PEGraphDecoder.trySimplifyInvoke(PEGraphDecoder.java:738)
+TRACE 302363:
+	org.graalvm.compiler.nodes.SimplifyingGraphDecoder.cleanupGraph(SimplifyingGraphDecoder.java:155)
+	org.graalvm.compiler.replacements.PEGraphDecoder.cleanupGraph(PEGraphDecoder.java:660)
+	org.graalvm.compiler.replacements.PEGraphDecoder.decode(PEGraphDecoder.java:642)
+	org.graalvm.compiler.truffle.compiler.PartialEvaluator.doGraphPE(PartialEvaluator.java:604)
+TRACE 302372:
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks(ControlFlowGraph.java:465)
+	org.graalvm.compiler.nodes.cfg.ControlFlowGraph.compute(ControlFlowGraph.java:82)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase.run(ConditionalEliminationPhase.java:134)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase.run(ConditionalEliminationPhase.java:111)
+TRACE 302575:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.optimizeEmptyBlocks(LinearScanResolveDataFlowPhase.java:169)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveDataFlow(LinearScanResolveDataFlowPhase.java:134)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.run(LinearScanResolveDataFlowPhase.java:55)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanAllocationPhase.apply(LinearScanAllocationPhase.java:53)
+TRACE 302620:
+	org.graalvm.collections.EconomicMapImpl.getHashIndex(EconomicMapImpl.java:414)
+	org.graalvm.collections.EconomicMapImpl.putHashEntry(EconomicMapImpl.java:577)
+	org.graalvm.collections.EconomicMapImpl.createHash(EconomicMapImpl.java:571)
+	org.graalvm.collections.EconomicMapImpl.put(EconomicMapImpl.java:453)
+TRACE 302739:
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.tryCanonicalize(CanonicalizerPhase.java:387)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processNode(CanonicalizerPhase.java:325)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processWorkSet(CanonicalizerPhase.java:302)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.run(CanonicalizerPhase.java:264)
+TRACE 302775:
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.tryCanonicalize(CanonicalizerPhase.java:391)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processNode(CanonicalizerPhase.java:325)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processWorkSet(CanonicalizerPhase.java:302)
+	org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.run(CanonicalizerPhase.java:264)
+TRACE 302908:
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.registerNewCondition(ConditionalEliminationPhase.java:678)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processFixedGuard(ConditionalEliminationPhase.java:373)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNode(ConditionalEliminationPhase.java:500)
+	org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processBlock(ConditionalEliminationPhase.java:474)
+TRACE 302980:
+	jdk.vm.ci.hotspot.CompilerToVM.resolveFieldInPool(CompilerToVM.java:Unknown line)
+	jdk.vm.ci.hotspot.HotSpotConstantPool.lookupField(HotSpotConstantPool.java:630)
+	org.graalvm.compiler.java.BytecodeParser.lookupField(BytecodeParser.java:4302)
+	org.graalvm.compiler.java.BytecodeParser.genGetStatic(BytecodeParser.java:4808)
+TRACE 303082:
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.toJavaValue(DebugInfoBuilder.java:346)
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.computeLocals(DebugInfoBuilder.java:300)
+	org.graalvm.compiler.core.gen.DebugInfoBuilder.computeFrameForState(DebugInfoBuilder.java:275)
+	org.graalvm.compiler.hotspot.HotSpotDebugInfoBuilder.computeFrameForState(HotSpotDebugInfoBuilder.java:131)
+TRACE 303116:
+	org.graalvm.compiler.nodes.GraphDecoder.makeFloatingNodeInputs(GraphDecoder.java:1297)
+	org.graalvm.compiler.nodes.GraphDecoder.decodeFloatingNode(GraphDecoder.java:1367)
+	org.graalvm.compiler.replacements.PEGraphDecoder.handleInvoke(PEGraphDecoder.java:706)
+	org.graalvm.compiler.nodes.GraphDecoder.processNextNode(GraphDecoder.java:757)
+TRACE 303162:
+	org.graalvm.compiler.graph.NodeClass.replaceFirstEdge(NodeClass.java:1392)
+	org.graalvm.compiler.graph.NodeClass.replaceFirstInput(NodeClass.java:1368)
+	org.graalvm.compiler.graph.Node.replaceFirstInput(Node.java:934)
+	org.graalvm.compiler.virtual.phases.ea.GraphEffectList$4.apply(GraphEffectList.java:275)
+TRACE 303391:
+	org.graalvm.compiler.graph.Graph$NodeEventListener.event(Graph.java:565)
+	org.graalvm.compiler.graph.Node.maybeNotifyInputChanged(Node.java:890)
+	org.graalvm.compiler.graph.Node.updateUsages(Node.java:585)
+	org.graalvm.compiler.graph.NodeInputList.update(NodeInputList.java:61)
+TRACE 303426:
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.lambda$buildIntervals$10(LinearScanLifetimeAnalysisPhase.java:758)
+	org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase$$Lambda$28.1612075130.visitValue(<Unknown Source>:Unknown line)
+	org.graalvm.compiler.lir.LIRFrameState.visitValues(LIRFrameState.java:157)
+	org.graalvm.compiler.lir.LIRFrameState.visitEachState(LIRFrameState.java:105)
+TRACE 303462:
+	org.graalvm.compiler.graph.Graph$NodeEventListener.event(Graph.java:565)
+	org.graalvm.compiler.graph.Graph.unregister(Graph.java:1130)
+	org.graalvm.compiler.graph.Node.markDeleted(Node.java:986)
+	org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs(GraphUtil.java:326)
+TRACE 303607:
+	org.graalvm.compiler.java.LocalLiveness.computeLocalLiveness(LocalLiveness.java:331)
+	org.graalvm.compiler.java.LocalLiveness.computeLiveness(LocalLiveness.java:103)
+	org.graalvm.compiler.java.LocalLiveness.compute(LocalLiveness.java:93)
+	org.graalvm.compiler.java.BytecodeParser.build(BytecodeParser.java:1017)
+TRACE 303753:
+	org.graalvm.compiler.graph.iterators.PredicatedProxyNodeIterator.forward(PredicatedProxyNodeIterator.java:43)
+	org.graalvm.compiler.graph.iterators.NodeIterator.hasNext(NodeIterator.java:40)
+	org.graalvm.compiler.graph.iterators.NodeIterable.isEmpty(NodeIterable.java:76)
+	org.graalvm.compiler.loop.LoopFragmentInside.lambda$clearStateNodes$1(LoopFragmentInside.java:318)
+TRACE 304861:
+	com.oracle.truffle.r.runtime.rng.RRNG.getContextState(RRNG.java:253)
+	com.oracle.truffle.r.runtime.rng.RRNG.currentSampleKind(RRNG.java:281)
+	com.oracle.truffle.r.runtime.rng.RRNG.unifIndex(RRNG.java:333)
+	com.oracle.truffle.r.runtime.rng.RRNG.unifIndex(RRNG.java:329)
+CPU SAMPLES BEGIN (total = 108586) Sat Jun 27 22:27:14 2020
+rank   self  accum   count trace method
+   1 39.99% 39.99%   43423 301607 java.io.FileInputStream.open0
+   2  8.03% 48.02%    8720 302074 com.oracle.truffle.nfi.impl.NFIContext.executePrimitive
+   3  4.17% 52.19%    4529 304669 com.oracle.truffle.api.library.LibraryFactory.getUncached
+   4  4.00% 56.19%    4340 305298 com.oracle.truffle.r.runtime.data.nodes.VectorAccess.setFromSameType
+   5  3.86% 60.05%    4196 304668 com.oracle.truffle.api.library.LibraryFactory.getUncached
+   6  1.89% 61.94%    2052 304277 com.oracle.truffle.api.profiles.ValueProfile$Equality.profile
+   7  1.59% 63.53%    1730 304676 com.oracle.truffle.r.nodes.builtin.base.Combine.processContentElement
+   8  1.46% 64.99%    1584 302207 jdk.vm.ci.hotspot.CompilerToVM.interpreterFrameSize
+   9  1.35% 66.34%    1462 305244 com.oracle.truffle.r.runtime.data.NativeDataAccess.getData
+  10  1.25% 67.59%    1352 301683 jdk.vm.ci.hotspot.CompilerToVM.hasNeverInlineDirective
+  11  1.22% 68.80%    1321 304673 com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibraryGen$UncachedDispatch.setDoubleAt
+  12  1.13% 69.94%    1231 304275 com.oracle.truffle.api.profiles.ValueProfile$Equality.profile
+  13  1.09% 71.02%    1181 304670 com.oracle.truffle.r.runtime.data.RDoubleVectorDataLibraryGen$UncachedDispatch.getDoubleAt
+  14  1.07% 72.09%    1160 302000 jdk.vm.ci.hotspot.CompilerToVM.installCode
+  15  0.97% 73.06%    1052 304286 com.oracle.truffle.r.runtime.nmath.RandomFunctions$RandomNumberProvider.unifRand
+  16  0.77% 73.83%     837 304649 com.oracle.truffle.r.runtime.data.nodes.VectorAccess.getDouble
+  17  0.68% 74.51%     739 305245 com.oracle.truffle.r.runtime.data.RDoubleVector.getLength
+  18  0.58% 75.09%     628 304652 com.oracle.truffle.r.nodes.binary.BinaryMapBooleanFunctionNode.applyLogical
+  19  0.56% 75.65%     612 302574 org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt
+  20  0.55% 76.21%     599 301844 jdk.vm.ci.hotspot.CompilerToVM.getComponentType
+  21  0.50% 76.70%     540 304594 com.oracle.truffle.r.runtime.data.nodes.VectorAccess.setFromSameType
+  22  0.46% 77.16%     501 301974 org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition
+  23  0.39% 77.55%     423 305315 com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doDouble
+  24  0.39% 77.94%     420 305020 com.oracle.truffle.r.nodes.binary.BinaryMapBooleanFunctionNode.applyLogical
+  25  0.38% 78.32%     417 301691 jdk.vm.ci.hotspot.CompilerToVM.lookupMethodInPool
+  26  0.36% 78.68%     389 304658 com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt
+  27  0.34% 79.02%     370 304647 com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached
+  28  0.32% 79.35%     350 304650 com.oracle.truffle.r.nodes.binary.BinaryMapBooleanFunctionNode.applyLogical
+  29  0.32% 79.66%     345 301631 java.lang.Throwable.fillInStackTrace
+  30  0.29% 79.96%     318 301170 java.lang.Throwable.fillInStackTrace
+  31  0.28% 80.24%     308 304671 com.oracle.truffle.r.nodes.builtin.base.Combine.processContentElement
+  32  0.25% 80.49%     272 304276 com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionDoubleExecutorNode.cached
+  33  0.24% 80.73%     264 305022 com.oracle.truffle.r.nodes.binary.BinaryMapBooleanFunctionNode.applyLogical
+  34  0.23% 80.97%     253 301771 jdk.vm.ci.hotspot.CompilerToVM.getResolvedJavaType0
+  35  0.22% 81.18%     235 301837 org.graalvm.collections.EconomicMapImpl.findLinear
+  36  0.21% 81.39%     227 301988 org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition
+  37  0.20% 81.59%     219 302833 org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt
+  38  0.20% 81.79%     217 305012 com.oracle.truffle.r.runtime.data.nodes.VectorAccess.setFromSameType
+  39  0.20% 81.99%     214 301819 jdk.vm.ci.hotspot.CompilerToVM.lookupNameAndTypeRefIndexInPool
+  40  0.19% 82.18%     208 301327 sun.nio.fs.UnixNativeDispatcher.access0
+  41  0.19% 82.37%     208 302495 org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt
+  42  0.19% 82.56%     207 301985 org.graalvm.compiler.nodes.java.InstanceOfNode.implies
+  43  0.19% 82.75%     204 300069 java.lang.ClassLoader.defineClass1
+  44  0.17% 82.92%     183 304651 com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doVectorScalar
+  45  0.17% 83.09%     182 304645 com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached
+  46  0.15% 83.23%     159 301694 jdk.vm.ci.hotspot.CompilerToVM.getResolvedJavaType0
+  47  0.15% 83.38%     158 304654 com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doSameLength
+  48  0.14% 83.52%     149 303691 java.lang.ThreadLocal$ThreadLocalMap.access$000
+  49  0.13% 83.65%     145 302031 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processInputs
+  50  0.13% 83.78%     136 301131 java.lang.String.intern
+  51  0.12% 83.90%     135 302407 org.graalvm.collections.EconomicMapImpl.getHashIndex
+  52  0.12% 84.02%     134 300972 java.lang.String.intern
+  53  0.12% 84.15%     133 304282 com.oracle.truffle.r.runtime.rng.mt.MersenneTwister.genrandDouble
+  54  0.12% 84.27%     132 301641 jdk.vm.ci.hotspot.CompilerToVM.resolveMethod
+  55  0.12% 84.39%     131 302147 org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition
+  56  0.12% 84.51%     127 301788 java.lang.System.identityHashCode
+  57  0.12% 84.62%     126 302834 org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt
+  58  0.11% 84.73%     123 301817 org.graalvm.compiler.graph.NodeClass.deepHashCode0
+  59  0.11% 84.85%     122 302141 org.graalvm.collections.EconomicMapImpl.getHashIndex
+  60  0.11% 84.96%     122 302792 org.graalvm.compiler.lir.ValueConsumer.visitValue
+  61  0.11% 85.07%     118 304279 com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionDoubleExecutorNode.cached
+  62  0.10% 85.17%     114 305025 com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt
+  63  0.10% 85.27%     106 304945 com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionDoubleExecutorNode.cached
+  64  0.10% 85.37%     106 305014 com.oracle.truffle.r.runtime.data.nodes.VectorAccess.getDouble
+  65  0.09% 85.46%     101 302386 org.graalvm.compiler.nodes.java.InstanceOfNode.implies
+  66  0.09% 85.55%     100 302550 org.graalvm.compiler.core.gen.DebugInfoBuilder.computeLocals
+  67  0.09% 85.64%      97 304883 com.oracle.truffle.r.runtime.data.nodes.VectorAccess.getInt
+  68  0.09% 85.73%      94 301665 com.oracle.truffle.api.TruffleFile.checkAccess
+  69  0.08% 85.81%      91 301748 jdk.vm.ci.hotspot.CompilerToVM.lookupType
+  70  0.08% 85.90%      89 303112 org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveCollectMappings
+  71  0.08% 85.97%      86 302439 org.graalvm.compiler.graph.Graph.findNextLiveiterable
+  72  0.08% 86.05%      84 301041 sun.nio.fs.UnixNativeDispatcher.realpath0
+  73  0.08% 86.13%      84 301832 java.lang.Object.hashCode
+  74  0.07% 86.20%      81 301312 sun.nio.fs.UnixNativeDispatcher.access
+  75  0.07% 86.28%      78 302057 org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition
+  76  0.07% 86.35%      78 304946 com.oracle.truffle.r.library.stats.RandFunctionsNodes$RandFunctionDoubleExecutorNode.cached
+  77  0.07% 86.42%      74 301729 jdk.vm.ci.hotspot.CompilerToVM.getResolvedJavaType0
+  78  0.07% 86.48%      74 302695 org.graalvm.compiler.lir.dfa.LocationMarker.processInstructionBottomUp
+  79  0.07% 86.55%      72 301672 jdk.vm.ci.hotspot.CompilerToVM.hasNeverInlineDirective
+  80  0.06% 86.61%      70 302011 java.lang.System.identityHashCode
+  81  0.06% 86.68%      69 302998 org.graalvm.compiler.graph.Graph.findDuplicate
+  82  0.06% 86.74%      63 301831 jdk.vm.ci.hotspot.CompilerToVM.getComponentType
+  83  0.06% 86.79%      63 303103 org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt
+  84  0.06% 86.85%      62 301336 com.oracle.truffle.r.runtime.env.frame.FrameSlotChangeMonitor.getObject
+  85  0.06% 86.91%      62 302477 org.graalvm.collections.EconomicMapImpl.getHashIndex
+  86  0.06% 86.96%      60 302383 org.graalvm.compiler.nodes.UnaryOpLogicNode.skipThroughPisAndProxies
+  87  0.06% 87.02%      60 302826 org.graalvm.compiler.lir.ValueConsumer.visitValue
+  88  0.05% 87.07%      59 301829 jdk.vm.ci.hotspot.CompilerToVM.resolveFieldInPool
+  89  0.05% 87.13%      58 302296 org.graalvm.collections.EconomicMapImpl.find
+  90  0.05% 87.18%      58 302904 org.graalvm.compiler.phases.common.inlining.walker.ComputeInliningRelevance$Scope.process
+  91  0.05% 87.23%      57 301642 jdk.vm.ci.hotspot.CompilerToVM.findUniqueConcreteMethod
+  92  0.05% 87.28%      57 302952 org.graalvm.compiler.lir.LIRInstructionClass.visitEachState
+  93  0.05% 87.34%      55 302373 org.graalvm.compiler.nodes.LogicNegationNode.implies
+  94  0.05% 87.39%      54 302773 org.graalvm.compiler.nodes.UnaryOpLogicNode.skipThroughPisAndProxies
+  95  0.05% 87.43%      54 303174 org.graalvm.compiler.nodes.FrameState.applyToNonVirtual
+  96  0.05% 87.48%      53 302380 org.graalvm.compiler.nodes.UnaryOpLogicNode.skipThroughPisAndProxies
+  97  0.05% 87.53%      53 302988 org.graalvm.compiler.nodes.UnaryOpLogicNode.skipThroughPisAndProxies
+  98  0.05% 87.58%      53 303052 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative
+  99  0.05% 87.63%      53 303085 org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.computeGlobalLiveSets
+ 100  0.05% 87.68%      52 302211 java.lang.Object.hashCode
+ 101  0.05% 87.73%      52 302993 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative
+ 102  0.05% 87.77%      51 300914 java.lang.System.identityHashCode
+ 103  0.05% 87.82%      51 302250 org.graalvm.compiler.lir.alloc.lsra.Interval$RegisterBindingLists.addToListSortedByStartAndUsePositions
+ 104  0.05% 87.87%      51 303053 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.calcLatestBlock
+ 105  0.05% 87.91%      50 300957 org.antlr.v4.runtime.atn.ParserATNSimulator.canDropLoopEntryEdgeInLeftRecursiveRule
+ 106  0.05% 87.96%      50 302321 org.graalvm.compiler.graph.NodeClass.deepEquals0
+ 107  0.05% 88.00%      50 303109 org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveCollectMappings
+ 108  0.05% 88.05%      50 304659 com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt
+ 109  0.05% 88.10%      49 303023 org.graalvm.collections.EconomicMapImpl.find
+ 110  0.04% 88.14%      47 300956 org.antlr.v4.runtime.atn.ParserATNSimulator.closure_
+ 111  0.04% 88.18%      47 301810 jdk.vm.ci.hotspot.CompilerToVM.lookupType
+ 112  0.04% 88.23%      47 302478 org.graalvm.compiler.graph.NodeClass.applyEdges
+ 113  0.04% 88.27%      47 304902 sun.misc.Unsafe.copyMemory
+ 114  0.04% 88.31%      47 305021 com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doVectorScalar
+ 115  0.04% 88.35%      44 300940 org.antlr.v4.runtime.misc.Array2DHashSet.getOrAdd
+ 116  0.04% 88.39%      43 301757 jdk.vm.ci.hotspot.CompilerToVM.lookupKlassInPool
+ 117  0.04% 88.43%      42 302622 jdk.vm.ci.hotspot.CompilerToVM.getComponentType
+ 118  0.04% 88.47%      42 304884 com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt
+ 119  0.04% 88.51%      41 300933 org.antlr.v4.runtime.atn.ParserATNSimulator.getEpsilonTarget
+ 120  0.04% 88.55%      41 305015 com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached
+ 121  0.04% 88.58%      40 302450 org.graalvm.compiler.nodes.FrameState.applyToNonVirtual
+ 122  0.04% 88.62%      40 302621 org.graalvm.compiler.virtual.phases.ea.PEReadEliminationClosure.processNode
+ 123  0.04% 88.66%      40 302636 org.graalvm.compiler.graph.NodeClass$RawEdgesIterator.forward
+ 124  0.04% 88.69%      39 301809 org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processNode
+ 125  0.04% 88.73%      39 302493 org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.buildIntervals
+ 126  0.04% 88.76%      39 302720 org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs
+ 127  0.04% 88.80%      39 303106 org.graalvm.compiler.lir.alloc.lsra.LinearScanOptimizeSpillPositionPhase.optimizeInterval
+ 128  0.03% 88.83%      38 302810 org.graalvm.collections.EconomicMapImpl.getHashIndex
+ 129  0.03% 88.87%      38 302868 com.oracle.truffle.r.nodes.function.RCallSpecialNode.execute
+ 130  0.03% 88.90%      37 302809 org.graalvm.compiler.phases.common.LoweringPhase$Round.process
+ 131  0.03% 88.94%      37 302822 jdk.vm.ci.hotspot.CompilerToVM.interpreterFrameSize
+ 132  0.03% 88.97%      36 301394 com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid
+ 133  0.03% 89.00%      36 301976 org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition
+ 134  0.03% 89.04%      35 300955 org.antlr.v4.runtime.misc.Array2DHashSet.getOrAdd
+ 135  0.03% 89.07%      35 302465 org.graalvm.compiler.graph.NodeClass.applyHelper
+ 136  0.03% 89.10%      35 302686 org.graalvm.compiler.lir.alloc.lsra.LinearScan.allocate
+ 137  0.03% 89.13%      34 302942 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative
+ 138  0.03% 89.16%      34 303472 org.graalvm.compiler.lir.LIRInstruction.visitEachState
+ 139  0.03% 89.19%      33 301764 jdk.vm.ci.hotspot.CompilerToVM.hasNeverInlineDirective
+ 140  0.03% 89.22%      33 302413 jdk.vm.ci.hotspot.CompilerToVM.getComponentType
+ 141  0.03% 89.25%      33 302770 org.graalvm.compiler.core.common.Fields.copy
+ 142  0.03% 89.28%      33 305370 com.oracle.truffle.r.runtime.data.RIntVector.getDataAt
+ 143  0.03% 89.31%      32 301906 org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.processNode
+ 144  0.03% 89.34%      32 302221 jdk.vm.ci.hotspot.CompilerToVM.getSymbol
+ 145  0.03% 89.37%      32 302535 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processNodes
+ 146  0.03% 89.40%      31 302226 org.graalvm.compiler.lir.ValueConsumer.visitValue
+ 147  0.03% 89.43%      31 302316 org.graalvm.compiler.graph.NodeClass.dataEquals
+ 148  0.03% 89.46%      31 302668 org.graalvm.compiler.graph.NodeClass.applyEdges
+ 149  0.03% 89.49%      31 304326 org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveCollectMappings
+ 150  0.03% 89.52%      31 304849 com.oracle.truffle.r.runtime.rng.RRNG.unifRand
+ 151  0.03% 89.54%      31 305016 com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached
+ 152  0.03% 89.57%      30 301021 org.graalvm.collections.EconomicMapImpl.getHashIndex
+ 153  0.03% 89.60%      30 302355 com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.executeInternal
+ 154  0.03% 89.63%      30 302597 org.graalvm.compiler.replacements.PEGraphDecoder.canonicalizeFixedNode
+ 155  0.03% 89.66%      30 302680 org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.process
+ 156  0.03% 89.68%      30 304842 com.oracle.truffle.r.runtime.rng.RRNG.getContextState
+ 157  0.03% 89.71%      29 302203 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks
+ 158  0.03% 89.74%      29 302484 org.graalvm.compiler.phases.common.ConditionalEliminationUtil.tryProveGuardCondition
+ 159  0.03% 89.76%      29 303095 org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.freeCollectInactiveAny
+ 160  0.03% 89.79%      29 303306 org.graalvm.compiler.graph.iterators.PredicatedProxyNodeIterator.forward
+ 161  0.03% 89.82%      29 303307 org.graalvm.compiler.virtual.phases.ea.PartialEscapeClosure.collectLockedVirtualObjects
+ 162  0.03% 89.84%      29 303442 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks
+ 163  0.03% 89.87%      28 300945 org.antlr.v4.runtime.atn.PredictionMode.getConflictingAltSubsets
+ 164  0.03% 89.89%      28 303078 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative
+ 165  0.03% 89.92%      28 303633 org.graalvm.compiler.nodes.java.InstanceOfNode.implies
+ 166  0.03% 89.95%      28 305017 com.oracle.truffle.r.nodes.builtin.base.IsNA.isNACached
+ 167  0.03% 89.97%      28 305101 com.oracle.truffle.r.runtime.data.RDoubleVector.<init>
+ 168  0.02% 90.00%      27 300942 org.antlr.v4.runtime.misc.FlexibleHashMap.expand
+ 169  0.02% 90.02%      27 302451 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.processStack
+ 170  0.02% 90.05%      27 302791 org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processNodes
+ 171  0.02% 90.07%      27 304085 com.oracle.truffle.api.library.LibraryFactory.getUncached
+ 172  0.02% 90.10%      27 305023 com.oracle.truffle.r.nodes.primitive.VectorMapBinaryInternalNode.doSameLength
+ 173  0.02% 90.12%      26 301492 com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.executeInternal
+ 174  0.02% 90.14%      26 302449 java.lang.System.identityHashCode
+ 175  0.02% 90.17%      26 303331 org.graalvm.compiler.graph.NodeClass$RawEdgesIterator.forward
+ 176  0.02% 90.19%      25 301162 java.lang.String.intern
+ 177  0.02% 90.21%      25 302545 org.graalvm.collections.EconomicMapImpl.add
+ 178  0.02% 90.24%      25 302641 org.graalvm.compiler.graph.NodeClass.applyEdges
+ 179  0.02% 90.26%      25 302697 org.graalvm.compiler.lir.LIRFrameState.visitEachState
+ 180  0.02% 90.28%      25 303504 org.graalvm.compiler.lir.alloc.lsra.Interval$RegisterBindingLists.addToListSortedByStartAndUsePositions
+ 181  0.02% 90.31%      24 301761 jdk.vm.ci.hotspot.CompilerToVM.getImplementor
+ 182  0.02% 90.33%      24 302114 com.oracle.truffle.r.nodes.builtin.base.Return.doReturn
+ 183  0.02% 90.35%      24 302716 org.graalvm.compiler.nodes.GraphDecoder.makeFixedNodeInputs
+ 184  0.02% 90.37%      24 302733 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlock
+ 185  0.02% 90.39%      24 302848 org.graalvm.compiler.lir.RedundantMoveElimination$Optimization.updateState
+ 186  0.02% 90.42%      24 302886 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.sortNodesLatestWithinBlock
+ 187  0.02% 90.44%      24 302956 org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.spillCollectInactiveAny
+ 188  0.02% 90.46%      24 303267 org.graalvm.compiler.nodes.GraphDecoder.makeFloatingNodeInputs
+ 189  0.02% 90.48%      24 304245 org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.processEnd
+ 190  0.02% 90.50%      24 305380 com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doDoubleCached
+ 191  0.02% 90.53%      23 300635 sun.misc.Unsafe.defineAnonymousClass
+ 192  0.02% 90.55%      23 302729 org.graalvm.compiler.core.common.spi.JavaConstantFieldProvider.isStableField
+ 193  0.02% 90.57%      23 302843 org.graalvm.compiler.lir.stackslotalloc.FixPointIntervalBuilder.markOutInterval
+ 194  0.02% 90.59%      23 303227 org.graalvm.compiler.phases.graph.ScheduledNodeIterator.processNodes
+ 195  0.02% 90.61%      22 300158 java.util.zip.ZipFile.read
+ 196  0.02% 90.63%      22 301322 java.lang.String.intern
+ 197  0.02% 90.65%      22 301656 jdk.vm.ci.hotspot.CompilerToVM.lookupType
+ 198  0.02% 90.67%      22 302001 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlock
+ 199  0.02% 90.69%      22 302685 org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase.colorLirOperand
+ 200  0.02% 90.71%      21 300257 java.lang.Class.forName0
+ 201  0.02% 90.73%      21 301134 com.oracle.truffle.nfi.impl.NFIContext.executePrimitive
+ 202  0.02% 90.75%      21 301200 java.lang.String.intern
+ 203  0.02% 90.77%      21 301617 com.oracle.truffle.r.nodes.control.RBlockNode.executeVoid
+ 204  0.02% 90.79%      21 301657 jdk.vm.ci.hotspot.CompilerToVM.getImplementor
+ 205  0.02% 90.81%      21 302302 jdk.vm.ci.hotspot.CompilerToVM.lookupKlassInPool
+ 206  0.02% 90.83%      21 302527 org.graalvm.compiler.phases.common.FixReadsPhase$RawConditionalEliminationVisitor.replaceConstantInputs
+ 207  0.02% 90.85%      21 302927 com.oracle.truffle.r.nodes.builtin.base.S3DispatchFunctions$UseMethod.execute
+ 208  0.02% 90.86%      21 303148 org.graalvm.compiler.nodes.GraphDecoder.readProperties
+ 209  0.02% 90.88%      21 303302 org.graalvm.compiler.nodes.StructuredGraph.maybeCompress
+ 210  0.02% 90.90%      21 303396 org.graalvm.compiler.virtual.phases.ea.EffectList.apply
+ 211  0.02% 90.92%      21 303469 org.graalvm.compiler.lir.LIRIntrospection.visitEach
+ 212  0.02% 90.94%      21 303518 org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.resolveCollectMappings
+ 213  0.02% 90.96%      21 304845 com.oracle.truffle.r.nodes.builtin.base.Sample.doSample
+ 214  0.02% 90.98%      20 300962 org.antlr.v4.runtime.misc.FlexibleHashMap.expand
+ 215  0.02% 91.00%      20 302110 com.oracle.truffle.r.nodes.function.FunctionBodyNode.visibleExecute
+ 216  0.02% 91.02%      20 302253 com.oracle.truffle.r.nodes.function.RCallNode$BuiltinCallNode.forceArgPromises
+ 217  0.02% 91.03%      20 302736 org.graalvm.compiler.virtual.phases.ea.PEReadEliminationClosure.processNode
+ 218  0.02% 91.05%      20 302794 com.oracle.truffle.r.nodes.control.IfNode.voidExecute
+ 219  0.02% 91.07%      20 303164 org.graalvm.compiler.phases.common.inlining.walker.ComputeInliningRelevance$Scope.process
+ 220  0.02% 91.09%      20 303416 org.graalvm.compiler.lir.constopt.ConstantTreeAnalyzer.analyzeBlocks
+ 221  0.02% 91.11%      19 302023 com.oracle.truffle.r.nodes.function.call.PrepareArguments$PrepareArgumentsDefault.executeArgs
+ 222  0.02% 91.13%      19 302554 com.oracle.truffle.api.TruffleFile.checkAccess
+ 223  0.02% 91.14%      19 302568 com.oracle.truffle.r.runtime.RSource.fromSrcfile
+ 224  0.02% 91.16%      19 302675 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.calcLatestBlock
+ 225  0.02% 91.18%      19 303006 jdk.vm.ci.hotspot.HotSpotJVMCIRuntime.fromClass0
+ 226  0.02% 91.19%      19 303013 org.graalvm.compiler.graph.NodeWorkList$IterativeNodeWorkList.inflateToBitMap
+ 227  0.02% 91.21%      19 303238 org.graalvm.compiler.lir.ValueConsumer.visitValue
+ 228  0.02% 91.23%      19 303425 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.scheduleEarliestIterative
+ 229  0.02% 91.25%      18 301646 org.graalvm.compiler.graph.NodeWorkList.<init>
+ 230  0.02% 91.26%      18 301675 sun.nio.fs.UnixException.rethrowAsIOException
+ 231  0.02% 91.28%      18 302332 org.graalvm.compiler.graph.NodeClass.unregisterAtInputsAsUsage
+ 232  0.02% 91.30%      18 302901 java.lang.System.identityHashCode
+ 233  0.02% 91.31%      18 302986 org.graalvm.compiler.graph.iterators.PredicatedProxyNodeIterator.forward
+ 234  0.02% 91.33%      18 303223 org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance$1.inputChanged
+ 235  0.02% 91.35%      18 303448 org.graalvm.compiler.core.gen.NodeLIRBuilder.matchComplexExpressions
+ 236  0.02% 91.36%      17 301652 sun.nio.fs.UnixNativeDispatcher.access
+ 237  0.02% 91.38%      17 301870 com.oracle.truffle.r.runtime.data.RSharingAttributeStorage.isShareable
+ 238  0.02% 91.39%      17 302013 org.graalvm.compiler.graph.NodeClass.registerAtInputsAsUsage
+ 239  0.02% 91.41%      17 302134 org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs
+ 240  0.02% 91.42%      17 302392 org.graalvm.compiler.graph.TypedGraphNodeIterator.forward
+ 241  0.02% 91.44%      17 302640 org.graalvm.compiler.phases.common.DeadCodeEliminationPhase.deleteNodes
+ 242  0.02% 91.46%      17 303217 org.graalvm.compiler.graph.NodeClass$RawEdgesIterator.forward
+ 243  0.01% 91.47%      16 300534 java.lang.Throwable.fillInStackTrace
+ 244  0.01% 91.49%      16 300784 java.lang.ClassLoader.loadClass
+ 245  0.01% 91.50%      16 300866 java.lang.invoke.MethodHandleNatives.resolve
+ 246  0.01% 91.51%      16 301079 java.lang.String.intern
+ 247  0.01% 91.53%      16 301172 java.lang.Object.hashCode
+ 248  0.01% 91.54%      16 301799 sun.misc.Unsafe.getAddress
+ 249  0.01% 91.56%      16 301853 jdk.vm.ci.hotspot.CompilerToVM.getComponentType
+ 250  0.01% 91.57%      16 302191 org.graalvm.compiler.graph.NodeWorkList.addAll
+ 251  0.01% 91.59%      16 302192 com.oracle.truffle.r.runtime.data.RBaseObject.<init>
+ 252  0.01% 91.60%      16 302199 org.graalvm.compiler.nodes.GraphDecoder.readProperties
+ 253  0.01% 91.62%      16 302218 jdk.vm.ci.hotspot.CompilerToVM.findUniqueConcreteMethod
+ 254  0.01% 91.63%      16 302624 org.graalvm.compiler.graph.NodeClass.replaceFirstEdge
+ 255  0.01% 91.65%      16 302632 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks
+ 256  0.01% 91.66%      16 302709 org.graalvm.collections.EconomicMapImpl.compareKeys
+ 257  0.01% 91.68%      16 303466 org.graalvm.compiler.lir.LIRIntrospection.visitEach
+ 258  0.01% 91.69%      16 305026 com.oracle.truffle.r.nodes.unary.UnaryArithmeticReduceNode.doInt
+ 259  0.01% 91.71%      15 301655 java.lang.String.intern
+ 260  0.01% 91.72%      15 301973 org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processBlock
+ 261  0.01% 91.73%      15 302077 org.graalvm.compiler.lir.alloc.lsra.IntervalWalker.walkTo
+ 262  0.01% 91.75%      15 302089 org.graalvm.compiler.lir.alloc.lsra.IntervalWalker.walkTo
+ 263  0.01% 91.76%      15 302187 jdk.vm.ci.hotspot.CompilerToVM.isCompilable
+ 264  0.01% 91.77%      15 302228 org.graalvm.compiler.graph.spi.Canonicalizable$Binary.canonical
+ 265  0.01% 91.79%      15 302548 jdk.vm.ci.hotspot.CompilerToVM.lookupAppendixInPool
+ 266  0.01% 91.80%      15 302656 org.graalvm.collections.EconomicMapImpl.put
+ 267  0.01% 91.82%      15 302832 org.graalvm.compiler.lir.alloc.lsra.Range.intersectsAt
+ 268  0.01% 91.83%      15 302841 org.graalvm.compiler.lir.LIRFrameState.forEachState
+ 269  0.01% 91.84%      15 302966 org.graalvm.compiler.nodes.SimplifyingGraphDecoder.handleFloatingNodeBeforeAdd
+ 270  0.01% 91.86%      15 303080 org.graalvm.compiler.nodes.ValueNode.getStackKind
+ 271  0.01% 91.87%      15 303563 org.graalvm.compiler.nodes.GraphDecoder.makeFloatingNodeInputs
+ 272  0.01% 91.88%      15 305011 com.oracle.truffle.r.ffi.impl.common.JavaUpCallsRFFIImpl.Rf_allocMatrix
+ 273  0.01% 91.90%      14 301651 sun.misc.Unsafe.allocateInstance
+ 274  0.01% 91.91%      14 301699 jdk.vm.ci.hotspot.CompilerToVM.getImplementor
+ 275  0.01% 91.92%      14 301703 com.oracle.truffle.r.nodes.function.RCallSpecialNode.execute
+ 276  0.01% 91.94%      14 301739 com.oracle.truffle.r.runtime.nodes.RNode.voidExecute
+ 277  0.01% 91.95%      14 302066 com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.executeInternal
+ 278  0.01% 91.96%      14 302184 org.graalvm.compiler.graph.InputEdges.update
+ 279  0.01% 91.98%      14 302246 com.oracle.truffle.r.nodes.access.variables.ReadVariableNode.executeInternal
+ 280  0.01% 91.99%      14 302267 org.graalvm.collections.EconomicMapImpl.find
+ 281  0.01% 92.00%      14 302389 org.graalvm.compiler.nodes.SimplifyingGraphDecoder.handleCanonicalization
+ 282  0.01% 92.01%      14 302603 org.graalvm.compiler.nodes.GraphDecoder.processNextNode
+ 283  0.01% 92.03%      14 302719 org.graalvm.compiler.nodes.ValueNode.stamp
+ 284  0.01% 92.04%      14 302732 org.graalvm.compiler.nodes.util.GraphUtil.killWithUnusedFloatingInputs
+ 285  0.01% 92.05%      14 303099 org.graalvm.compiler.lir.alloc.lsra.Interval$RegisterBindingLists.addToListSortedByStartAndUsePositions
+ 286  0.01% 92.07%      14 303140 org.graalvm.compiler.graph.Node.safeDelete
+ 287  0.01% 92.08%      14 303328 com.oracle.truffle.r.nodes.access.AccessArgumentNode.execute
+ 288  0.01% 92.09%      14 303363 com.oracle.truffle.r.nodes.function.FunctionBodyNode.visibleExecute
+ 289  0.01% 92.10%      14 303604 org.graalvm.compiler.phases.common.inlining.walker.ComputeInliningRelevance.createLoopScope
+ 290  0.01% 92.12%      14 303889 org.graalvm.compiler.core.gen.NodeLIRBuilder.doBlock
+ 291  0.01% 92.13%      13 300989 org.antlr.v4.runtime.misc.FlexibleHashMap.expand
+ 292  0.01% 92.14%      13 301159 jdk.vm.ci.hotspot.CompilerToVM.iterateFrames
+ 293  0.01% 92.15%      13 301205 java.lang.Class.isArray
+ 294  0.01% 92.16%      13 301840 org.graalvm.compiler.nodes.GraphEncoder.writeProperties
+ 295  0.01% 92.18%      13 301941 java.lang.Class.isAssignableFrom
+ 296  0.01% 92.19%      13 301960 org.graalvm.compiler.nodes.SimplifyingGraphDecoder.cleanupGraph
+ 297  0.01% 92.20%      13 302153 org.graalvm.compiler.nodes.GraphEncoder.writeOrderId
+ 298  0.01% 92.21%      13 302227 com.oracle.truffle.r.nodes.control.IfNode.voidExecute
+ 299  0.01% 92.22%      13 302265 org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase.assignLocations
+ 300  0.01% 92.24%      13 302317 jdk.vm.ci.hotspot.CompilerToVM.lookupKlassInPool
+ 301  0.01% 92.25%      13 302325 com.oracle.truffle.r.nodes.function.ArgumentMatcher.permuteArguments
+ 302  0.01% 92.26%      13 302430 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlock
+ 303  0.01% 92.27%      13 302583 jdk.vm.ci.hotspot.CompilerToVM.lookupKlassRefIndexInPool
+ 304  0.01% 92.28%      13 302670 org.graalvm.compiler.phases.schedule.SchedulePhase$Instance.sortIntoList
+ 305  0.01% 92.30%      13 302902 org.graalvm.collections.EconomicMapImpl.createHash
+ 306  0.01% 92.31%      13 303086 java.util.ArrayList.forEach
+ 307  0.01% 92.32%      13 303117 org.graalvm.compiler.lir.ValueConsumer.visitValue
+ 308  0.01% 92.33%      13 303369 org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.processBlock
+ 309  0.01% 92.34%      13 303447 org.graalvm.compiler.lir.ValueConsumer.visitValue
+ 310  0.01% 92.36%      13 303485 org.graalvm.compiler.lir.alloc.lsra.Interval.calcTo
+ 311  0.01% 92.37%      13 303835 java.util.ArrayList.addAll
+ 312  0.01% 92.38%      12 300825 java.util.zip.ZipFile.read
+ 313  0.01% 92.39%      12 300831 java.security.AccessController.doPrivileged
+ 314  0.01% 92.40%      12 301658 java.lang.Object.clone
+ 315  0.01% 92.41%      12 301908 org.graalvm.compiler.phases.common.DeoptimizationGroupingPhase.run
+ 316  0.01% 92.42%      12 302172 com.oracle.truffle.r.nodes.builtin.RBuiltinNode$Arg1.call
+ 317  0.01% 92.43%      12 302521 org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance$1.inputChanged
+ 318  0.01% 92.45%      12 302531 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks
+ 319  0.01% 92.46%      12 302613 org.graalvm.compiler.nodes.GraphDecoder.makeSuccessorStubs
+ 320  0.01% 92.47%      12 302742 org.graalvm.compiler.graph.iterators.PredicatedProxyNodeIterator.forward
+ 321  0.01% 92.48%      12 302757 java.lang.Object.clone
+ 322  0.01% 92.49%      12 302786 org.graalvm.compiler.nodes.StructuredGraph.maybeCompress
+ 323  0.01% 92.50%      12 302812 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.commonDominatorRawSameDepth
+ 324  0.01% 92.51%      12 302869 org.graalvm.compiler.nodes.IfNode.simplify
+ 325  0.01% 92.52%      12 302933 org.graalvm.collections.EconomicMapImpl.findLinear
+ 326  0.01% 92.53%      12 302963 org.graalvm.compiler.lir.NullCheckOptimizer.foldNullChecks
+ 327  0.01% 92.55%      12 302996 org.graalvm.compiler.graph.Graph.grow
+ 328  0.01% 92.56%      12 303010 org.graalvm.compiler.nodes.LogicNegationNode.implies
+ 329  0.01% 92.57%      12 303040 org.graalvm.compiler.graph.Node.copyOrClearEdgesForClone
+ 330  0.01% 92.58%      12 303105 org.graalvm.compiler.lir.alloc.lsra.Interval$RegisterBindingLists.addToListSortedByStartAndUsePositions
+ 331  0.01% 92.59%      12 303231 org.graalvm.compiler.nodes.spi.NodeWithState.states
+ 332  0.01% 92.60%      12 303314 org.graalvm.collections.EconomicMapImpl.add
+ 333  0.01% 92.61%      12 303424 org.graalvm.compiler.lir.alloc.lsra.Interval$UsePosList.<init>
+ 334  0.01% 92.62%      12 303457 org.graalvm.compiler.graph.NodeClass.unregisterAtSuccessorsAsPredecessor
+ 335  0.01% 92.63%      12 303511 org.graalvm.compiler.lir.alloc.lsra.LinearScanWalker.freeCollectInactiveFixed
+ 336  0.01% 92.64%      12 303666 org.graalvm.compiler.core.common.util.UnsafeArrayTypeReader.getU1
+ 337  0.01% 92.66%      12 304766 org.graalvm.compiler.graph.iterators.FilteredNodeIterable.filter
+ 338  0.01% 92.67%      12 305214 com.oracle.truffle.r.ffi.impl.nodes.RfAllocVectorNode.allocate
+ 339  0.01% 92.68%      11 300072 java.lang.ClassLoader.findBootstrapClass
+ 340  0.01% 92.69%      11 300074 java.util.zip.ZipFile.getEntry
+ 341  0.01% 92.70%      11 300865 java.util.zip.ZipFile.getNextEntry
+ 342  0.01% 92.71%      11 300992 org.antlr.v4.runtime.atn.ParserATNSimulator.canDropLoopEntryEdgeInLeftRecursiveRule
+ 343  0.01% 92.72%      11 301192 com.oracle.truffle.r.nodes.function.call.PrepareArguments$PrepareArgumentsDefault.prepare
+ 344  0.01% 92.73%      11 301289 java.lang.Object.clone
+ 345  0.01% 92.74%      11 301490 org.graalvm.compiler.truffle.runtime.OptimizedCallTarget.callBoundary
+ 346  0.01% 92.75%      11 301786 org.graalvm.compiler.nodes.GraphDecoder.decode
+ 347  0.01% 92.76%      11 301834 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.calcDominatorRanges
+ 348  0.01% 92.77%      11 301874 org.graalvm.compiler.phases.common.DeadCodeEliminationPhase.iterateSuccessorsAndInputs
+ 349  0.01% 92.78%      11 301961 org.graalvm.compiler.nodes.SimplifyingGraphDecoder.cleanupGraph
+ 350  0.01% 92.79%      11 302113 org.graalvm.compiler.nodes.ValueNode.stamp
+ 351  0.01% 92.80%      11 302176 org.graalvm.compiler.nodes.graphbuilderconf.InvocationPlugins.isEmpty
+ 352  0.01% 92.81%      11 302363 org.graalvm.compiler.nodes.SimplifyingGraphDecoder.cleanupGraph
+ 353  0.01% 92.82%      11 302372 org.graalvm.compiler.nodes.cfg.ControlFlowGraph.identifyBlocks
+ 354  0.01% 92.83%      11 302575 org.graalvm.compiler.lir.alloc.lsra.LinearScanResolveDataFlowPhase.optimizeEmptyBlocks
+ 355  0.01% 92.84%      11 302620 org.graalvm.collections.EconomicMapImpl.getHashIndex
+ 356  0.01% 92.85%      11 302739 org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.tryCanonicalize
+ 357  0.01% 92.86%      11 302775 org.graalvm.compiler.phases.common.CanonicalizerPhase$Instance.tryCanonicalize
+ 358  0.01% 92.87%      11 302908 org.graalvm.compiler.phases.common.ConditionalEliminationPhase$Instance.registerNewCondition
+ 359  0.01% 92.88%      11 302980 jdk.vm.ci.hotspot.CompilerToVM.resolveFieldInPool
+ 360  0.01% 92.89%      11 303082 org.graalvm.compiler.core.gen.DebugInfoBuilder.toJavaValue
+ 361  0.01% 92.90%      11 303116 org.graalvm.compiler.nodes.GraphDecoder.makeFloatingNodeInputs
+ 362  0.01% 92.91%      11 303162 org.graalvm.compiler.graph.NodeClass.replaceFirstEdge
+ 363  0.01% 92.92%      11 303391 org.graalvm.compiler.graph.Graph$NodeEventListener.event
+ 364  0.01% 92.93%      11 303426 org.graalvm.compiler.lir.alloc.lsra.LinearScanLifetimeAnalysisPhase.lambda$buildIntervals$10
+ 365  0.01% 92.94%      11 303462 org.graalvm.compiler.graph.Graph$NodeEventListener.event
+ 366  0.01% 92.95%      11 303607 org.graalvm.compiler.java.LocalLiveness.computeLocalLiveness
+ 367  0.01% 92.96%      11 303753 org.graalvm.compiler.graph.iterators.PredicatedProxyNodeIterator.forward
+ 368  0.01% 92.97%      11 304861 com.oracle.truffle.r.runtime.rng.RRNG.getContextState
+CPU SAMPLES END
