@@ -85,12 +85,16 @@ setMethod("/", c("NormalizedMatrix", "numeric"), function(e1, e2) {
 
 # TODO: this is wrong!
 setMethod("^", c("NormalizedMatrix", "numeric"), function(e1, e2) {
+    print("AQUI")
+    print(class(e2))
+    print(class(e1))
     result <- e1@morpheus@scalarExponentiation(e2)
     newNormalizedMatrix <- NormalizedMatrix(morpheus=result)
     return(newNormalizedMatrix)
 })
 
 setMethod("^", c("numeric", "NormalizedMatrix"), function(e1, e2) {
+    print("ALLA")
     result <- e2@morpheus@scalarExponentiation(e1)
     newNormalizedMatrix <- NormalizedMatrix(morpheus=result)
     return(newNormalizedMatrix)

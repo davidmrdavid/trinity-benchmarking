@@ -16,7 +16,8 @@ MatrixLibAdapter2 <- setClass(
      splice = "ANY",
      matrixAddition = "ANY",
      getNumRows = "ANY",
-     getNumCols = "ANY"
+     getNumCols = "ANY",
+    scalarExponentiation = "ANY"
    )
 )
 
@@ -30,10 +31,23 @@ setMethod("initialize", "MatrixLibAdapter2",
         }
         .Object@leftMatrixMultiplication = function(x, y) {
             z <- leftMatrixMultiplication(x, y)
+            if(TRUE){ #SPARSE check
+                z <- as.matrix(z)
+            }
             return(z)
+        }
+        .Object@scalarExponentiation = function(x, y){
+            print("??")
+            print(x)
+            print(y)
+            print("...")
+            return(scalarExponentiation(x, y))
         }
         .Object@rightMatrixMultiplication = function(x, y) {
             z <- rightMatrixMultiplication(x, y)
+            if(TRUE){ #SPARSE check
+                z <- as.matrix(z)
+            }
             return(z)
         }
         .Object@columnWiseAppend = function(x, y) {

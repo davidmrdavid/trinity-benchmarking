@@ -15,6 +15,7 @@ mode <- cliArgs[8]
 TR <- cliArgs[10]
 FR <- cliArgs[12]
 
+print(datasetJSON)
 print(actionParam);
 
 datasetMeta <- fromJSON(txt=datasetJSON)

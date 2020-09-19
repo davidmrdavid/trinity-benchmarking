@@ -6,12 +6,15 @@ CMD = "mx --dynamicimports /compiler,fastr,/tools --cp-sfx ../../mxbuild/dists/j
 # You need to remove hprof stuff above ^
 
 
-#D = ["movie_metadata.json"]#, 
-D = ["yelp_metadata.json", "walmart_metadata.json",
-     "books_metadata.json", "lastfm_metadata.json, expedia_metadata.json",
-     "flights_metadata.json"] 
-M = ["linearRegression","logisticRegression", "kMeansClustering"]
+D = ["movie_metadata.json"]#, 
+#D = ["yelp_metadata.json", "walmart_metadata.json",
+#     "books_metadata.json", "lastfm_metadata.json", "expedia_metadata.json",
+#     "flights_metadata.json"] 
+#M = ["linearRegression","logisticRegression"]#, "kMeansClustering"]
+M = ["kMeansClustering"]
 for d in D:
+
+  d = "./benchparams/" + d
   for m in M:
     for TR in range(1,2):#15,16):
       for FR in range(1,2):
@@ -24,14 +27,18 @@ for d in D:
         #COMMAND = CMD % ("linearRegression", "trinity", TR, FR)
         #pipe = subprocess.Popen(COMMAND, shell=True)
         #pipe.wait()
-        d = "./benchparams/" + d
+
+        #print("RUNNING: ", "TR=",TR, "FR=",FR)
+        #COMMAND = CMD % (d, m, "trinity", TR, FR)
+        #pipe = subprocess.Popen(COMMAND, shell=True)
+        #pipe.wait()
 
         print("RUNNING: ", "TR=",TR, "FR=",FR)
-        COMMAND = CMD % (d, m, "trinity", TR, FR)
+        COMMAND = CMD % (d, m, "morpheusR", TR, FR)
         pipe = subprocess.Popen(COMMAND, shell=True)
         pipe.wait()
 
         print("RUNNING: ", "TR=",TR, "FR=",FR)
-        COMMAND = CMD % (d, m, "morpheusR", TR, FR)
+        COMMAND = CMD % (d, m, "materialized", TR, FR)
         pipe = subprocess.Popen(COMMAND, shell=True)
         pipe.wait()
