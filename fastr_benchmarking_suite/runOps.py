@@ -6,11 +6,12 @@ CMD = "mx --dynamicimports /compiler,fastr,/tools --cp-sfx ../../mxbuild/dists/j
 # You need to remove hprof stuff above ^
 
 
-D = ["movie_metadata.json"]#, 
+#D = ["movie_metadata.json"]#, 
 #D = ["yelp_metadata.json", "walmart_metadata.json",
 #     "books_metadata.json", "lastfm_metadata.json", "expedia_metadata.json",
 #     "flights_metadata.json"] 
 #M = ["linearRegression","logisticRegression"]#, "kMeansClustering"]
+D = ["flights_metadata.json", "lastfm_metadata.json"]
 M = ["kMeansClustering"]
 for d in D:
 
