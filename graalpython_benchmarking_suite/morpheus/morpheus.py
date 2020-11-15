@@ -88,8 +88,7 @@ class TensorFromNumpy(object):
     def transpose(self):
         return TensorFromNumpy(self.npArr.T, self.foreign_backend)
 
-# TODO: this should inherit from np.array, thus behave like one
-class NormalizedMatrix(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
+class NormalizedMatrix(matrix):
 
     """
     Array functions are created to follow numpy semantics.
@@ -213,7 +212,7 @@ class NormalizedMatrix(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
         else:
             output = self.normalizedTable.elementWiseSum()
         if self.foreign_backend:
-            # TODO: DO BETTER, THIS IS A  HACK KNOWING BACK IS R
+            # TODO: This is a hack, relies on knowing that the backend is in R
             return np.matrix(output.unwrap()).reshape(output.getNumRows()[0], output.getNumCols()[0])
         return output.unwrap()
 
@@ -279,8 +278,8 @@ class NormalizedMatrix(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
            output = self.normalizedTable.leftMatrixMultiplication(TensorFromNumpy(other, self.foreign_backend))
            if self.foreign_backend:
                got = list(output.unwrap())
-               ncol = output.getNumCols()[0] # TODO: fix
-               nrow = output.getNumRows()[0] # TODO: fix
+               ncol = output.getNumCols()[0] # TODO: R-hack
+               nrow = output.getNumRows()[0] # TODO: R-hack
                return np.matrix(got).reshape(nrow, ncol)
            else:
                return output.unwrap()
@@ -307,8 +306,8 @@ class NormalizedMatrix(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
            output = self.normalizedTable.rightMatrixMultiplication(TensorFromNumpy(other))
            if self.foreign_backend:
                got = list(output.unwrap())   # TODO: why list() ?
-               ncol = output.getNumCols()[0] # TODO: fix
-               nrow = output.getNumRows()[0] # TODO: fix
+               ncol = output.getNumCols()[0] # TODO: R-hack
+               nrow = output.getNumRows()[0] # TODO: R-hack
                return np.matrix(got).reshape(nrow, ncol)
            else:
                return output.unwrap()
@@ -337,7 +336,7 @@ class NormalizedMatrix(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
 
 # ==================
 
-class Faux(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
+class Faux(matrix): #(np.array): Alternative implementation
 
     """
     Array functions are created to follow numpy semantics.
@@ -420,7 +419,7 @@ class Faux(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
             output = self.obj.elementWiseSum()
             return output
         if True:
-            return np.matrix(output.unwrap()).reshape(output.getNumRows()[0], output.getNumCols()[0]) # TODO: DO BETTER, THIS IS A  HACK KNOWING BACK IS R
+            return np.matrix(output.unwrap()).reshape(output.getNumRows()[0], output.getNumCols()[0])
         return output.unwrap()
 
     """ scalarExponentiation """
@@ -430,7 +429,7 @@ class Faux(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
         return mm
     def __ipow__(self, other, expo):
         output = self.__pow__(other, expo)
-        other.obj = output.obj #TODO: confirm this is fine
+        other.obj = output.obj
         return other
     def __rpow__(self, other, expo):
         return self.__pow__(other, expo)
@@ -464,7 +463,6 @@ class Faux(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
 
     
     """ scalarMultiplication, crossProd, LMM and RMM """
-    #TODO: LMM AND RMM ARE STIL SWTICHEEEEED
     #TODO: morpheusPy also handles the case where 'other' has no
     # __rmul__ method, but that's for another day.
     def __mul__(self, other):
@@ -489,6 +487,7 @@ class Faux(matrix): #(np.array): << SWITCH 2 DIS IF THINGS BREAK
             mm.obj = self.obj.scalarMultiplication(other)
             return mm
 
+        # Hack for R-backend
         if True: #isinstance(other, (N.ndarray, list,tuple)): # TODO
            if not(isinstance(other, (N.ndarray, list, tuple))):
                output = self.obj.leftMatrixMultiplication(other)

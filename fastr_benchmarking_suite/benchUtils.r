@@ -280,7 +280,6 @@ genDatasetExtended <- function(mode, numRowsR, numColsS, tupRatio, featRatio) {
   nMat <- matrices$nMat
   dMat <- matrices$dMat
 
-  print("down?")
   if(mode == "trinity") {
 
     data <- asNormalizedMatrix(
@@ -310,7 +309,6 @@ genDatasetExtended <- function(mode, numRowsR, numColsS, tupRatio, featRatio) {
   Y =((Matrix(runif(nMat, 0, 1), nMat, 1)) > 0.5)
 
   #print(object.size(cbind(S, K1 %*% R1, K2 %*% R2, K3 %*% R3, K4 %*% R4))/(object.size(K1)+object.size(K2) + object.size(K3) + object.size(K4) + object.size(R1) + object.size(R2) + object.size(R3) + object.size(R4) + object.size(S)))
-  print("$$$$$$$$$$$$$$$$$$$$$$")
   exit(-1)
 
   matrices = list(
@@ -326,7 +324,6 @@ genDatasetExtended <- function(mode, numRowsR, numColsS, tupRatio, featRatio) {
 
 
 genDataset <- function(mode, numRowsR, numColsS, tupRatio, featRatio) {
-  print("!!!");
 
   matrices <- genBaseMatrices(numRowsR, numColsS, tupRatio, featRatio)
   S <- matrices$S;
@@ -336,7 +333,6 @@ genDataset <- function(mode, numRowsR, numColsS, tupRatio, featRatio) {
   nMat <- matrices$nMat
   dMat <- matrices$dMat
 
-  print("down?")
   if(mode == "trinity") {
 
     data <- asNormalizedMatrix(

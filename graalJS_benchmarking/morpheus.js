@@ -1,11 +1,3 @@
-// ======= Monday
-// 3. Ensure TensorFromMatrix works
-// 4. Ensure typed functions work
-// 5. Does typed functions need 2 accept TensorFromMatrix types?
-// ^^^ or maybe 'foreign' types? I think not, it's TFM that has to
-// handle foreigness, not the numeric library
-// In other words, run JS on Graal!!!!
-
 const fs = require('fs');
 const mathjs = require('mathjs');
 
@@ -60,7 +52,7 @@ const addScalar = math.typed('addScalar', {
 })
 
 
-//TODO: should this be substract scalar???
+//TODO: should this be substract scalar?
 const subtract = math.typed('subtract', {
     'NormMatrix, number': function (a, b) {
         let newMorph = a.morph.scalarMultiplication(b);
@@ -108,7 +100,7 @@ const transpose = math.typed('transpose', {
     }
 })
 
-//TODO: are these the right dims???
+//TODO: are these the right dims?
 const rowSum = math.typed('rowSum', {
     'Matrix': function (a) {
         return math.reshape(math.apply(a, 1, math.sum), [a.size()[0], 1]);
@@ -132,7 +124,6 @@ const colSum = math.typed('colSum', {
     }
 })
 
-//TODO: this may be wrong
 const sum = math.typed('sum', {
     'NormMatrix': function (a) {
         let res = a.morph.elementWiseSum().unwrap(); 
@@ -373,45 +364,23 @@ function benchmarkIt() {
 }
 
 
-//TODO: add norm matrix!!!
 function genMatrices(numRowsR, numColsS, tupRatio, featRatio) {
 
-    console.log("GM");
     // Computing matrix dims
+    console.log("GM");
     let numRowsS = numRowsR * tupRatio;
     let numColsR = numColsS * featRatio;
     let numRowsK = numRowsS;
     let numColsK = numRowsR;
 
-    let s = Date.now();
-    let e = null;
-    console.log("S");
-    s = Date.now();
     let S = math.random(math.matrix([numRowsS, numColsS]));
-    e = Date.now();
-    console.log("S/", (e - s)/60000, numRowsS, numColsS);
-    s = Date.now();
     let K = math.zeros(numRowsK, numColsK, 'sparse');
-    e = Date.now();
-    console.log("K/", (e-s)/60000);
-
-    console.log("FLOP");
     for(let i = 0; i < numRowsK; i++) {
         K.set([i, math.randomInt(0, numColsK)], 1);
     }
-    console.log("FLOP/");
-    s = Date.now();
     let R = math.random(math.matrix([numRowsR, numColsR]));
-    e = Date.now();
-    s = Date.now();
-    console.log("R/", (e-s)/60000, numRowsR, numColsR);
     KR = math.multiply(K, R)
-    e = Date.now();
-    console.log("KR/", (e-s)/60000);
-    s = Date.now();
     matMatrix = math.concat(S, KR, 1)
-    e = Date.now();
-    console.log("matMatrix/", (e-s)/60000);
     Y = math.ones(math.matrix([numRowsS, 1]))
 
     let constructor = Polyglot.eval("morpheusDSL", "");
@@ -428,128 +397,6 @@ function genMatrices(numRowsR, numColsS, tupRatio, featRatio) {
 
     return matrices;
 }
-
-function loadDataset(mode, params) {
-
-    let contents = null;
-    let json = null;
-    let SDir = params.SDir.replace("datasets", "datasetsJSON");
-    let FK1Dir = params.FK1dir.replace("datasets", "datasetsJSON");
-    let FK2Dir = params.FK2dir.replace("datasets", "datasetsJSON");
-    let R1dir = params.R1S.replace("datasets", "datasetsJSON");
-    let R2dir = params.R2S.replace("datasets", "datasetsJSON");
-    let Ydir = params.Ydir.replace("datasets", "datasetsJSON");
-    let binarizeTarget = params.binarizeTarget;
-    
-    let S = math.matrix([[]]); // TODO: does this return numRows = 0?
-
-    if(SDir != ""){
-        contents = fs.readFileSync(SDir);
-        json = JSON.parse(contents); 
-        S = math.SparseMatrix.fromJSON(SDir);
-    }
-
-    console.log(FK1Dir);
-    contents = fs.readFileSync(FK1Dir);
-    json = JSON.parse(contents); 
-    let FK1 = math.SparseMatrix.fromJSON(json);
-
-    contents = fs.readFileSync(R1dir);
-    json = JSON.parse(contents); 
-    let R1S = math.SparseMatrix.fromJSON(json);
-
-    console.log(FK2Dir);
-    contents = fs.readFileSync(FK2Dir);
-    json = JSON.parse(contents); 
-    let FK2 = math.SparseMatrix.fromJSON(json);
-
-    contents = fs.readFileSync(R2dir);
-    json = JSON.parse(contents); 
-    let R2S = math.SparseMatrix.fromJSON(json);
-
-
-    //TODO: ADD THIS TODO TODO TODO TODO cuz Y is importnat!
-    //throw 39;
-
-    contents = fs.readFileSync(Ydir);
-    json = JSON.parse(contents); 
-    let Y = math.DenseMatrix.fromJSON(json);
-    if(binarizeTarget == "1") {
-        throw 42;
-    }
-
-    let FK3 = null;
-    let R3S = null;
-
-    console.log(FK1Dir);
-    console.log(FK1.size());
-    console.log(R1S.size());
-    console.log("--");
-    console.log(FK2.size());
-    console.log(R2S.size());
-    
-    let FK1R1S = math.multiply(FK1, R1S);
-    console.log("HERE")
-    let FK2R2S = math.multiply(FK2, R2S);
-    console.log("THERE")
-    console.log(FK1R1S.size());
-    console.log(FK2R2S.size());
-    console.log("about 2 crash");
-    console.log(R1S.size());
-    console.log(R1S.size());
-    console.log(R1S);
-    console.log(Y.size());
-
-    let B = Y + 10;
-    let C = math.sum(Y);
-    console.log(C);
-    console.log("-------");
-    console.log(Y.size());
-    let materializedMatrix = math.concat(Y, Y, 0);
-    console.log(materializedMatrix.size());
-    console.log("!!!!!!!");
-    let queso = math.subset(Y, math.index(math.range(0,5), 0));
-    console.log(math.concat(queso, queso, 1));
-    console.log("===========");
-    console.log(queso.size());
-    console.log(Y.size());
-    //console.log(math.concat(Y, queso, 2));
-    console.log(math.concat(FK1R1S, FK2R2S, 1));
-    console.log("CONCATTED")
-    if(params.outputMeta == "Flight"){
-        //TODO: FK3 stuff
-        throw 42;
-    }
-
-    if(SDir != ""){
-        materializedMatrix = math.concat(S, materializedMatrix);
-    }
-
-
-    throw 26;
-    let data = materializedMatrix
-    if(mode == "trinity"){
-        if(params.outputMeta == "Flights"){
-            data = new NormMatrix(S, [FK1, FK2, FK3], [R1S, R2S, R3S]);
-        }
-        else{
-            data = new NormMatrix(S, [FK1, FK2], [R1S, R2S]);
-        }
-    }
-    
-    let size = materializedMatrix.size();
-    let nMat = size[0];
-    let dMat = size[1];
-    let matrices = {
-        "data": data,
-        "matMatrix": materializedMatrix,
-        "target": Y,
-        "nMat": nMat,
-        "dMat": dMat
-    }
-    return matrices;
-}
-
 
 function doScalarAddition(x) {
     math.add(x, 42);
@@ -908,11 +755,3 @@ console.log(math.sum(morph));
 console.log(math.transpose(morph));
 */
 //main()
-//*/
-//TODO: add NORMTABLE TO BENCHMARKER
-//^^^ Start testing micro and macro?
-//Then test R
-//Then load datasets
-//console.log(math.elementWiseSum(morph));
-//TRY TRANSSSSSPOSE? I THINK ITS BROKEN IN PYTHON MY DUDE!!!!!!
-//FIX ROWSUM ???????!?!?!!??!

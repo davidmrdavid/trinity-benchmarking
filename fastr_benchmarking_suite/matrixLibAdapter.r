@@ -37,10 +37,6 @@ setMethod("initialize", "MatrixLibAdapter2",
             return(z)
         }
         .Object@scalarExponentiation = function(x, y){
-            print("??")
-            print(x)
-            print(y)
-            print("...")
             return(scalarExponentiation(x, y))
         }
         .Object@rightMatrixMultiplication = function(x, y) {

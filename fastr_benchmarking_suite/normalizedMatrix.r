@@ -160,7 +160,7 @@ setMethod("colSums", c("NormalizedMatrix"), function(x) {
     return(result)
 })
 
-# TODO: why is it like this (?)
+
 't.NormalizedMatrix' <- function(x) {
     result <- x@morpheus@transpose()
     newNormalizedMatrix <- NormalizedMatrix(morpheus=result)

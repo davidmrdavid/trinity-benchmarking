@@ -10,7 +10,7 @@
 # limitations under the License.
 
 import numpy as np
-
+# Replace this with old implementation
 class NormalizedKMeans():
     def __init__(self, iterations=20, center_num=10):
         self.center_num = center_num
@@ -21,24 +21,10 @@ class NormalizedKMeans():
         return self
 
     def k_means(self, data, iterations, center_num, k_center, rows):
-        del1 = ([1]*rows)
-        print("ok...")
-        np.matrix(del1)
-        print("weird")
         all_one = np.matrix([1] * rows).T
-        print("...")
         all_one_k = np.matrix([1] * center_num)
-        print("...")
-        print
-        all_one_c = np.matrix([1] * 40).T #k_center.shape[0]).T
-        print("REDDY NOW")
-        #if sp.issparse(data):
-        #    t2 = (data.power(2)).sum(axis=1).dot(all_one_k)
-        # REMOVE ME
-        # REMOVE ME
+        all_one_c = np.matrix([1] * 40).T 
         t2 = (data ** 2).sum(axis=1).reshape((-1,1)) * all_one_k
-        #else:
-        #    t2 = (np.power(data, 2)).sum(axis=1).reshape((-1, 1)) * all_one_k
         t22 = data * 2
         ya = None
         for _ in range(iterations):
