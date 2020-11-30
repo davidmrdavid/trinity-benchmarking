@@ -17,6 +17,7 @@ MatrixLibAdapter2 <- setClass(
      matrixAddition = "ANY",
      getNumRows = "ANY",
      getNumCols = "ANY",
+     scalarAddition = "ANY",
     scalarExponentiation = "ANY"
    )
 )
@@ -35,6 +36,9 @@ setMethod("initialize", "MatrixLibAdapter2",
                 z <- as.matrix(z)
             }
             return(z)
+        }
+        .Object@scalarAddition = function(x, y){
+            return(scalarAddition(x, y))
         }
         .Object@scalarExponentiation = function(x, y){
             return(scalarExponentiation(x, y))

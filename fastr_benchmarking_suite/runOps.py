@@ -12,7 +12,7 @@ CMD = "mx --dynamicimports /compiler,fastr,/tools --cp-sfx ../../mxbuild/dists/j
 #     "flights_metadata.json"] 
 #M = ["linearRegression","logisticRegression"]#, "kMeansClustering"]
 D = ["flights_metadata.json", "lastfm_metadata.json"]
-M = ["kMeansClustering"]
+M = ["scalarAddition"]
 for d in D:
 
   d = "./benchparams/" + d
@@ -29,17 +29,17 @@ for d in D:
         #pipe = subprocess.Popen(COMMAND, shell=True)
         #pipe.wait()
 
+        print("RUNNING: ", "TR=",TR, "FR=",FR)
+        COMMAND = CMD % (d, m, "trinity", TR, FR)
+        pipe = subprocess.Popen(COMMAND, shell=True)
+        pipe.wait()
+
         #print("RUNNING: ", "TR=",TR, "FR=",FR)
-        #COMMAND = CMD % (d, m, "trinity", TR, FR)
+        #COMMAND = CMD % (d, m, "morpheusR", TR, FR)
         #pipe = subprocess.Popen(COMMAND, shell=True)
         #pipe.wait()
 
-        print("RUNNING: ", "TR=",TR, "FR=",FR)
-        COMMAND = CMD % (d, m, "morpheusR", TR, FR)
-        pipe = subprocess.Popen(COMMAND, shell=True)
-        pipe.wait()
-
-        print("RUNNING: ", "TR=",TR, "FR=",FR)
-        COMMAND = CMD % (d, m, "materialized", TR, FR)
-        pipe = subprocess.Popen(COMMAND, shell=True)
-        pipe.wait()
+        #print("RUNNING: ", "TR=",TR, "FR=",FR)
+        #COMMAND = CMD % (d, m, "materialized", TR, FR)
+        #pipe = subprocess.Popen(COMMAND, shell=True)
+        #pipe.wait()
