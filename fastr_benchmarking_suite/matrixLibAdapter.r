@@ -3,6 +3,7 @@ library(Matrix)
 MatrixLibAdapter2 <- setClass(
   "MatrixLibAdapter2",
    slot = c(
+     rowSum = "Any",
      columnSum = "ANY",
      leftMatrixMultiplication = "ANY",
      rightMatrixMultiplication = "ANY",
@@ -18,7 +19,8 @@ MatrixLibAdapter2 <- setClass(
      getNumRows = "ANY",
      getNumCols = "ANY",
      scalarAddition = "ANY",
-    scalarExponentiation = "ANY"
+     scalarExponentiation = "ANY",
+     elementWiseSum = "ANY"
    )
 )
 
@@ -26,6 +28,10 @@ MatrixLibAdapter2 <- setClass(
 setMethod("initialize", "MatrixLibAdapter2",
 
     function(.Object) {
+	.Object@rowSum = function(x) {
+            z <- rowSum(x)
+            return(z)
+        }
         .Object@columnSum = function(x) {
             z <- columnSum(x)
             return(z)
@@ -66,7 +72,11 @@ setMethod("initialize", "MatrixLibAdapter2",
             z <- crossProductDuo(x, y)
             return(z)
         }
-        .Object@elementWiseSqrt = function(x) {
+        .Object@elementWiseSum = function(x) {
+            z <- elementWiseSum(x)
+            return(z)
+        }
+	.Object@elementWiseSqrt = function(x) {
             z <- elementWiseSqrt(x)
             return(z)
         }
