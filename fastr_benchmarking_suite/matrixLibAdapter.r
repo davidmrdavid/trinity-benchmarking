@@ -3,7 +3,7 @@ library(Matrix)
 MatrixLibAdapter2 <- setClass(
   "MatrixLibAdapter2",
    slot = c(
-     rowSum = "Any",
+     rowSum = "ANY",
      columnSum = "ANY",
      leftMatrixMultiplication = "ANY",
      rightMatrixMultiplication = "ANY",
