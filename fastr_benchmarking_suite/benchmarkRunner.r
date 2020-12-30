@@ -46,6 +46,7 @@ if(actionParam == "all") {
 
 # Benchmarking loop
 isDataSynthetic = (datasetMeta$name == "synthesized")
+print(isDataSynthetic)
 extended = (datasetMeta$outputMeta == "synth_extended")
 TRs = c(as.numeric(TR));
 FRs = c(as.numeric(FR));
