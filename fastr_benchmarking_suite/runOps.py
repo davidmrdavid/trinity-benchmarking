@@ -11,8 +11,8 @@ CMD = "mx --dynamicimports /compiler,fastr,/tools --cp-sfx ../../mxbuild/dists/j
 #     "books_metadata.json", "lastfm_metadata.json", "expedia_metadata.json",
 #     "flights_metadata.json"] 
 #M = ["linearRegression","logisticRegression"]#, "kMeansClustering"]
-D = ["flights_metadata.json", "lastfm_metadata.json"]
-M = ["scalarAddition"]
+D = ["synthesized.json"]
+M = ["crossProduct"]
 for d in D:
 
   d = "./benchparams/" + d
@@ -34,10 +34,10 @@ for d in D:
         pipe = subprocess.Popen(COMMAND, shell=True)
         pipe.wait()
 
-        #print("RUNNING: ", "TR=",TR, "FR=",FR)
-        #COMMAND = CMD % (d, m, "morpheusR", TR, FR)
-        #pipe = subprocess.Popen(COMMAND, shell=True)
-        #pipe.wait()
+        print("RUNNING: ", "TR=",TR, "FR=",FR)
+        COMMAND = CMD % (d, m, "morpheusR", TR, FR)
+        pipe = subprocess.Popen(COMMAND, shell=True)
+        pipe.wait()
 
         #print("RUNNING: ", "TR=",TR, "FR=",FR)
         #COMMAND = CMD % (d, m, "materialized", TR, FR)

@@ -3,6 +3,7 @@ library(Matrix)
 MatrixLibAdapter2 <- setClass(
   "MatrixLibAdapter2",
    slot = c(
+     Sparse = "logical",
      rowSum = "ANY",
      columnSum = "ANY",
      leftMatrixMultiplication = "ANY",
@@ -27,7 +28,8 @@ MatrixLibAdapter2 <- setClass(
 
 setMethod("initialize", "MatrixLibAdapter2",
 
-    function(.Object) {
+    function(.Object, Sparse) {
+    .Object@Sparse = Sparse
 	.Object@rowSum = function(x) {
             return(rowSum(x));
         }
@@ -36,7 +38,7 @@ setMethod("initialize", "MatrixLibAdapter2",
         }
         .Object@leftMatrixMultiplication = function(x, y) {
             z <- leftMatrixMultiplication(x, y)
-            if(TRUE){ #SPARSE check
+            if(Sparse){ #SPARSE check
                 z <- as.matrix(z)
             }
             return(z)
@@ -50,7 +52,8 @@ setMethod("initialize", "MatrixLibAdapter2",
         }
         .Object@rightMatrixMultiplication = function(x, y) {
             z <- rightMatrixMultiplication(x, y)
-            if(TRUE){ #SPARSE check
+            print(Sparse)
+            if(Sparse){ #SPARSE check
                 z <- as.matrix(z)
             }
             return(z)
@@ -105,6 +108,11 @@ setMethod("initialize", "MatrixLibAdapter2",
 
 
 setGeneric("rightMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {
+    print(c("Tensor Data Type: ", toString(class(tensor))));
+    print(c("Matrix Data Type: ", toString(class(otherMatrix))));
+    print(dim(tensor));
+    print(dim(otherMatrix));
+    
     return(tensor %*% otherMatrix);
 })
 

@@ -622,7 +622,10 @@ NormalMatrixCrossprod <- function(x)
                         duration <- tEnd - tStart
                         print(sprintf("DIAG: %i", duration))
 
-
+                        print(c("Tensor Data Type: ", toString(class(colSumm))));
+                        print(c("Matrix Data Type: ", toString(class(x@AttTables[[1]]))));
+                        print(dim(colSumm));
+                        print(dim(x@AttTables[[1]]));
                         tStart <- as.numeric(Sys.time())*1000;
                         colSummRMM <- colSumm %*% x@AttTables[[1]] 
                         tEnd <- as.numeric(Sys.time())*1000;

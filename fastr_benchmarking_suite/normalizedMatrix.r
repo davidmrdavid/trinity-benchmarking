@@ -7,7 +7,7 @@ NormalizedMatrix <- setClass(
 )
 
 # Adapter constructor
-asNormalizedMatrix <- function(S, Ks, Rs) {
+asNormalizedMatrix <- function(S, Ks, Rs, Sparse=FALSE) {
 
     # Obtain NM constructor, execute it, store it in adapter object,
     # return adapter
@@ -17,7 +17,7 @@ asNormalizedMatrix <- function(S, Ks, Rs) {
     if(nrow(S)*ncol(S) == 0){
         Sempty <- TRUE
     }
-    avatar <- MatrixLibAdapter2()
+    avatar <- MatrixLibAdapter2(Sparse=Sparse)
     morpheus <- morpheusBuilder@build(S, Ks, Rs, Sempty, avatar)
     normMatrix <- NormalizedMatrix(morpheus=morpheus)
     return(normMatrix)
