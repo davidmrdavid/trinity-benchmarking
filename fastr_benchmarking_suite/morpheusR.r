@@ -341,8 +341,30 @@ NormalMatrixLMM <- function(x,y)
 		}
 		else
 		{
-                        #print("CHECK DOS")
-			Out1 = x@EntTable[[1]]%*% y[1:(ncol(x@EntTable[[1]]) ),] + as.matrix(x@KFKDs[[1]] %*% (x@AttTables[[1]] %*% y[(1+ncol(x@EntTable[[1]])):(ncol(x@AttTables[[1]])+ncol(x@EntTable[[1]]) ),] ));
+            #print("GOES HERE")
+            tStart <- as.numeric(Sys.time())*1000;
+			Out1 = x@EntTable[[1]]%*% y[1:(ncol(x@EntTable[[1]]) ),]
+            tEnd <- as.numeric(Sys.time())*1000;
+            duration <- tEnd - tStart
+            print(sprintf("Out1 : %i", duration))
+            
+            tStart <- as.numeric(Sys.time())*1000;
+            mulR = (x@AttTables[[1]] %*% y[(1+ncol(x@EntTable[[1]])):(ncol(x@AttTables[[1]])+ncol(x@EntTable[[1]]) ),] )
+            tEnd <- as.numeric(Sys.time())*1000;
+            duration <- tEnd - tStart
+            print(sprintf("Mul R : %i", duration))
+            
+            tStart <- as.numeric(Sys.time())*1000;
+            Out2 = as.matrix(x@KFKDs[[1]] %*% mulR);
+            tEnd <- as.numeric(Sys.time())*1000;
+            duration <- tEnd - tStart
+            print(sprintf("Mul K : %i", duration))
+            
+            tStart <- as.numeric(Sys.time())*1000;
+            Out1 = Out1 + Out2
+            tEnd <- as.numeric(Sys.time())*1000;
+            duration <- tEnd - tStart
+            print(sprintf("Add2 : %i", duration))
 		}		
 		StartCol = ncol(x@EntTable[[1]])+ncol(x@AttTables[[1]]);
 		i = 2;			

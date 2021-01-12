@@ -12,13 +12,13 @@ CMD = "mx --dynamicimports /compiler,fastr,/tools --cp-sfx ../../mxbuild/dists/j
 #     "flights_metadata.json"] 
 #M = ["linearRegression","logisticRegression"]#, "kMeansClustering"]
 D = ["synthesized.json"]
-M = ["crossProduct"]
+M = ["leftMatrixMultiplication"]
 for d in D:
 
   d = "./benchparams/" + d
   for m in M:
-    for TR in range(1,2):#15,16):
-      for FR in range(1,2):
+    for TR in range(4,5):#15,16):
+      for FR in range(3,4):
         #print("RUNNING: ", "TR=",TR, "FR=",FR)
         #COMMAND = CMD % ("rowWiseSum", "materialized", TR, FR)
         #pipe = subprocess.Popen(COMMAND, shell=True)

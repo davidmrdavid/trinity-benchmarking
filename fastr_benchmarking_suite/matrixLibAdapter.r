@@ -52,7 +52,7 @@ setMethod("initialize", "MatrixLibAdapter2",
         }
         .Object@rightMatrixMultiplication = function(x, y) {
             z <- rightMatrixMultiplication(x, y)
-            print(Sparse)
+            
             if(Sparse){ #SPARSE check
                 z <- as.matrix(z)
             }
@@ -108,10 +108,6 @@ setMethod("initialize", "MatrixLibAdapter2",
 
 
 setGeneric("rightMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {
-    print(c("Tensor Data Type: ", toString(class(tensor))));
-    print(c("Matrix Data Type: ", toString(class(otherMatrix))));
-    print(dim(tensor));
-    print(dim(otherMatrix));
     
     return(tensor %*% otherMatrix);
 })
