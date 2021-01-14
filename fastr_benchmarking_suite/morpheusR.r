@@ -316,7 +316,7 @@ NormalMatrixLMM <- function(x,y)
                 print("CHECK UNO")
 		if(Sempty==0) # EntTable is empty
 		{
-                        print("CHECL DOS")
+                        
                         queso <- y[1:(ncol(x@AttTables[[1]]) ),]
 
 
@@ -341,30 +341,12 @@ NormalMatrixLMM <- function(x,y)
 		}
 		else
 		{
-            #print("GOES HERE")
-            tStart <- as.numeric(Sys.time())*1000;
+   
 			Out1 = x@EntTable[[1]]%*% y[1:(ncol(x@EntTable[[1]]) ),]
-            tEnd <- as.numeric(Sys.time())*1000;
-            duration <- tEnd - tStart
-            print(sprintf("Out1 : %i", duration))
-            
-            tStart <- as.numeric(Sys.time())*1000;
             mulR = (x@AttTables[[1]] %*% y[(1+ncol(x@EntTable[[1]])):(ncol(x@AttTables[[1]])+ncol(x@EntTable[[1]]) ),] )
-            tEnd <- as.numeric(Sys.time())*1000;
-            duration <- tEnd - tStart
-            print(sprintf("Mul R : %i", duration))
-            
-            tStart <- as.numeric(Sys.time())*1000;
             Out2 = as.matrix(x@KFKDs[[1]] %*% mulR);
-            tEnd <- as.numeric(Sys.time())*1000;
-            duration <- tEnd - tStart
-            print(sprintf("Mul K : %i", duration))
-            
-            tStart <- as.numeric(Sys.time())*1000;
             Out1 = Out1 + Out2
-            tEnd <- as.numeric(Sys.time())*1000;
-            duration <- tEnd - tStart
-            print(sprintf("Add2 : %i", duration))
+            
 		}		
 		StartCol = ncol(x@EntTable[[1]])+ncol(x@AttTables[[1]]);
 		i = 2;			
@@ -600,93 +582,34 @@ NormalMatrixCrossprod <- function(x)
 		else
 		{
 
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
                         crossProdS <- crossprod(x@EntTable[[1]])
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("CROSSPRODS : %i", duration))
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
                         Y21 <-  as.matrix( crossprod(x@KFKDs[[1]], x@EntTable[[1]])) 
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("Y21 1: %i", duration))
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
-			Y21 <- crossprod(x@AttTables[[1]], Y21);
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("Y21: %i", duration))
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
+                        Y21 <- crossprod(x@AttTables[[1]], Y21);
+                        
                         colSumm <- colSums(x@KFKDs[[1]])
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("COLSUMS: %i", duration))
-
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
                         colSumm <- colSumm ^ {1/2} 
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("SQRT: %i", duration))
+                        
 
-                        tStart <- as.numeric(Sys.time())*1000;
-                        #xxxxx <- Diagonal( x=colSums(x@KFKDs[[1]])^{1/2} ) 
-                        #print("SUCC?")
+                        
                         
                         colSumm <- Diagonal(x=colSumm)
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("DIAG: %i", duration))
-
-                        print(c("Tensor Data Type: ", toString(class(colSumm))));
-                        print(c("Matrix Data Type: ", toString(class(x@AttTables[[1]]))));
-                        print(dim(colSumm));
-                        print(dim(x@AttTables[[1]]));
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
                         colSummRMM <- colSumm %*% x@AttTables[[1]] 
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("RMM: %i", duration))
-
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
                         crossProdd <- crossprod(colSummRMM)
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("CROSSPROD: %i", duration))
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
                         y21T <- t(Y21)
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("TRANS: %i", duration))
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
                         row1 <- cbind(crossProdS, y21T)
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("CWA: %i", duration))
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
                         row2 <- cbind(Y21, as.matrix(crossProdd))
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("CWA: %i", duration))
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
+                        
                         Out1 <- rbind(row1, row2)
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("RWA: %i", duration))
+                        
 
 
 

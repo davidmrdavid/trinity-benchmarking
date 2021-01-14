@@ -91,7 +91,7 @@ setMethod("^", c("numeric", "NormalizedMatrix"), function(e1, e2) {
 })
 
 setMethod("%*%", c("ANY", "NormalizedMatrix"), function(x, y) {
-    result <- y@morpheus@rightMatrixMultiplication(tensorArg)
+    result <- y@morpheus@rightMatrixMultiplication(x)
     return(result);
 })
 

@@ -38,7 +38,8 @@ setMethod("initialize", "MatrixLibAdapter2",
         }
         .Object@leftMatrixMultiplication = function(x, y) {
             z <- leftMatrixMultiplication(x, y)
-            if(Sparse){ #SPARSE check
+            
+            if(!Sparse & (toString(class(x)) == "ngCMatrix" | toString(class(y)) == "ngCMatrix")){ #SPARSE check
                 z <- as.matrix(z)
             }
             return(z)
@@ -53,7 +54,7 @@ setMethod("initialize", "MatrixLibAdapter2",
         .Object@rightMatrixMultiplication = function(x, y) {
             z <- rightMatrixMultiplication(x, y)
             
-            if(Sparse){ #SPARSE check
+            if(!Sparse & (toString(class(x)) == "ngCMatrix" | toString(class(y)) == "ngCMatrix")){ #SPARSE check
                 z <- as.matrix(z)
             }
             return(z)
@@ -65,10 +66,18 @@ setMethod("initialize", "MatrixLibAdapter2",
             return(transpose(x));
         }
         .Object@crossProduct = function(x) {
-            return(crossProduct(x));
+            z <- crossProduct(x)
+            if(!Sparse  & toString(class(x)) == "ngCMatrix"){
+                z <- as.matrix(z)
+            }
+            return(z);
         }
         .Object@crossProductDuo = function(x, y) {
-            return(crossProductDuo(x, y));
+            z <- crossProductDuo(x, y)
+            if(!Sparse & (toString(class(x)) == "ngCMatrix" | toString(class(y)) == "ngCMatrix")){
+                z <- as.matrix(z)
+            }
+            return(z);
         }
         .Object@elementWiseSum = function(x) {
             return(elementWiseSum(x));
@@ -107,8 +116,7 @@ setMethod("initialize", "MatrixLibAdapter2",
 # MatrixLibAdapter methods ====================================================
 
 
-setGeneric("rightMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {
-    
+setGeneric("rightMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {    
     return(tensor %*% otherMatrix);
 })
 
