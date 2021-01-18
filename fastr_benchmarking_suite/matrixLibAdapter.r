@@ -20,6 +20,7 @@ MatrixLibAdapter2 <- setClass(
      getNumRows = "ANY",
      getNumCols = "ANY",
      scalarAddition = "ANY",
+     scalarMultiplication = "ANY",
      scalarExponentiation = "ANY",
      elementWiseSum = "ANY"
    )
@@ -46,6 +47,10 @@ setMethod("initialize", "MatrixLibAdapter2",
         }
         .Object@scalarAddition = function(x, y){
             return(scalarAddition(x,y));
+  
+        }
+        .Object@scalarMultiplication = function(x, y){
+            return(scalarMultiplication(x,y));
   
         }
         .Object@scalarExponentiation = function(x, y){
