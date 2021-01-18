@@ -57,6 +57,10 @@ setMethod("initialize", "MatrixLibAdapter2",
             if(!Sparse & (toString(class(x)) == "ngCMatrix" | toString(class(y)) == "ngCMatrix")){ #SPARSE check
                 z <- as.matrix(z)
             }
+            dims <- dim(z)
+            if(dims[2] == 1){
+                z <- as.numeric(z)
+            }
             return(z)
         }
         .Object@columnWiseAppend = function(x, y) {

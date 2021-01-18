@@ -1,4 +1,4 @@
-#Copyright 2016 Lingjiao Chen, Arun Kumar, Jeffrey Naughton, and Jignesh M. Patel, Version 0.8.
+#opyright 2016 Lingjiao Chen, Arun Kumar, Jeffrey Naughton, and Jignesh M. Patel, Version 0.8.
 #All rights reserved.
 #
 #Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,20 +28,11 @@ NormalMatrix <- setClass (
 
 #############################################
 # Transpose Rule
-#'t.NormalMatrix' <- function( NM1)
-#{
-#       
-#	NM1@Trans=!NM1@Trans;
-#	return(NM1);
-#}
-
-setMethod("t", c("NormalMatrix"), function(x){
-	x@Trans=!x@Trans;
-	return(x);
-
-
-})
-
+'t.NormalMatrix' <- function( NM1)
+{
+	NM1@Trans=!NM1@Trans;
+	return(NM1);
+}
 #############################################
 
 #############################################
@@ -228,7 +219,6 @@ NormalMatrixrowSums <- function(x){
 	i = 1;
 	if(Sempty!=0)
 	{
-                y <- 0
 		y = rowSums(x@EntTable[[1]])+as.numeric(x@KFKDs[[i]]%*%rowSums(x@AttTables[[i]]));;
 	}
 	else
@@ -250,28 +240,13 @@ NormalMatrixcolSums <- function(x){
 	Rnum = length(x@AttTables);
 	if(Sempty!=0)
 	{
-                tStart <- as.numeric(Sys.time())*1000;
-                colSums(x@EntTable[[1]])
-                tEnd <- as.numeric(Sys.time())*1000;
-                total <- tEnd - tStart
-                print(sprintf("COLSUM: %d | %d x %d", total, nrow(x@EntTable[[1]]), ncol(x@EntTable[[1]])));
-
-
-                tStart <- as.numeric(Sys.time())*1000;
-                colSums(x@KFKDs[[1]])
-                tEnd <- as.numeric(Sys.time())*1000;
-	        total <- tEnd - tStart
-                print(sprintf("COLSUM: %d | %d x %d", total, nrow(x@KFKDs[[1]]), ncol(x@KFKDs[[1]])));
-                
-                 
 		y = c(colSums(x@EntTable[[1]]), colSums(x@KFKDs[[1]])%*%x@AttTables[[1]]);
 	}
 	else
 	{
-		#y = colSums(x@KFKDs[[1]])%*%x@AttTables[[1]];
+		y = colSums(x@KFKDs[[1]])%*%x@AttTables[[1]];
 	}	
 	i = 2;
-	sprintf("justcheckinn: %d", Rnum)
 	while(i <= Rnum)
 	{
 		y = c(y, colSums(x@KFKDs[[i]])%*%x@AttTables[[i]] );
@@ -313,40 +288,13 @@ NormalMatrixLMM <- function(x,y)
 	}
 	else
 	{
-                print("CHECK UNO")
 		if(Sempty==0) # EntTable is empty
 		{
-                        
-                        queso <- y[1:(ncol(x@AttTables[[1]]) ),]
-
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
-                        uno <- x@AttTables[[1]] %*% queso
-
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("UNO : %i", duration))
-
-
-                        tStart <- as.numeric(Sys.time())*1000;
-                        dos <- x@KFKDs[[1]] %*% uno
-
-                        tEnd <- as.numeric(Sys.time())*1000;
-                        duration <- tEnd - tStart
-                        print(sprintf("DOS : %i", duration))
-                        Out1 <- as.matrix(dos)
-
-			#Out1 = as.matrix(x@KFKDs[[1]] %*% (x@AttTables[[1]] %*% y[1:(ncol(x@AttTables[[1]]) ),] ));
+			Out1 = as.matrix(x@KFKDs[[1]] %*% (x@AttTables[[1]] %*% y[1:(ncol(x@AttTables[[1]]) ),] ));
 		}
 		else
 		{
-   
-			Out1 = x@EntTable[[1]]%*% y[1:(ncol(x@EntTable[[1]]) ),]
-            mulR = (x@AttTables[[1]] %*% y[(1+ncol(x@EntTable[[1]])):(ncol(x@AttTables[[1]])+ncol(x@EntTable[[1]]) ),] )
-            Out2 = as.matrix(x@KFKDs[[1]] %*% mulR);
-            Out1 = Out1 + Out2
-            
+			Out1 = x@EntTable[[1]]%*% y[1:(ncol(x@EntTable[[1]]) ),] + as.matrix(x@KFKDs[[1]] %*% (x@AttTables[[1]] %*% y[(1+ncol(x@EntTable[[1]])):(ncol(x@AttTables[[1]])+ncol(x@EntTable[[1]]) ),] ));
 		}		
 		StartCol = ncol(x@EntTable[[1]])+ncol(x@AttTables[[1]]);
 		i = 2;			
@@ -516,7 +464,6 @@ NormalMatrixCrossprod <- function(x)
 	Rnum = length(x@AttTables);
 	if(x@Sparse==TRUE)# Sparse 
 	{
-                print("IF-")
 		if(Sempty==0) # EntTable is empty
 		{
 			Out1 = ( crossprod( Diagonal( x=colSums(x@KFKDs[[1]])^{1/2} ) %*% x@AttTables[[1]]) ) ;
@@ -558,7 +505,6 @@ NormalMatrixCrossprod <- function(x)
 	}
 	else
 	{
-                print("ELSE")
 		if(Sempty==0) # EntTable is empty
 		{
 			Out1 = as.matrix( crossprod( Diagonal( x=colSums(x@KFKDs[[1]])^{1/2} ) %*% x@AttTables[[1]]) ) ;
@@ -581,55 +527,8 @@ NormalMatrixCrossprod <- function(x)
 		}
 		else
 		{
-
-                        
-                        crossProdS <- crossprod(x@EntTable[[1]])
-                        
-                        Y21 <-  as.matrix( crossprod(x@KFKDs[[1]], x@EntTable[[1]])) 
-                        
-                        Y21 <- crossprod(x@AttTables[[1]], Y21);
-                        
-                        colSumm <- colSums(x@KFKDs[[1]])
-                        
-                        colSumm <- colSumm ^ {1/2} 
-                        
-
-                        
-                        
-                        colSumm <- Diagonal(x=colSumm)
-                        
-                        colSummRMM <- colSumm %*% x@AttTables[[1]] 
-                        
-                        crossProdd <- crossprod(colSummRMM)
-                        
-                        y21T <- t(Y21)
-                        
-                        row1 <- cbind(crossProdS, y21T)
-                        
-                        row2 <- cbind(Y21, as.matrix(crossProdd))
-                        
-                        Out1 <- rbind(row1, row2)
-                        
-
-
-
-
-                        # ====================
-
-                        #tStart <- as.numeric(Sys.time())*1000;
-
-			#Y21 = crossprod(x@AttTables[[1]], as.matrix( crossprod(x@KFKDs[[1]], x@EntTable[[1]])  ) );
-                        #tEnd <- as.numeric(Sys.time())*1000;
-                        #duration <- tEnd - tStart
-                        #print(sprintf("CROSSPROD 1: %i", duration))
-                        
-
-                        #tStart <- as.numeric(Sys.time())*1000;
-			#Out1 = (rbind( cbind(crossprod(x@EntTable[[1]]),t(Y21) ) , cbind( Y21, as.matrix(crossprod( Diagonal( x=colSums(x@KFKDs[[1]])^{1/2} ) %*% x@AttTables[[1]]) ) )) );
-                        #tEnd <- as.numeric(Sys.time())*1000;
-                        #duration <- tEnd - tStart
-                        #print(sprintf("CROSSPROD 2: %i", duration))
-
+			Y21 = crossprod(x@AttTables[[1]], as.matrix( crossprod(x@KFKDs[[1]], x@EntTable[[1]])  ) );
+			Out1 = (rbind( cbind(crossprod(x@EntTable[[1]]),t(Y21) ) , cbind( Y21, as.matrix(crossprod( Diagonal( x=colSums(x@KFKDs[[1]])^{1/2} ) %*% x@AttTables[[1]]) ) )) );
 			i = 2;	
 			while( i <= Rnum) # multi-table joins
 			{
