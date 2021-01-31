@@ -4,19 +4,14 @@ library("jsonlite")
 source("normalizedMatrix.r")
 source("macroBenchmarks.r")
 
-#TODO: How come microbenchmarks do not need to be imported?
-
 genRanMatrixForPy <- function(numRows, numCols) {
-
   area = numRows * numCols
-
-  # generating the matrices
   M = Matrix(runif(area, min=0, max=1), numRows, numCols)
-  return(MatrixLibAdapter(matrix=M, foreignBackend=TRUE))
+  return(M);
 }
 
 genMatricesForPy <- function(numRowsR, numColsS, tupRatio, featRatio) {
-
+  
   # Computing matrix dims
   numRowsS = numRowsR * tupRatio 
   numColsR = numColsS * featRatio
@@ -45,11 +40,12 @@ genMatricesForPy <- function(numRowsR, numColsS, tupRatio, featRatio) {
 
   # package them and return
   matrices = list(
-    S = MatrixLibAdapter(matrix=S, foreignBackend=TRUE),
-    K = list(MatrixLibAdapter(matrix=K1, foreignBackend=TRUE)),
-    R = list(MatrixLibAdapter(matrix=R1, foreignBackend=TRUE)),
-    matMatrix = MatrixLibAdapter(matrix=materializedMatrix, foreignBackend=TRUE),
-    target = MatrixLibAdapter(matrix=Y, foreignBackend=TRUE)
+    S = S,
+    K = list(K1),
+    R = list(R1),
+    matMatrix = materializedMatrix,
+    target = Y,
+    avatar = MatrixLibAdapter2(Sparse=FALSE)
   )
 
   return(matrices)
@@ -102,7 +98,7 @@ loadDataset <- function(mode, params) {
 
   materializedMatrix <- cbind(FK1%*%R1S, FK2%*%R2S)
   if(params$outputMeta == "Flights") {
-    print("AKK");
+    
     FK3dir = params$FK3dir;
     R3dir = params$R3S;
 
@@ -113,9 +109,9 @@ loadDataset <- function(mode, params) {
     R3S = readMM(file=R3dir)+0;
     dR3 = ncol(R3S);
 
-    print(dim(materializedMatrix))
+    
     materializedMatrix <- cbind(materializedMatrix, FK3%*%R3S)
-    print(dim(materializedMatrix))
+    
   }
 
 
@@ -125,10 +121,10 @@ loadDataset <- function(mode, params) {
   data <- materializedMatrix 
   if(mode == "trinity"){
     if(params$outputMeta == "Flights"){
-      data <- asNormalizedMatrix(S, list(FK1, FK2, FK3), list(R1S, R2S, R3S))
+      data <- asNormalizedMatrix(S, list(FK1, FK2, FK3), list(R1S, R2S, R3S), TRUE)
     }
     else{
-      data <- asNormalizedMatrix(S, list(FK1, FK2), list(R1S, R2S))
+      data <- asNormalizedMatrix(S, list(FK1, FK2), list(R1S, R2S), TRUE)
     }
   }
   else if(mode == "morpheusR"){
@@ -142,6 +138,7 @@ loadDataset <- function(mode, params) {
 
     }
     else{
+      print("MORPH")
       data <- NormalMatrix(EntTable = list(S),
                    AttTables = list(R1S, R2S),
                    KFKDs = list(FK1, FK2),
@@ -160,12 +157,7 @@ loadDataset <- function(mode, params) {
   #                 KFKDs = list(FK1, FK2),
   #                 Sparse = FALSE);
 
-  print("----------------------");
-  
-  print(dim(R1S))
-  print(dim(R2S))
-  print(dim(materializedMatrix));
-  print("=========================");
+ 
   #exit(-1);
   
   nMat <- nrow(materializedMatrix)
@@ -264,7 +256,7 @@ genBaseMatricesExtended <- function(numRowsR, numColsS, tupRatio, featRatio) {
 
 
 genDatasetExtended <- function(mode, numRowsR, numColsS, tupRatio, featRatio) {
-  print("BASE EX")
+  
 
   matrices <- genBaseMatricesExtended(numRowsR, numColsS, tupRatio, featRatio)
   S <- matrices$S;
@@ -399,24 +391,13 @@ benchmarkIt <- function(action, numTimes, fname) {
 
 checkEquivalence <- function(action1, action2) {
   gc();
-  print("act1")
+  
   res1 <- action1();
   gc();
-  print("act2")
+  
   res2 <- action2();
   gc();
-  print(typeof(res1));
-  print(class(res1));
-  print(length(res1));
-  print(is.vector(res1));
-  print(typeof(res2));
-  print(class(res2));
-  print(length(res2));
-  print(is.vector(res2));
-  print(all.equal(res1, res2));
-  print(res1)
-  print("---")
-  print(res2)
+  
   gc();
   return(0);
 }
@@ -469,6 +450,7 @@ getTasks <- function(params, nMat, dMat, T, target, tasks) {
       doLinearRegression(x, logRegMaxIter, logRegWinit, logRegGamma, target)
     }),
     list(name="kMeansClustering", runner=function(x) {
+      
       doKMeansClustering(x, logRegMaxIter, centerNumber, kCenter, nS)
     }),
     list(name="GNMFClustering", runner=function(x) {
@@ -478,7 +460,7 @@ getTasks <- function(params, nMat, dMat, T, target, tasks) {
 
   taskPairs <- list()
   selectedTasks <- tasks
-  print(selectedTasks);
+  
   for(pair in allTaskPairs){
 
     if(pair$name %in% selectedTasks){

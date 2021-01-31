@@ -11,17 +11,13 @@ function NormMatrix (S, Ks, Rs, morph=null) {
         return this;
     }
 
-    let STFM = new TensorFromMatrix(S);
-    let KsTFM = [];
-    let RsTFM = [];
-    for(let i = 0; i < Ks.length; i++){
-        KsTFM.push(new TensorFromMatrix(Ks[i]));
-        RsTFM.push(new TensorFromMatrix(Rs[i]));
-    }
+    console.log(typeof(S));
+
     let constructor2 = Polyglot.eval("morpheusDSL", "");
     const dims = S.size();
     const sEmpty = dims[0] == dims[1] && dims [1] == 0;
-    this.morph = constructor2.build(STFM, KsTFM, RsTFM, sEmpty);
+    let avatar = new TensorFromMatrix();
+    this.morph = constructor2.build(S, Ks, Rs, sEmpty, avatar);
     return this;
 }
 
@@ -74,14 +70,12 @@ const multiply = math.typed('multiply', {
         return new NormMatrix(null, null, null, newMorph);
     },
     'Matrix, NormMatrix': function (a, b) {
-        let tfm = new TensorFromMatrix(a);
-        let res = b.morph.rightMatrixMultiplication(tfm);
-        return res.unwrap();
+        let res = b.morph.rightMatrixMultiplication(a);
+        return res;
     },
     'NormMatrix, Matrix': function (a, b) {
-        let tfm = new TensorFromMatrix(b);
-        let res = a.morph.leftMatrixMultiplication(tfm);
-        return res.unwrap();
+        let res = a.morph.leftMatrixMultiplication(b);
+        return res;
     }
 })
 
@@ -96,7 +90,10 @@ const transpose = math.typed('transpose', {
     'NormMatrix': function (a) {
         let newMorph = a.morph.transpose();
         
-        return new NormMatrix(null, null, null, newMorph)
+    let avatar = new TensorFromMatrix();
+
+
+        return new NormMatrix(null, null, null, newMorph, avatar)
     }
 })
 
@@ -108,7 +105,7 @@ const rowSum = math.typed('rowSum', {
     },
     'NormMatrix': function (a) {
         let res = a.morph.rowSum();
-        return res.unwrap();
+        return res;
 
     }
 })
@@ -119,14 +116,14 @@ const colSum = math.typed('colSum', {
     },
     'NormMatrix': function (a) {
         let res = a.morph.columnSum();
-        return res.unwrap();
+        return res;
 
     }
 })
 
 const sum = math.typed('sum', {
     'NormMatrix': function (a) {
-        let res = a.morph.elementWiseSum().unwrap(); 
+        let res = a.morph.elementWiseSum(); 
         return res.get([0, 0]);
 
     }
@@ -146,86 +143,87 @@ math.import({
 
 class TensorFromMatrix {
 
-    constructor(matrix) {
-        this.matrix = matrix;
+    constructor() {
     }
 
-    scalarAddition(number) {
-        let res = math.add(this.matrix, number);
-        return new TensorFromMatrix(res);
+    scalarAddition(matrix, number) {
+        let res = math.add(matrix, number);
+        return res;
     }
 
-    scalarMultiplication(number) {
-        let res = math.multiply(this.matrix, number);
-        return new TensorFromMatrix(res);
+    scalarMultiplication(matrix, number) {
+        let res = math.multiply(matrix, number);
+        return res;
     }
 
-    scalarExponentiation(number) {
-        let res = math.exp(this.matrix);
-        return new TensorFromMatrix(res);
+    scalarExponentiation(matrix, number) {
+        let res = math.exp(matrix);
+        return res;
     }
 
-    rightMatrixMultiplication(otherMatrix) {
-        let res = math.multiply(this.matrix, otherMatrix.matrix);
-        return new TensorFromMatrix(res);
+    rightMatrixMultiplication(matrix, otherMatrix) {
+        let res = math.multiply(matrix, otherMatrix);
+        return res;
     }
 
-    leftMatrixMultiplication(otherMatrix) {
-        let res = math.multiply(otherMatrix.matrix, this.matrix);
-        return new TensorFromMatrix(res); 
+    leftMatrixMultiplication(matrix, otherMatrix) {
+        let res = math.multiply(otherMatrix, matrix);
+        return res; 
     }
 
-    crossProduct(otherMatrix) {
-        return math.cross(this.matrix, otherMatrix);
+    crossProduct(matrix, otherMatrix) {
+        return math.cross(matrix, otherMatrix);
     }
 
-    rowSum() {
-        let res = math.reshape(math.apply(this.matrix, 1, math.sum), [this.matrix.size()[0], 1]);
-        return new TensorFromMatrix(res);
+    rowSum(matrix) {
+        let res = math.reshape(math.apply(matrix, 1, math.sum), [matrix.size()[0], 1]);
+        return res;
     }
 
-    columnSum() {
-        let res = math.reshape(math.apply(this.matrix, 0, math.sum), [1, this.matrix.size()[1]]);
-        return new TensorFromMatrix(res);
+    columnSum(matrix) {
+        let res = math.reshape(math.apply(matrix, 0, math.sum), [1, matrix.size()[1]]);
+        return res;
     }
 
-    elementWiseSum() {
-        return math.sum(this.matrix);
+    elementWiseSum(matrix) {
+        return math.sum(matrix);
     }
 
-    rowWiseAppend(otherMatrix) {
-        let res = math.concat(this.matrix, otherMatrix.matrix, 0);
-        return new TensorFromMatrix(res);
+    rowWiseAppend(matrix, otherMatrix) {
+        let res = math.concat(matrix, otherMatrix, 0);
+        return res;
     }
 
-    columnWiseAppend(otherMatrix) {
-        let res = math.concat(this.matrix, otherMatrix.matrix, 1);
-        return new TensorFromMatrix(res);
+    columnWiseAppend(matrix, otherMatrix) {
+        let res = math.concat(matrix, otherMatrix, 1);
+        return res;
     }
 
-    matrixAddition(otherMatrix) {
-        let res = math.add(this.matrix, otherMatrix.matrix);
-        return new TensorFromMatrix(res);
+    matrixAddition(matrix, otherMatrix) {
+        let res = math.add(matrix, otherMatrix);
+        return res;
     }
 
-    transpose() {
-        let res = math.transpose(this.matrix);
-        return new TensorFromMatrix(res);
+    transpose(matrix) {
+        let res = math.transpose(matrix);
+        return res;
     }
 
-    splice(rowBeg, rowEnd, colBeg, colEnd) {
+    splice(matrix, rowBeg, rowEnd, colBeg, colEnd) {
         const rowRange = math.range(rowBeg, rowEnd + 1);
         const colRange = math.range(colBeg, colEnd + 1);
-        let res = math.subset(this.matrix, math.index(rowRange, colRange));
-        return new TensorFromMatrix(res);
+        let res = math.subset(matrix, math.index(rowRange, colRange));
+        return res;
     }
 
-    getNumRows() {
-        return this.matrix.size()[0];
+    getNumRows(matrix) {
+        return matrix.size()[0];
     }
 
-    getNumCols() {
-        return this.matrix.size()[1];
+    getNumCols(matrix) {
+        console.log(typeof(matrix));
+        math.size(matrix)
+        return matrix.size()[1];
     }
 
     removeAbstractions() {
@@ -233,7 +231,7 @@ class TensorFromMatrix {
     }
 
     unwrap() {
-        return this.matrix;
+        return matrix;
     }
 }
 
@@ -270,12 +268,23 @@ class NormalizedLogisticRegression {
         let newW = null;
         let Xtrans = math.transpose(X)
         for(let i = 0; i < this.iterations; i++) {
-
+            console.log("!");
+            console.log(typeof(w))
             newW = math.multiply(X, this.w)
+
+            console.log("!!");
             newW = math.exp(newW)
+
+            console.log("!!!");
             newW = math.add(1, newW)
+
+            console.log("!!!!");
             newW = math.dotDivide(y, newW)
+
+            console.log("!!!!!");
             newW = math.multiply(Xtrans, newW)
+
+            console.log("!!!!!!");
             this.w = math.subtract(this.w, math.multiply(this.gamma, newW))
         }
         return this
@@ -382,6 +391,8 @@ function genMatrices(numRowsR, numColsS, tupRatio, featRatio) {
     KR = math.multiply(K, R)
     matMatrix = math.concat(S, KR, 1)
     Y = math.ones(math.matrix([numRowsS, 1]))
+
+    console.log(R.size());
 
     let constructor = Polyglot.eval("morpheusDSL", "");
 
