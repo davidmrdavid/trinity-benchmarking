@@ -43,6 +43,10 @@ setMethod("initialize", "MatrixLibAdapter2",
             if(!Sparse & (toString(class(x)) == "ngCMatrix" | toString(class(y)) == "ngCMatrix")){ #SPARSE check
                 z <- as.matrix(z)
             }
+            dims <- dim(z)
+            if(dims[2] == 1){
+                z <- as.numeric(z)
+            }
             return(z)
         }
         .Object@scalarAddition = function(x, y){
@@ -105,8 +109,29 @@ setMethod("initialize", "MatrixLibAdapter2",
         }
 
         .Object@matrixAddition = function(x, y) {
-            return(matrixAddition(x, y));
-
+            cast = FALSE;
+            
+            if((class(x) != "numeric")){
+                d <- dim(x);
+                x = as.numeric(x);
+                cast = TRUE;
+            }
+            if((class(y) != "numeric")){
+                d <- dim(y);
+                y = as.numeric(y);
+                cast = TRUE;
+            }
+            tStart <- as.numeric(Sys.time())*1000;
+            z <- matrixAddition(x, y);
+            if(cast){
+                dim(z) <- d;
+            }
+            
+            
+            tEnd <- as.numeric(Sys.time()) * 1000;
+            time <- tEnd - tStart;
+            print(sprintf("Add: %d", time));
+            return(z);
         }
         .Object@getNumCols = function(x) {
             return(getNumCols(x));

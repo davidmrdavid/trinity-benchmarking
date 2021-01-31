@@ -274,22 +274,17 @@ NormalMatrixLMM <- function(x,y)
         if(Sempty==0) # EntTable is empty
 		{
 			#print("Empty");
-            tStart <- as.numeric(Sys.time())*1000;
+            
             Out1 = (x@AttTables[[1]] %*% y[1:(ncol(x@AttTables[[1]]) ),] );
-            tEnd <- as.numeric(Sys.time()) * 1000;
-            time <- tEnd - tStart;
-            print(sprintf("LMM1: %d", time));
             
             dims <- dim(Out1)
             if(dims[2] == 1){
                 Out1 <- as.numeric(Out1)
             }
             
-            tStart <- as.numeric(Sys.time())*1000;
+            
             Out1 = x@KFKDs[[1]] %*% Out1;
-            tEnd <- as.numeric(Sys.time()) * 1000;
-            time <- tEnd - tStart;
-            print(sprintf("LMM2: %d", time));
+            
             
             dims <- dim(Out1)
             if(dims[2] == 1){
@@ -299,7 +294,7 @@ NormalMatrixLMM <- function(x,y)
 		}
 		else
 		{
-            print("Not Empty");
+            
 			Out1 = x@EntTable[[1]]%*% y[1:(ncol(x@EntTable[[1]]) ),]; 
             dims <- dim(Out1)
             if(dims[2] == 1){
@@ -323,32 +318,29 @@ NormalMatrixLMM <- function(x,y)
 		i = 2;
 		while(i <= Rnum) # multi-table joins
 		{
-			tStart <- as.numeric(Sys.time())*1000;
+			
             tmp = (x@AttTables[[i]] %*% y[(1+StartCol):(StartCol+ncol(x@AttTables[[i]]) ),] );
-            tEnd <- as.numeric(Sys.time()) * 1000;
-            time <- tEnd - tStart;
-            print(sprintf("LMM3: %d", time));
+            
             
             dims <- dim(tmp)
             if(dims[2] == 1){
                 tmp <- as.numeric(tmp)
             } 
             
-            tStart <- as.numeric(Sys.time())*1000;
+            
             tmp = (x@KFKDs[[i]]) %*% tmp;
-            tEnd <- as.numeric(Sys.time()) * 1000;
-            time <- tEnd - tStart;
-            print(sprintf("LMM4: %d", time));
+            
             
             dims <- dim(tmp)
+            
             if(dims[2] == 1){
                 tmp <- as.numeric(tmp)
             }
             
-            print(toString(class(Out1)));
-            print(toString(class(tmp)));
+            
             tStart <- as.numeric(Sys.time())*1000;
             Out1 = as.numeric(Out1) + as.numeric(tmp);
+            dim(Out1) <- dims;
             tEnd <- as.numeric(Sys.time()) * 1000;
             time <- tEnd - tStart;
             print(sprintf("LMM5: %d", time));

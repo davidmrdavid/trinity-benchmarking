@@ -77,10 +77,11 @@ doKMeansClustering <- function(Data, Max_Iter, Center_Number, k_center, nS) {
     All1_k = matrix(1,1,Center_Number);
     All1_C = t(matrix(1,1,nrow(k_center)));	
     T2 = rowSums(Data^{2}) %*% All1_k;
-    #print(class(T2))
+    print("T2");
+    print(class(T2));
     #print(W)
     T22 = Data * 2;
-    Max_Iter = 5;
+    Max_Iter = 1;
     for( k in 1: Max_Iter )
     {
         #print(class(Data))
@@ -96,22 +97,52 @@ doKMeansClustering <- function(Data, Max_Iter, Center_Number, k_center, nS) {
         tStart <- as.numeric(Sys.time())*1000;
 #         print(dim());
 #         print(dim(k_center));
-        tmp = T22 %*% k_center;
-#         print(dim(T2));
-#         print(dim(tmp));
-#         print("Good");
-        Dist = T2 - as.matrix(tmp) +  All1 %*% colSums(k_center ^2);
-        #print(class(Dist))
-        #print(X)
-        YA = (Matrix(Dist == (rowMins((Dist)) %*% All1_k),sparse=TRUE))+0;
-        #print(Z)
-        arg1 <- t(Data) %*% YA;
-        arg2 <- All1_C %*% colSums(YA);
-        k_center = as.matrix(  ( t(Data) %*% YA ) / ( (All1_C) %*% colSums(YA) )  );
         
+        tmp = T22 %*% k_center;
         tEnd <- as.numeric(Sys.time()) * 1000;
         time <- tEnd - tStart;
         print(sprintf("1: %d", time));
+        
+        
+        tStart <- as.numeric(Sys.time())*1000;
+        Dist = T2 - as.matrix(tmp);
+        tEnd <- as.numeric(Sys.time()) * 1000;
+        time <- tEnd - tStart;
+        print(sprintf("2A: %d", time));
+        #print(class(Dist))
+        #print(X)
+        tStart <- as.numeric(Sys.time())*1000;
+        Dist = Dist +  All1 %*% colSums(k_center ^2);
+        tEnd <- as.numeric(Sys.time()) * 1000;
+        time <- tEnd - tStart;
+        print(sprintf("2B: %d", time));
+        
+        tStart <- as.numeric(Sys.time())*1000;
+        YA = (Matrix(Dist == (rowMins((Dist)) %*% All1_k),sparse=TRUE))+0;
+        tEnd <- as.numeric(Sys.time()) * 1000;
+        time <- tEnd - tStart;
+        print(sprintf("3: %d", time));
+        
+        #print(Z)
+        tStart <- as.numeric(Sys.time())*1000;
+        arg1 <- t(Data) %*% YA;
+        tEnd <- as.numeric(Sys.time()) * 1000;
+        time <- tEnd - tStart;
+        print(sprintf("4: %d", time));
+        
+        tStart <- as.numeric(Sys.time())*1000;
+        arg2 <- All1_C %*% colSums(YA);
+        tEnd <- as.numeric(Sys.time()) * 1000;
+        time <- tEnd - tStart;
+        print(sprintf("5: %d", time));
+        
+        tStart <- as.numeric(Sys.time())*1000;
+        k_center = as.matrix(  ( t(Data) %*% YA ) / ( (All1_C) %*% colSums(YA) )  );
+        tEnd <- as.numeric(Sys.time()) * 1000;
+        time <- tEnd - tStart;
+        print(sprintf("6: %d", time));
+        
+        
     }
     return(list(k_center ,YA));
 }
@@ -124,7 +155,7 @@ doGNMFClustering <- function(X, Max_Iter, winit, hinit){
   h <- hinit;
   print(dim(w));
   print(dim(h));
-  Max_Iter = 1;
+  Max_Iter = 10;
   for(k in 1:Max_Iter) { 
 #     numerator <- (t(w) %*% X);
 #     denominator <- crossprod(w) %*% h;
@@ -156,8 +187,8 @@ doGNMFClustering <- function(X, Max_Iter, winit, hinit){
     time <- tEnd - tStart;
     print(sprintf("4: %d", time));
     
-    print(toString(class(X)));
-    print(toString(class(h)));
+#     print(toString(class(X)));
+#     print(toString(class(h)));
     tStart <- as.numeric(Sys.time())*1000;  
     tmp1 = X %*% t(as.matrix(h));
     tEnd <- as.numeric(Sys.time()) * 1000;
@@ -177,13 +208,13 @@ doGNMFClustering <- function(X, Max_Iter, winit, hinit){
     print(sprintf("7: %d", time));
     
     tStart <- as.numeric(Sys.time())*1000;
-    w <- as.numeric(w) * as.numeric(tmp1);
+    w <- w * tmp1;
     tEnd <- as.numeric(Sys.time()) * 1000;
     time <- tEnd - tStart;
     print(sprintf("8: %d", time));
             
     tStart <- as.numeric(Sys.time())*1000;
-    w <- as.numeric(w) / as.numeric(tmp2);  
+    w <- w / tmp2;  
     tEnd <- as.numeric(Sys.time()) * 1000;
     time <- tEnd - tStart;
     print(sprintf("9: %d", time));
