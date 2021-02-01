@@ -121,16 +121,11 @@ setMethod("initialize", "MatrixLibAdapter2",
                 y = as.numeric(y);
                 cast = TRUE;
             }
-            tStart <- as.numeric(Sys.time())*1000;
+            
             z <- matrixAddition(x, y);
             if(cast){
                 dim(z) <- d;
             }
-            
-            
-            tEnd <- as.numeric(Sys.time()) * 1000;
-            time <- tEnd - tStart;
-            print(sprintf("Add: %d", time));
             return(z);
         }
         .Object@getNumCols = function(x) {

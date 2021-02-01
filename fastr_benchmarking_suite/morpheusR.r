@@ -270,10 +270,10 @@ NormalMatrixLMM <- function(x,y)
 	Rnum = length(x@AttTables);
 	if(x@Sparse==TRUE) # EntTable is empty
 	{
-		#print("Sparse");
+		
         if(Sempty==0) # EntTable is empty
 		{
-			#print("Empty");
+			
             
             Out1 = (x@AttTables[[1]] %*% y[1:(ncol(x@AttTables[[1]]) ),] );
             
@@ -290,28 +290,35 @@ NormalMatrixLMM <- function(x,y)
             if(dims[2] == 1){
                 Out1 <- as.numeric(Out1)
             }
-            #print(sprintf("Out1: %s", toString(class(Out1))));
+            
 		}
 		else
 		{
             
 			Out1 = x@EntTable[[1]]%*% y[1:(ncol(x@EntTable[[1]]) ),]; 
+            
             dims <- dim(Out1)
             if(dims[2] == 1){
                 Out1 <- as.numeric(Out1)
-            } 
+            }
+            
             tmp = (x@AttTables[[1]] %*% y[(1+ncol(x@EntTable[[1]])):(ncol(x@AttTables[[1]])+ncol(x@EntTable[[1]]) ),] );
+            
             dims <- dim(tmp)
             if(dims[2] == 1){
                 tmp <- as.numeric(tmp)
             } 
+            
             tmp = x@KFKDs[[1]] %*% tmp;
+            
             dims <- dim(tmp)
             if(dims[2] == 1){
                 tmp <- as.numeric(tmp)
-            } 
-            Out1 = Out1 + tmp;
-            #x@KFKDs[[1]] %*% (x@AttTables[[1]] %*% y[(1+ncol(x@EntTable[[1]])):(ncol(x@AttTables[[1]])+ncol(x@EntTable[[1]]) ),] );
+            }
+            
+            Out1 = as.numeric(Out1) + as.numeric(tmp);
+            dim(Out1) <- dims;
+            
             
 		}		
 		StartCol = ncol(x@EntTable[[1]])+ncol(x@AttTables[[1]]);
@@ -319,6 +326,7 @@ NormalMatrixLMM <- function(x,y)
 		while(i <= Rnum) # multi-table joins
 		{
 			
+            
             tmp = (x@AttTables[[i]] %*% y[(1+StartCol):(StartCol+ncol(x@AttTables[[i]]) ),] );
             
             
@@ -338,17 +346,16 @@ NormalMatrixLMM <- function(x,y)
             }
             
             
-            tStart <- as.numeric(Sys.time())*1000;
+            
             Out1 = as.numeric(Out1) + as.numeric(tmp);
             dim(Out1) <- dims;
-            tEnd <- as.numeric(Sys.time()) * 1000;
-            time <- tEnd - tStart;
-            print(sprintf("LMM5: %d", time));
+            
             
             #print(sprintf("Out1: %s", toString(class(Out1))));
 			StartCol=StartCol+(ncol(x@AttTables[[i]]) );
 			i = i + 1;
 		}
+        
 		return (Out1);
 	}
 	else
@@ -356,12 +363,12 @@ NormalMatrixLMM <- function(x,y)
         #print("Not Sparse");
 		if(Sempty==0) # EntTable is empty
 		{
-			print("Empty");
+			
             Out1 = as.matrix(x@KFKDs[[1]] %*% (x@AttTables[[1]] %*% y[1:(ncol(x@AttTables[[1]]) ),] ));
 		}
 		else
 		{
-			print("Not Empty");
+			
             Out1 = x@EntTable[[1]]%*% y[1:(ncol(x@EntTable[[1]]) ),] + as.matrix(x@KFKDs[[1]] %*% (x@AttTables[[1]] %*% y[(1+ncol(x@EntTable[[1]])):(ncol(x@AttTables[[1]])+ncol(x@EntTable[[1]]) ),] ));
 		}		
 		StartCol = ncol(x@EntTable[[1]])+ncol(x@AttTables[[1]]);
