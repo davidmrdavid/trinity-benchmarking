@@ -221,8 +221,6 @@ class TensorFromMatrix {
     }
 
     getNumCols(matrix) {
-        console.log(typeof(matrix));
-        math.size(matrix)
         return matrix.size()[1];
     }
 
@@ -268,23 +266,16 @@ class NormalizedLogisticRegression {
         let newW = null;
         let Xtrans = math.transpose(X)
         for(let i = 0; i < this.iterations; i++) {
-            console.log("!");
-            console.log(typeof(w))
             newW = math.multiply(X, this.w)
 
-            console.log("!!");
             newW = math.exp(newW)
 
-            console.log("!!!");
             newW = math.add(1, newW)
 
-            console.log("!!!!");
             newW = math.dotDivide(y, newW)
 
-            console.log("!!!!!");
             newW = math.multiply(Xtrans, newW)
 
-            console.log("!!!!!!");
             this.w = math.subtract(this.w, math.multiply(this.gamma, newW))
         }
         return this
@@ -376,7 +367,6 @@ function benchmarkIt() {
 function genMatrices(numRowsR, numColsS, tupRatio, featRatio) {
 
     // Computing matrix dims
-    console.log("GM");
     let numRowsS = numRowsR * tupRatio;
     let numColsR = numColsS * featRatio;
     let numRowsK = numRowsS;
@@ -392,7 +382,6 @@ function genMatrices(numRowsR, numColsS, tupRatio, featRatio) {
     matMatrix = math.concat(S, KR, 1)
     Y = math.ones(math.matrix([numRowsS, 1]))
 
-    console.log(R.size());
 
     let constructor = Polyglot.eval("morpheusDSL", "");
 
