@@ -8,6 +8,17 @@ class NormalizedLinearRegression():
     def fit(self, X, y, w_init=None):
         self.w = w_init if w_init is not None else np.matrix(np.random.randn(X.shape[1], 1))
         for _ in range(self.iterations):
+            #bb = (X * self.w)
+            #print("......", type(bb), bb.dimm())
+            #bb = bb - y
+            #print("_______", type(bb), bb.dimm())
+            #cc = X.T
+            #print("=======", type(cc))
+            #dd = (cc * bb)
+            #print("^^^^^^^", type(dd), dd.dimm())
+            #ee = self.w - dd
+            
+            #raise UU
             self.w = self.w - self.gamma * (X.T * (X * self.w - y))
         return self
 

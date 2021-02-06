@@ -18,6 +18,12 @@ import csv
 import os
 import gc
 
+def do_linear_regression(x, max_iter, winit, gamma, target):
+    m1 = NormalizedLinearRegression()
+    return m1.fit(x, target, winit)
+
+
+
 def gen_matrices_poly(num_rows_R, num_cols_S, tup_ratio, feat_ratio, mode):
     # Computing matrix dims
     num_rows_S = num_rows_R * tup_ratio
@@ -34,23 +40,10 @@ def gen_matrices_poly(num_rows_R, num_cols_S, tup_ratio, feat_ratio, mode):
     res = foo(num_rows_R, num_cols_S, tup_ratio, feat_ratio)
 
     Sarg, Ksarg, Rsarg, matMatrixForeign, target, avatarArg = res
-    print(avatarArg)
-    print(dir(avatarArg))
-    print(avatarArg.scalarAddition(1,2))
-    #raise NotImplementedError
     nm = morpheus.NormalizedMatrix(S=Sarg, Ks=Ksarg, Rs=Rsarg, foreign_backend=True, avatar=avatarArg) 
-    print("#################################################")
-    print(nm.isMorpheus)
-    print("#################################################")
-    print(avatarArg.scalarAddition(1,2))
     mat = morpheus.NormalizedMatrix(mat=matMatrixForeign, avatar=avatarArg)
-    print("---------")
     target = morpheus.NormalizedMatrix(mat=target, avatar=avatarArg)
-    print(">>>>>>>>>")
     data = nm if mode == "trinity" else mat
-    print("#################################################")
-    print(data.isMorpheus)
-    print("#################################################")
     n_mat, d_mat = (num_rows_S, num_cols_R + num_cols_S)
     matrices = {
         "data": data,
@@ -107,51 +100,32 @@ def get_tasks(params, n_mat, d_mat, T, target, tasks, is_monolang):
         raise NotImplementedError
 
     else:
-        print("ELSE")
-
         foo = polyglot.eval(language="R", string="source('benchUtils.r'); function(x,y){ genRanMatrixForPy(x,y); }")
-        log_reg_winit = foo(d_mat, 1)
-
+        log_reg_winit = morpheus.NormalizedMatrix(mat=foo(d_mat, 1), avatar=T.avatar)
         #gnmf_winit = morpheus.Faux(urg(n_mat, 5))
         #gnmf_h_init = morpheus.Faux(urg(5, d_mat))
         #k_center = morpheus.Faux(T.obj.splice(0, 10-1, 0, d_mat-1).transpose())
     
-    """
+
     all_tasks = [
-        ("scalarAddition", do_scalar_addition),
-        ("scalarMultiplication", do_scalar_multiplication),
-        ("leftMatrixMultiplication", lambda x: do_left_matrix_multiplication(x, lmm_arg)),
-        ("rightMatrixMultiplication", lambda x: do_right_matrix_multiplication(x, rmm_arg)),
-        ("rowWiseSum", do_row_wise_sum),
-        ("columnWiseSum", do_column_wise_sum),
-        ("elementWiseSum", do_element_wise_sum),
         ("logisticRegression", 
            lambda x: do_logistic_regression(x, 
                log_reg_max_iter, log_reg_winit, log_reg_gamma, target)),
         ("linearRegression",
            lambda x: do_linear_regression(x,
-               log_reg_max_iter, log_reg_winit, log_reg_gamma, target)),
-        ("gaussianNMF", 
-            lambda x: do_gnmf(x,
-                gnmf_winit, gnmf_h_init)),
-        ("kMeansClustering", 
-            lambda x: do_kmeans_clustering(x, 
-               log_reg_max_iter, center_num, k_center, n_S))
-    ]
-    """
-    print("ALL TASKS")
-    all_tasks = [
-        ("logisticRegression", 
-           lambda x: do_logistic_regression(x, 
                log_reg_max_iter, log_reg_winit, log_reg_gamma, target))
     ]
+    #all_tasks = [
+    #    ("logisticRegression", 
+    #       lambda x: do_logistic_regression(x, 
+    #           log_reg_max_iter, log_reg_winit, log_reg_gamma, target))
+    #]
 
     chosen_tasks = []
     for name, func in all_tasks:
         if name in tasks:
              chosen_tasks.append((name, func))
 
-    print(len(list(chosen_tasks)))
     return chosen_tasks
 
 def main():
@@ -214,18 +188,14 @@ def main():
                 # matrices = gen_matrices(mode, dataset_meta["nR"], dataset_meta["dS"], TR, FR)
                 raise NotImplementException
             elif is_data_synthetic:
-                print("MAT")
                 matrices = gen_matrices_poly(dataset_meta["nR"], dataset_meta["dS"], TR, FR, mode)
-                print("MATS")
             else:
                raise NotImplementedError
 
             task_pairs = get_tasks(args, matrices["nMat"], matrices["dMat"], matrices["matMatrix"], matrices["target"], tasks, is_monolang)
-            print(task_pairs)
             start_time = time()
             print("__________")
             for name, action in task_pairs:
-                print("TASK")
                 fname = args.outputDir + "/"  + name + "_" + dataset_meta["outputMeta"] + "_" + "TR=" + str(TR) +  "_FR=" + str(FR) + "_"  + mode + ".txt"
                 times = benchmark_it(lambda : action(matrices["data"]), fname)
 main()
@@ -294,10 +264,6 @@ def do_column_wise_sum(x):
 def do_element_wise_sum(x):
     return np.sum(x)
 
-
-def do_linear_regression(x, max_iter, winit, gamma, target):
-    m1 = NormalizedLinearRegression()
-    return m1.fit(x, target, winit)
 
 def do_gnmf(x, w_init, h_init):
     m1 = GaussianNMF()

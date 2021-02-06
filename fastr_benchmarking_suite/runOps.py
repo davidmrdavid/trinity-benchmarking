@@ -6,19 +6,19 @@ CMD = "mx --dynamicimports /compiler,fastr,/tools --cp-sfx ../../mxbuild/dists/j
 # You need to remove hprof stuff above ^
 
 
-D = ["movie_metadata.json"]#, 
+#D = ["movie_metadata.json"]#, 
 #D = ["yelp_metadata.json", "walmart_metadata.json",
 #     "books_metadata.json", "lastfm_metadata.json", "expedia_metadata.json",
 #     "flights_metadata.json"] 
 #M = ["linearRegression","logisticRegression"]#, "kMeansClustering"]
-#D = ["synthesized.json"]
+D = ["synthesized.json"]
 M = ["crossProduct"]
 for d in D:
 
   d = "./benchparams/" + d
   for m in M:
-    for TR in range(3,4):#15,16):
-      for FR in range(5,6):
+    for TR in range(2,3):#15,16):
+      for FR in range(2,3):
         #print("RUNNING: ", "TR=",TR, "FR=",FR)
         #COMMAND = CMD % ("rowWiseSum", "materialized", TR, FR)
         #pipe = subprocess.Popen(COMMAND, shell=True)
@@ -39,7 +39,7 @@ for d in D:
         pipe = subprocess.Popen(COMMAND, shell=True)
         pipe.wait()
 
-        print("RUNNING: ", "TR=",TR, "FR=",FR)
-        COMMAND = CMD % (d, m, "materialized", TR, FR)
-        pipe = subprocess.Popen(COMMAND, shell=True)
-        pipe.wait()
+        #print("RUNNING: ", "TR=",TR, "FR=",FR)
+        #COMMAND = CMD % (d, m, "materialized", TR, FR)
+        #pipe = subprocess.Popen(COMMAND, shell=True)
+        #pipe.wait()

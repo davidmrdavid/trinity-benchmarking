@@ -19,14 +19,26 @@ class NormalizedLogisticRegression:
     def fit(self, X, y, w_init=None):
         self.w = w_init if w_init is not None else np.matrix(np.random.randn(X.shape[1], 1))
         for i in range(self.iterations):
-            print(type(self.w))
-            print(type(X))
-            print(X.isMorpheus)
-            print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-            bb = X * self.w
-            cc = self.w - self.gamma * (y / (1 + 2.71 ** bb))
-            raise NotImplementedError
-            #self.w = self.w - self.gamma * (X.T * (y / (1 + 2.71 ** (X * self.w))))
+            #print("))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))")
+            #print(self.w)
+            #bb = X * self.w
+            #print(type(bb))
+            #print("11 ----------------")
+            #cc = bb.__pow__(2.71)
+            #print(cc)
+            #print(type(cc))
+            #print("22 $$$$$$$$$$$$$$$$$$$$$$$$$$$")
+            #dd = self.w - cc
+            #raise X #NotImplementedError
+
+
+            cc = ((X * self.w))
+            print("--&&&&&&&&&&&&&&&&&&&&&&&")
+            dd = (y / cc)
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            #self.w = self.w - self.gamma * (X.T * (y / cc))
+            #self.w = self.w - self.gamma * (X.T * (y / (1 + (X * self.w).__pow__(2.71))))
+            raise YYY
         return self
 
     def predict(self, X):
