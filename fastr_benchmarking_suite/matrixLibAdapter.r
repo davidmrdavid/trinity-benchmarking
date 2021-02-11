@@ -38,6 +38,7 @@ setMethod("initialize", "MatrixLibAdapter2",
             return(columnSum(x));
         }
         .Object@leftMatrixMultiplication = function(x, y) {
+            tStart <- as.numeric(Sys.time())*1000;
             z <- leftMatrixMultiplication(x, y)
             
             if(!Sparse & (toString(class(x)) == "ngCMatrix" | toString(class(y)) == "ngCMatrix")){ #SPARSE check
@@ -47,6 +48,9 @@ setMethod("initialize", "MatrixLibAdapter2",
             if(dims[2] == 1){
                 z <- as.numeric(z)
             }
+            tEnd <- as.numeric(Sys.time()) * 1000;
+            time <- tEnd - tStart;
+            print(sprintf("LMM: %i", time))
             return(z)
         }
         .Object@scalarAddition = function(x, y){
@@ -61,6 +65,9 @@ setMethod("initialize", "MatrixLibAdapter2",
             return(scalarExponentiation(x, y))
         }
         .Object@rightMatrixMultiplication = function(x, y) {
+            print(object.size(x), units = "auto");
+            print(object.size(y), units = "auto");
+            tStart <- as.numeric(Sys.time())*1000;
             z <- rightMatrixMultiplication(x, y)
             
             if(!Sparse & (toString(class(x)) == "ngCMatrix" | toString(class(y)) == "ngCMatrix")){ #SPARSE check
@@ -70,6 +77,9 @@ setMethod("initialize", "MatrixLibAdapter2",
             if(dims[2] == 1){
                 z <- as.numeric(z)
             }
+            tEnd <- as.numeric(Sys.time()) * 1000;
+            time <- tEnd - tStart;
+            print(sprintf("RMM: %i", time))
             return(z)
         }
         .Object@columnWiseAppend = function(x, y) {

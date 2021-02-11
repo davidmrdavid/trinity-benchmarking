@@ -5,7 +5,7 @@ CMD = "mx --dynamicimports /compiler,graalpython,fastr --cp-sfx ../../mxbuild/di
 
 
 print("RUNNING: ")
-COMMAND = CMD % (sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+COMMAND = CMD % ("linearRegression", "materialized", "1", "1")
 print(COMMAND)
 pipe = subprocess.Popen(COMMAND, shell=True)
 pipe.wait()
