@@ -54,20 +54,20 @@ setMethod("initialize", "MatrixLibAdapter2",
             return(z)
         }
         .Object@scalarAddition = function(x, y){
-            tStart <- as.numeric(Sys.time())*1000;
+            #tStart <- as.numeric(Sys.time())*1000;
             z <- scalarAddition(x,y);
-            tEnd <- as.numeric(Sys.time()) * 1000;
-            time <- tEnd - tStart;          
-            print(sprintf("Add: %i", time))
+#             tEnd <- as.numeric(Sys.time()) * 1000;
+#             time <- tEnd - tStart;          
+#             print(sprintf("Add: %i", time))
             return(z);
   
         }
         .Object@scalarMultiplication = function(x, y){
-            tStart <- as.numeric(Sys.time())*1000;
+            #tStart <- as.numeric(Sys.time())*1000;
             z <- scalarMultiplication(x,y);
-            tEnd <- as.numeric(Sys.time()) * 1000;
-            time <- tEnd - tStart;
-            print(sprintf("Mul: %i", time));
+#             tEnd <- as.numeric(Sys.time()) * 1000;
+#             time <- tEnd - tStart;
+#             print(sprintf("Mul: %i", time));
             return(z);
   
         }
@@ -130,7 +130,7 @@ setMethod("initialize", "MatrixLibAdapter2",
 
         .Object@matrixAddition = function(x, y) {
             cast = FALSE;
-            tStart <- as.numeric(Sys.time())*1000;
+            #tStart <- as.numeric(Sys.time())*1000;
             
             if((class(x) != "numeric")){
                 d <- dim(x);
@@ -147,9 +147,9 @@ setMethod("initialize", "MatrixLibAdapter2",
             if(cast){
                 dim(z) <- d;
             }
-            tEnd <- as.numeric(Sys.time()) * 1000;
-            time <- tEnd - tStart;          
-            print(sprintf("Add: %i", time))
+#             tEnd <- as.numeric(Sys.time()) * 1000;
+#             time <- tEnd - tStart;          
+#             print(sprintf("Add: %i", time))
             return(z);
         }
         .Object@getNumCols = function(x) {
