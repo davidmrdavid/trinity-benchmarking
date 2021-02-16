@@ -79,6 +79,7 @@ class NormalizedMatrix(matrix):
 
     def __new__(cls, mat=None, S=None, Ks=None, Rs=None, is_transposed=False, foreign_backend=False, avatar=None):
         def curryed_avatar(fname, arg=None):
+            
             if mat is None:
                 raise NotImplementedError
             method = getattr(avatar, fname)
@@ -202,6 +203,7 @@ class NormalizedMatrix(matrix):
     #TODO: morpheusPy also handles the case where 'other' has no
     # __rmul__ method, but that's for another day.
     def __mul__(self, other):
+        
         if isscalar(other):
             if self.isMorpheus:
                 raise NotImplementedError
@@ -240,12 +242,18 @@ class NormalizedMatrix(matrix):
                 return NormalizedMatrix(mat=newMat, avatar=self.avatar)
             else:
                 # Here the reason for the switch is that the names are backwars
+                if other.isMorpheus:
+                    
+                    newMat = other.inner.rightMatrixMultiplication(self.mat)
+                    
+                    return NormalizedMatrix(mat=newMat, avatar=self.avatar)
+                
                 newMat = self.inner("rightMatrixMultiplication", other.mat)
                 return NormalizedMatrix(mat=newMat, avatar=self.avatar)
         return NotImplemented
 
     def __rmul__(self, other):
-
+        
         if isscalar(other):
             if self.isMorpheus:
                 raise NotImplementedError

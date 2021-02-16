@@ -21,30 +21,36 @@ class NormalizedLinearRegression():
             #ee = self.w - dd
             
             #raise UU
-            start = int(time() * 1000)
+            #start = int(time() * 1000)
             tmp = X * self.w
-            end = int(time() * 1000)
-            print("Step 1:", str(end - start))
+            #end = int(time() * 1000)
+            #print("Step 1:", str(end - start))
             
-            start = int(time() * 1000)
+            #start = int(time() * 1000)
             tmp = tmp - y
-            end = int(time() * 1000)
-            print("Step 2:", str(end - start))
+            #end = int(time() * 1000)
+            #print("Step 2:", str(end - start))
             
-            start = int(time() * 1000)
-            tmp = X.T * tmp
-            end = int(time() * 1000)
-            print("Step 3:", str(end - start))
+#             start = int(time() * 1000)
+#             XT = X.T
+#             end = int(time() * 1000)
+#             print("T:", str(end - start))
             
-            start = int(time() * 1000)
+            
+            #start = int(time() * 1000)
+            tmp = (tmp.T * X).T
+            #end = int(time() * 1000)
+            #print("Step 3:", str(end - start))
+            
+            #start = int(time() * 1000)
             tmp = self.gamma * tmp
-            end = int(time() * 1000)
-            print("Step 4:", str(end - start))
+            #end = int(time() * 1000)
+            #print("Step 4:", str(end - start))
             
-            start = int(time() * 1000)
+            #start = int(time() * 1000)
             self.w = self.w - tmp
-            end = int(time() * 1000)
-            print("Step 5:", str(end - start))
+            #end = int(time() * 1000)
+            #print("Step 5:", str(end - start))
             #self.w = self.w - self.gamma * (X.T * (X * self.w - y))
         return self
 
