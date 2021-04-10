@@ -20,6 +20,7 @@ asNormalizedMatrix <- function(S, Ks, Rs, Sparse=FALSE) {
     avatar <- MatrixLibAdapter2(Sparse=Sparse)
     morpheus <- morpheusBuilder@build(S, Ks, Rs, Sempty, avatar)
     normMatrix <- NormalizedMatrix(morpheus=morpheus)
+    result <- normMatrix.scalarAddition(40)
     return(normMatrix)
 }
 
