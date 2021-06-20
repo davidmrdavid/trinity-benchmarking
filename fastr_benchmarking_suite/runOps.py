@@ -21,7 +21,7 @@
 import sys
 import subprocess
 
-CMD = "mx --dynamicimports /compiler,fastr,/tools --cp-sfx ../../mxbuild/dists/jdk1.8/morpheusdsl.jar --jdk jvmci R  --J @'-Xmx220G -da -dsa -agentlib:hprof=cpu=samples' --R.PrintErrorStacktracesToFile=true  --polyglot -f benchmarkRunner.r --args -fpath %s -task %s -outputDir results_operators -mode %s -TR %d -FR %d"
+CMD = "mx --dynamicimports /compiler,fastr,/tools --cp-sfx ../../mxbuild/dists/jdk1.8/morpheusdsl.jar --jdk jvmci R  --J @'-Xmx220G -da -dsa -agentlib:hprof=cpu=samples' --R.PrintErrorStacktracesToFile=true  --polyglot -f benchmarkRunner.r --args -fpath %s -task %s -outputDir results_R -mode %s -TR %d -FR %d"
 
 DATASETS = ["synthesized.json"]
 TASKS = [

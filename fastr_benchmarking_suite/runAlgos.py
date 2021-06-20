@@ -39,7 +39,7 @@ TASKS = [
 "GNMFClustering"
 ]
 
-CMD = "mx --dynamicimports fastr,/compiler --cp-sfx ../../mxbuild/dists/jdk1.8/morpheusdsl.jar --J @'-Xmx220G' --jdk jvmci R --polyglot -f benchmarkRunner.r --args -fpath %s -task %s -outputDir results_algorithms -mode %s -TR %s -FR %s"
+CMD = "mx --dynamicimports fastr,/compiler --cp-sfx ../../mxbuild/dists/jdk1.8/morpheusdsl.jar --J @'-Xmx220G' --jdk jvmci R --polyglot -f benchmarkRunner.r --args -fpath %s -task %s -outputDir results_R -mode %s -TR %s -FR %s"
 
 for dataset in DATASETS:
     for task in TASKS:
