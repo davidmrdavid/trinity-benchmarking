@@ -16,18 +16,13 @@
 
 from morpheus import morpheus
 import numpy as np
-import logReg
-import kmeans
 import statistics
 import argparse
 import json
 import argparse
 import timeit
 import statistics
-from kmeans import NormalizedKMeans
-from logReg import NormalizedLogisticRegression
 from linReg import NormalizedLinearRegression
-from gnmf import GaussianNMF
 import polyglot
 from time import time
 import csv
@@ -84,7 +79,7 @@ def benchmark_it(action, fname):
             print("iteration: ", i, "/25 | time total: ", timeTotal)
     return times
 
-# Gets an anonymous function to run the chosen test. For the paper, we focused exclusively on LogisticRegression
+# Gets an anonymous function to run the chosen test. For the paper, we focused exclusively on LinearRegression
 # but other algorithms are technically supported as well. The matrix representation is drawn from R, for stability
 def get_tasks(params, n_mat, d_mat, T, target, tasks, is_monolang):
 
@@ -110,9 +105,6 @@ def get_tasks(params, n_mat, d_mat, T, target, tasks, is_monolang):
         log_reg_winit = morpheus.NormalizedMatrix(mat=func(d_mat, 1), avatar=T.avatar)
 
     all_tasks = [
-        ("logisticRegression", 
-           lambda x: do_logistic_regression(x, 
-               log_reg_max_iter, log_reg_winit, log_reg_gamma, target)),
         ("linearRegression",
            lambda x: do_linear_regression(x,
                log_reg_max_iter, log_reg_winit, log_reg_gamma, target))
@@ -145,7 +137,7 @@ def main():
     with open(args.fpath) as f:
         dataset_meta = json.load(f)
 
-    algorithm_tasks = ["logisticRegression", "kMeansClustering"]
+    algorithm_tasks = ["linearRegression"]
     microbench_tasks = [
         "scalarAddition", "scalarMultiplication",
         "leftMatrixMultiplication", "rightMatrixMultiplication",
@@ -263,18 +255,6 @@ def do_column_wise_sum(x):
 def do_element_wise_sum(x):
     return np.sum(x)
 
-def do_logistic_regression(x, max_iter, winit, gamma, target):
-    m1 = NormalizedLogisticRegression() 
-    return m1.fit(x,target, winit)
-
 def do_linear_regression(x, max_iter, winit, gamma, target):
     m1 = NormalizedLinearRegression()
     return m1.fit(x, target, winit)
-
-def do_gnmf(x, w_init, h_init):
-    m1 = GaussianNMF()
-    return m1.fit(x, w_init, h_init)
-
-def do_kmeans_clustering(x, max_iter, center_number, k_center, n_S):
-    m1 = NormalizedKMeans()
-    return m1.fit(x, k_center, n_S)
