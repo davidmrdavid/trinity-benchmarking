@@ -1,3 +1,21 @@
+# Copyright 2021 David Justo, Shaoqing Yi, Nadia Polikarpova,
+#     Lukas Stadler and, Arun Kumar
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file implements our MatrixLib adapter in R. It maps the MatrixLib
+# interface we define in GraalVM to concrete operators in R. Additionally,
+# it includes optimized operator implementations based on the input shape
+# and representation.
+
 library(Matrix)
 
 MatrixLibAdapter2 <- setClass(
@@ -142,13 +160,11 @@ setMethod("initialize", "MatrixLibAdapter2",
 
 
 
-# MatrixLibAdapter methods ====================================================
-
+# Mapping the MatrixLib interface to concrete R operators =====================================
 
 setGeneric("rightMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {    
     return(tensor %*% otherMatrix);
 })
-
 
 setGeneric("leftMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {
     return(otherMatrix %*% tensor);
@@ -159,18 +175,16 @@ setGeneric("scalarAddition", function(tensor, otherMatrix) {
 })
 
 setGeneric("scalarExponentiation", function(tensor, number) {
-        return(tensor ^ number); #number ^ tensor, would fail (?)
+        return(tensor ^ number);
 })
 
 setGeneric("scalarMultiplication", function(tensor, scalar) {
     return(tensor * scalar);
 })
 
-
 setGeneric("crossProduct", function(tensor) {
     return(tensor * normMatrix);
 })
-
 
 setGeneric("rowSum", function(tensor, foreignBackendOpt=FALSE) {
     return(rowSums(tensor));
@@ -183,7 +197,6 @@ setGeneric("columnSum", function(tensor, foreignBackendOpt=FALSE) {
 setGeneric("elementWiseSum", function(tensor) {
     return(sum(tensor));
 })
-
 
 setGeneric("rowWiseAppend", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {
     return(rbind(tensor, otherMatrix));
@@ -219,15 +232,12 @@ setGeneric("transpose", function(tensor, foreignBackendOpt=FALSE) {
 })
 
 setGeneric("diagonal", function(tensor, foreignBackendOpt=FALSE) {
-    # TODO: why do we need the `as.vector`
     return(Diagonal(x=as.vector(tensor)));
 })
-
 
 setGeneric("crossProduct", function(tensor, foreignBackendOpt=FALSE) {
     return(crossprod(tensor));
 })
-
 
 setGeneric("elementWiseSqrt", function(tensor, foreignBackendOpt=FALSE) {
     return((tensor)^{1/2});
@@ -239,7 +249,6 @@ setGeneric("crossProductDuo", function(tensor, otherMatrix, foreignBackendOpt=FA
     return(result);
 })
 
-
 setGeneric("splice", function(tensor, rowBeg, rowEnd, colBeg, colEnd) {
 
     rowBeg <- rowBeg + 1
@@ -248,10 +257,10 @@ setGeneric("splice", function(tensor, rowBeg, rowEnd, colBeg, colEnd) {
     colEnd <- colEnd + 1
 
     return(tensor[rowBeg:rowEnd, colBeg:colEnd]);
-})
- 
+}) 
 
-# =============== The following needs to be abstracted away
+# Enable concrete R operators to operate on the the MatrixLibAdapter datatype =================
+
 setMethod("^", c("MatrixLibAdapter", "ANY"), function(e1, e2) {
     result <- e1@matrix ^ e2
     return(result)
@@ -282,7 +291,8 @@ setMethod("*", c("ANY", "MatrixLibAdapter"), function(e1, e2) {
     return(result)
 })
 
-# ============================= Minor ops
+# Implement helper / minor MatrixLib operators that are mostly used in polyglot execution (R + Python) =
+
 setGeneric("invert", function(e1){
     result <- MatrixLibAdapter(matrix=(1 / e1@matrix))
     return(result)

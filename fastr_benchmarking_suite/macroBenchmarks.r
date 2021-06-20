@@ -1,3 +1,19 @@
+# Copyright 2021 David Justo, Shaoqing Yi, Nadia Polikarpova,
+#     Lukas Stadler and, Arun Kumar
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file exports algorithm tests, i.e our macrobenchmarks,
+# for use in our test runner.
+
 library(matrixStats)
 source("morpheusR.r")
 
@@ -12,7 +28,6 @@ doLogisticRegression <- function(Data, max_iter, winit, gamma0, Target) {
     }
     return(list(w))
 }
-
 
 doLinearRegression <- function(Data, Max_Iter, winit, gamma0, Target) {
     w = winit;
@@ -30,7 +45,6 @@ doLinearRegression <- function(Data, Max_Iter, winit, gamma0, Target) {
     return(list(w));
 }
 
-
 doKMeansClustering <- function(Data, Max_Iter, Center_Number, k_center, nS) {
 
     All1 = matrix(1, nS, 1);
@@ -42,7 +56,6 @@ doKMeansClustering <- function(Data, Max_Iter, Center_Number, k_center, nS) {
     
     for( k in 1: Max_Iter )
     {
-        
         
         tmp = T22 %*% k_center;
         
@@ -61,8 +74,6 @@ doKMeansClustering <- function(Data, Max_Iter, Center_Number, k_center, nS) {
     }
     return(list(k_center ,YA));
 }
-
-
 
 doGNMFClustering <- function(X, Max_Iter, winit, hinit){
   

@@ -1,3 +1,24 @@
+# Copyright 2021 David Justo, Shaoqing Yi, Nadia Polikarpova,
+#     Lukas Stadler and, Arun Kumar
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file implements the Normalized Matrix interface in Python, which in turn
+# delegates its operator semantics to MorpheusDSL. The implementation contains
+# a large amount of boilerplate because it's meant to subclass NumPy matrices.
+# In the mean, this didn't help us much as NumPy, in GraalPython, wasn't stable
+# enough to run single-language experiements with it. Stil, for completeness' sake,
+# we kept the boilerplate as we shifted towards running our Python implementation
+# with R-based matrices as the "backend".
+
 """
 Python package to support 'morpheus' rewrites of linear algebra operations
 """
@@ -7,9 +28,6 @@ import numpy as np
 import numpy.core.numeric as N
 from numpy.core.numeric import isscalar
 from numpy.matrixlib.defmatrix import asmatrix, matrix
-
-class MorpheuInvalidArgsError(TypeError):
-    pass
 
 class NormalizedMatrix(matrix):
 
@@ -66,10 +84,7 @@ class NormalizedMatrix(matrix):
     def __getitem__(self, index):
         return NotImplementedError
 
-    # =============================================================================================
-    # =============================================================================================
-    # =============================================================================================
-
+    # Obtain a MorpheusDSL object to which to delegate our semantics
     def __getNormalizedTable(self, S, Ks, Rs, Sempty, avatar=None):
         normalizedTable = polyglot.eval(language="morpheusDSL",string="")
         if avatar is None:
@@ -96,7 +111,7 @@ class NormalizedMatrix(matrix):
             obj.Ks = Ks
             obj.Rs = Rs
             obj.is_transposed = is_transposed
-            obj.Sempty = False #Sempty
+            obj.Sempty = False # NOTE: Sempty is never empty in our experiments
             obj.foreign_backend = foreign_backend
 
             if str(type(S)) == "<class 'foreign'>":
@@ -114,53 +129,21 @@ class NormalizedMatrix(matrix):
         obj.avatar = getattr(obj, 'avatar')
         obj.mat = getattr(obj, 'mat')
 
-        #obj.foreign_backend = getattr(obj, 'foreign_backend', None)
-        #S = getattr(obj, 'S', None)
-        #Ks = getattr(obj, 'Ks', None) 
-        #Rs = getattr(obj, 'Rs', None)
-
-        #obj.S = S
-        #obj.Ks = Ks
-        #obj.Rs = Rs
-        #obj.is_tranposed = getattr(obj, 'is_transposed', None)
-        #obj.Sempty = getattr(obj, 'Sempty', None)
-        #obj.avatar = getattr(obj, 'avatar', None)
-
-        #if str(type(S)) == "<class 'foreign'>":
-        #    obj.normalizedTable = obj.__getNormalizedTable(S, Ks, Rs, obj.Sempty, obj.avatar)
-        #    obj.foreign_backend = True
-        #else:
-        #    #obj.normalizedTable = obj.__getNormalizedTable(tensorS, tensorKs, tensorRs)
-        #    raise NotImplementedError
     def dimm(self):
         return self.inner("dimmu")
 
     """ columnSum, rowSum, elementWiseSum """
     def sum(self, axis=None, dtype=None, out=None):
         raise NotImplementedError
-        #output = None
-        #if axis == 0:
-        #    output = self.normalizedTable.columnSum()
-        #elif axis == 1:
-        #    output = self.normalizedTable.rowSum()
-        #else:
-        #    output = self.normalizedTable.elementWiseSum()
-        #if self.foreign_backend:
-        #    # TODO: This is a hack, relies on knowing that the backend is in R
-        #    return np.matrix(output.unwrap()).reshape(output.getNumRows()[0], output.getNumCols()[0])
-        #return output.unwrap()
 
     """ scalarExponentiation """
     def __pow__(self, other=2.71):
         newMat = self.inner("scalarMultiplication", other)
         return NormalizedMatrix(mat=newMat, avatar=self.avatar)
-        #normMatrix = NormalizedMatrix(self.S, self.Ks, self.Rs)
-        #normMatrix.normalizedTable = self.normalizedTable.scalarExponentiation(other)
-        #return normMatrix
 
     def __ipow__(self, other=2.71):
         output = self.__pow__(other)
-        self.normalizedTable = output.normalizedTable # TODO: confirm this is fine
+        self.normalizedTable = output.normalizedTable
         return self
 
     def __rpow__(self, other=2.71):
@@ -170,16 +153,17 @@ class NormalizedMatrix(matrix):
     def __add__(self, other):
         if isscalar(other):
             if self.isMorpheus:
-                raise ZZ
+                raise NotImplementedError
             else:
                 newMat = self.inner("scalarAddition", other)
                 return NormalizedMatrix(mat=newMat, avatar=self.avatar)
         if self.isMorpheus:
-            return X
+            return NotImplementedError
         else:
             newMat = self.inner("matrixAddition", other.mat)
             return NormalizedMatrix(mat=newMat, avatar=self.avatar)
         return self.normalizedTable.matrixAddition(other).unwrap()
+
     def __iadd__(self, other):
         output =  self.__add__(other) 
         self.normalizedTable = output.normalizedTable
@@ -194,13 +178,11 @@ class NormalizedMatrix(matrix):
     def __isub__(self, other):
         return self.__iadd__(-other)
     def __rsub__(self, other):
-        #prepped = self.(-1)
+        prepped = self.__mul__(-1)
         return self.__radd__(prepped)
 
     
     """ scalarMultiplication, crossProd, LMM and RMM """
-    #TODO: morpheusPy also handles the case where 'other' has no
-    # __rmul__ method, but that's for another day.
     def __mul__(self, other):
         if isscalar(other):
             if self.isMorpheus:
@@ -208,38 +190,14 @@ class NormalizedMatrix(matrix):
             else:
                 newMat = self.inner("scalarMultiplication", other)
                 return NormalizedMatrix(mat=newMat, avatar=self.avatar)
-                #normMatrix = NormalizedMatrix(self.S, self.Ks, self.Rs)
-                #normMatrix.normalizedTable = self.normalizedTable.scalarMultiplication(other)
             return normMatrix
-        #if isinstance(other, NormalizedMatrix):
-        #    print("CASE 2")
-        #    if self.stamp == other.stamp and self.is_transposed ^ other.is_transposed:
-        #        return self.normalizedTable.crossProduct().unwrap()
-        #    else:
-        #        print("CASE BAD")
-        #        # TODO: can we implement this?
-        #        return NotImplemented
-
-        #if isinstance(other, Faux):
-        #    output = self.normalizedTable.leftMatrixMultiplication(other.obj)
-        #    faux = Faux(output)
-        #    return faux
-        #if isinstance(other, (N.ndarray, list,tuple)):
-        #   output = self.normalizedTable.leftMatrixMultiplication(TensorFromNumpy(other, self.foreign_backend))
-        #   if self.foreign_backend:
-        #       got = list(output.unwrap())
-        #       ncol = output.getNumCols()[0] # TODO: R-hack
-        #       nrow = output.getNumRows()[0] # TODO: R-hack
-        #       return np.matrix(got).reshape(nrow, ncol)
-        #   else:
-        #       return output.unwrap()
 
         elif isinstance(other, NormalizedMatrix):
             if self.isMorpheus:
                 newMat = self.inner.leftMatrixMultiplication(other.mat)
                 return NormalizedMatrix(mat=newMat, avatar=self.avatar)
             else:
-                # Here the reason for the switch is that the names are backwars
+                # Here the reason for the switch is that the names are backwards
                 newMat = self.inner("rightMatrixMultiplication", other.mat)
                 return NormalizedMatrix(mat=newMat, avatar=self.avatar)
         return NotImplemented
@@ -257,18 +215,10 @@ class NormalizedMatrix(matrix):
             if self.stamp == other.stamp and self.is_transposed ^ other.is_transposed:
                 return self.normalizedTable.crossProduct().unwrap()
             else:
-                # TODO: can we implement this?
-                return NotImplemented
+                raise NotImplementedError
         if isinstance(other, (N.ndarray, list,tuple)):
-           output = self.normalizedTable.rightMatrixMultiplication(TensorFromNumpy(other))
-           if self.foreign_backend:
-               got = list(output.unwrap())   # TODO: why list() ?
-               ncol = output.getNumCols()[0] # TODO: R-hack
-               nrow = output.getNumRows()[0] # TODO: R-hack
-               return np.matrix(got).reshape(nrow, ncol)
-           else:
-               return output.unwrap()
-        return NotImplemented
+            raise NotImplementedError
+        raise NotImplementedError
 
     def __imul__(self, other):
         if not isscalar(other):
@@ -282,11 +232,9 @@ class NormalizedMatrix(matrix):
         preppedArg = NormalizedMatrix(mat=newMat, avatar=self.avatar)
         return self.__mul__(preppedArg)
     def __rtruediv__(self, other):
-        #raise ZZ
         return other.__truediv__(self)
     def __itruediv__(self, other):
-        raise WW
-        return self.__truediv__(1/other)
+        raise NotImplementedError
 
     @property
     def T(self):

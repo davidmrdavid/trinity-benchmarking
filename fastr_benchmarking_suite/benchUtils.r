@@ -1,15 +1,35 @@
+# Copyright 2021 David Justo, Shaoqing Yi, Nadia Polikarpova,
+#     Lukas Stadler and, Arun Kumar
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file exports our utility/helper functions for R experients.
+
 library(Matrix)
 library(data.table)
 library("jsonlite")
 source("normalizedMatrix.r")
 source("macroBenchmarks.r")
 
+# Helper Functions for the Polyglot (R + Python) experiment ==============
+
+# Generates random matrices, in R, for the Python driver to request.
 genRanMatrixForPy <- function(numRows, numCols) {
   area = numRows * numCols
   M = Matrix(runif(area, min=0, max=1), numRows, numCols)
   return(M);
 }
 
+# Generates a Materialized Matrix, its corresponding Normalized Matrix,
+# and a target vector for use in Python, but represented in R datatypes ====
 genMatricesForPy <- function(numRowsR, numColsS, tupRatio, featRatio) {
   
   # Computing matrix dims
@@ -51,6 +71,7 @@ genMatricesForPy <- function(numRowsR, numColsS, tupRatio, featRatio) {
   return(matrices)
 }
 
+# Matrix/dataset loading and generation procedures ===============================
 loadDataset <- function(mode, params) {
 
   SDir = params$SDir;
@@ -109,11 +130,9 @@ loadDataset <- function(mode, params) {
     R3S = readMM(file=R3dir)+0;
     dR3 = ncol(R3S);
 
-    
     materializedMatrix <- cbind(materializedMatrix, FK3%*%R3S)
     
   }
-
 
   if(SDir != "") {
     materializedMatrix <- cbind(S, materializedMatrix)
@@ -129,7 +148,6 @@ loadDataset <- function(mode, params) {
   }
   else if(mode == "morpheusR"){
     if(params$outputMeta == "Flights"){
-      #data <- asNormalizedMatrix(S, list(FK1, FK2, FK3), list(R1S, R2S, R3S))
       data <- NormalMatrix(EntTable = list(S),
                    AttTables = list(R1S, R2S, R3S),
                    KFKDs = list(FK1, FK2, FK3),
@@ -138,7 +156,6 @@ loadDataset <- function(mode, params) {
 
     }
     else{
-      print("MORPH")
       data <- NormalMatrix(EntTable = list(S),
                    AttTables = list(R1S, R2S),
                    KFKDs = list(FK1, FK2),
@@ -146,19 +163,9 @@ loadDataset <- function(mode, params) {
     }
   }
 
-
   else{ 
     data <- materializedMatrix
   }
-
-
-  #TNM = NormalMatrix(EntTable = list(S),
-  #                 AttTables = list(R1S, R2S),
-  #                 KFKDs = list(FK1, FK2),
-  #                 Sparse = FALSE);
-
- 
-  #exit(-1);
   
   nMat <- nrow(materializedMatrix)
   dMat <- ncol(materializedMatrix)
@@ -257,7 +264,6 @@ genBaseMatricesExtended <- function(numRowsR, numColsS, tupRatio, featRatio) {
 
 genDatasetExtended <- function(mode, numRowsR, numColsS, tupRatio, featRatio) {
   
-
   matrices <- genBaseMatricesExtended(numRowsR, numColsS, tupRatio, featRatio)
   S <- matrices$S;
   K1 <- matrices$K1;
@@ -300,7 +306,6 @@ genDatasetExtended <- function(mode, numRowsR, numColsS, tupRatio, featRatio) {
 
   Y =((Matrix(runif(nMat, 0, 1), nMat, 1)) > 0.5)
 
-  #print(object.size(cbind(S, K1 %*% R1, K2 %*% R2, K3 %*% R3, K4 %*% R4))/(object.size(K1)+object.size(K2) + object.size(K3) + object.size(K4) + object.size(R1) + object.size(R2) + object.size(R3) + object.size(R4) + object.size(S)))
   exit(-1)
 
   matrices = list(
@@ -360,13 +365,18 @@ genDataset <- function(mode, numRowsR, numColsS, tupRatio, featRatio) {
   return(matrices)
 }
 
+# Procedures to run and evaluate correctness and perf  ===============================
+
+# Captures the runtime performance of a test scenario over some matrix representation
 benchmarkIt <- function(action, numTimes, fname) {
   gc()
   times <- c()
+
+  # Warm-up
   for(i in seq(1:5)){
     gc()
     tStart <- as.numeric(Sys.time())*1000;
-    print(sprintf("WARMING: %s/2000", i));
+    print(sprintf("WARMING: %s/5", i));
     action();
     tEnd <- as.numeric(Sys.time()) * 1000;
     time <- tEnd - tStart;
@@ -374,6 +384,7 @@ benchmarkIt <- function(action, numTimes, fname) {
     times <- c(times, time);
   }
   
+  # warmed-up runs
   for(i in seq(1:20)){
     gc()
     tStart <- as.numeric(Sys.time())*1000;
@@ -388,7 +399,10 @@ benchmarkIt <- function(action, numTimes, fname) {
   return(times)
 }
 
-
+# Helper for testing the approximate equality between the output of operators
+# on the normalized and materialized matrix representations. Needs to be modified
+# with an approximate equality check between res1 and res, depending on the operation
+# of choice.
 checkEquivalence <- function(action1, action2) {
   gc();
   
@@ -402,6 +416,8 @@ checkEquivalence <- function(action1, action2) {
   return(0);
 }
 
+# Exports argument-less functions that execute a chosen benchmark over a given matrix
+# representation. 
 getTasks <- function(params, nMat, dMat, T, target, tasks) {
  
   lmmNumRows <- dMat

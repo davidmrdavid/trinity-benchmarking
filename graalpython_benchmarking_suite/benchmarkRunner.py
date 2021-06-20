@@ -1,3 +1,19 @@
+# Copyright 2021 David Justo, Shaoqing Yi, Nadia Polikarpova,
+#     Lukas Stadler and, Arun Kumar
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file exports our the main driver for the Python experiments, and its helper
+# utility functions.
+
 from morpheus import morpheus
 import numpy as np
 import logReg
@@ -18,12 +34,7 @@ import csv
 import os
 import gc
 
-def do_linear_regression(x, max_iter, winit, gamma, target):
-    m1 = NormalizedLinearRegression()
-    return m1.fit(x, target, winit)
-
-
-
+# Obtains a normalized matrix, its corresponding materialized matrix, and target vector from R
 def gen_matrices_poly(num_rows_R, num_cols_S, tup_ratio, feat_ratio, mode):
     # Computing matrix dims
     num_rows_S = num_rows_R * tup_ratio
@@ -36,8 +47,8 @@ def gen_matrices_poly(num_rows_R, num_cols_S, tup_ratio, feat_ratio, mode):
     area_R = num_rows_R * num_cols_R
     area_K = num_rows_K * num_cols_K
 
-    foo = polyglot.eval(language="R", string="source('benchUtils.r'); function(x,y,z,w){ genMatricesForPy(x,y,z,w); }")
-    res = foo(num_rows_R, num_cols_S, tup_ratio, feat_ratio)
+    func = polyglot.eval(language="R", string="source('benchUtils.r'); function(x,y,z,w){ genMatricesForPy(x,y,z,w); }")
+    res = func(num_rows_R, num_cols_S, tup_ratio, feat_ratio)
 
     Sarg, Ksarg, Rsarg, matMatrixForeign, target, avatarArg = res
     nm = morpheus.NormalizedMatrix(S=Sarg, Ks=Ksarg, Rs=Rsarg, foreign_backend=True, avatar=avatarArg) 
@@ -55,8 +66,9 @@ def gen_matrices_poly(num_rows_R, num_cols_S, tup_ratio, feat_ratio, mode):
     }
     return matrices
 
+# Captures the runtime of some test
 def benchmark_it(action, fname):
-    print("BIT")
+    print("Beginning benchmark loop")
     times = []
     with open(fname, 'a') as f:
         for i in range(25):
@@ -69,13 +81,11 @@ def benchmark_it(action, fname):
             f.write(str(timeTotal) + "\n")
             f.flush()
             os.fsync(f.fileno())
-            print(i, "__", timeTotal)
+            print("iteration: ", i, "/25 | time total: ", timeTotal)
     return times
 
-def do_logistic_regression(x, max_iter, winit, gamma, target):
-    m1 = NormalizedLogisticRegression() 
-    return m1.fit(x,target, winit)
-
+# Gets an anonymous function to run the chosen test. For the paper, we focused exclusively on LogisticRegression
+# but other algorithms are technically supported as well. The matrix representation is drawn from R, for stability
 def get_tasks(params, n_mat, d_mat, T, target, tasks, is_monolang):
 
     lmm_num_rows = d_mat
@@ -93,19 +103,11 @@ def get_tasks(params, n_mat, d_mat, T, target, tasks, is_monolang):
     end = d_mat
     
     if is_monolang:
-        #log_reg_winit = np.matrix(np.random.randn(d_mat, 1))
-        #gnmf_winit = np.matrix(np.random.randn(n_mat, 5))
-        #gnmf_h_init = np.matrix(np.random.rand(5, d_mat))
-        #k_center = (T[:center_num, : end]).T 
         raise NotImplementedError
 
     else:
-        foo = polyglot.eval(language="R", string="source('benchUtils.r'); function(x,y){ genRanMatrixForPy(x,y); }")
-        log_reg_winit = morpheus.NormalizedMatrix(mat=foo(d_mat, 1), avatar=T.avatar)
-        #gnmf_winit = morpheus.Faux(urg(n_mat, 5))
-        #gnmf_h_init = morpheus.Faux(urg(5, d_mat))
-        #k_center = morpheus.Faux(T.obj.splice(0, 10-1, 0, d_mat-1).transpose())
-    
+        func = polyglot.eval(language="R", string="source('benchUtils.r'); function(x,y){ genRanMatrixForPy(x,y); }")
+        log_reg_winit = morpheus.NormalizedMatrix(mat=func(d_mat, 1), avatar=T.avatar)
 
     all_tasks = [
         ("logisticRegression", 
@@ -115,11 +117,6 @@ def get_tasks(params, n_mat, d_mat, T, target, tasks, is_monolang):
            lambda x: do_linear_regression(x,
                log_reg_max_iter, log_reg_winit, log_reg_gamma, target))
     ]
-    #all_tasks = [
-    #    ("logisticRegression", 
-    #       lambda x: do_logistic_regression(x, 
-    #           log_reg_max_iter, log_reg_winit, log_reg_gamma, target))
-    #]
 
     chosen_tasks = []
     for name, func in all_tasks:
@@ -128,6 +125,7 @@ def get_tasks(params, n_mat, d_mat, T, target, tasks, is_monolang):
 
     return chosen_tasks
 
+# The main experiment driver, mostly parses its cli arguments and executes the tests using helper functions
 def main():
 
     # parse params
@@ -185,8 +183,7 @@ def main():
     for TR in TRs:
         for FR in FRs:
             if(is_data_synthetic and is_monolang):
-                # matrices = gen_matrices(mode, dataset_meta["nR"], dataset_meta["dS"], TR, FR)
-                raise NotImplementException
+                raise NotImplementedError
             elif is_data_synthetic:
                 matrices = gen_matrices_poly(dataset_meta["nR"], dataset_meta["dS"], TR, FR, mode)
             else:
@@ -200,7 +197,7 @@ def main():
                 times = benchmark_it(lambda : action(matrices["data"]), fname)
 main()
 
-
+# Generate input matrices in NumPy, unused due to stability issues ====
 def gen_matrices(mode, num_rows_R, num_cols_S, tup_ratio, feat_ratio):
 
     # Computing matrix dims
@@ -226,7 +223,7 @@ def gen_matrices(mode, num_rows_R, num_cols_S, tup_ratio, feat_ratio):
 
     data = materialized_matrix
     if mode == "trinity":
-        # generate materialized matrix
+        # generate normalized matrix
         data = morpheus.NormalizedMatrix(S, [K], [R])
 
     # get Y, package them, return
@@ -242,6 +239,8 @@ def gen_matrices(mode, num_rows_R, num_cols_S, tup_ratio, feat_ratio):
     }
      
     return matrices
+
+# Test runners ===========================================================
 
 def do_scalar_addition(x):
     return x + 42
@@ -264,6 +263,13 @@ def do_column_wise_sum(x):
 def do_element_wise_sum(x):
     return np.sum(x)
 
+def do_logistic_regression(x, max_iter, winit, gamma, target):
+    m1 = NormalizedLogisticRegression() 
+    return m1.fit(x,target, winit)
+
+def do_linear_regression(x, max_iter, winit, gamma, target):
+    m1 = NormalizedLinearRegression()
+    return m1.fit(x, target, winit)
 
 def do_gnmf(x, w_init, h_init):
     m1 = GaussianNMF()
@@ -272,4 +278,3 @@ def do_gnmf(x, w_init, h_init):
 def do_kmeans_clustering(x, max_iter, center_number, k_center, n_S):
     m1 = NormalizedKMeans()
     return m1.fit(x, k_center, n_S)
-

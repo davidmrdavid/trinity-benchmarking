@@ -1,17 +1,32 @@
+// Copyright 2021 David Justo, Shaoqing Yi, Nadia Polikarpova,
+//     Lukas Stadler and, Arun Kumar
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//     http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// This file contains all of the code for the JS experiments, divided into
+// sections for readability.
+
 const fs = require('fs');
 const mathjs = require('mathjs');
 
 const math = mathjs.create(mathjs.all);
 
-// create a new data type
+// The Normalized Matrix interface in R, which in turn
+// delegates its operator semantics to MorpheusDSL. ===================
 function NormMatrix (S, Ks, Rs, morph=null) {
 
     if(morph) {
         this.morph = morph;
         return this;
     }
-
-    console.log(typeof(S));
 
     let constructor2 = Polyglot.eval("morpheusDSL", "");
     const dims = S.size();
@@ -34,8 +49,8 @@ math.typed.addType({
         return x && x.isNormMatrix
     }
 })
-  
-// use the type in a new typed function
+ 
+// Enable Math.JS operators to work on the NormalizedMatrix ==============
 const addScalar = math.typed('addScalar', {
     'NormMatrix, number': function (a, b) {
         let newMorph = a.morph.scalarAddition(b);
@@ -47,8 +62,6 @@ const addScalar = math.typed('addScalar', {
     }
 })
 
-
-//TODO: should this be substract scalar?
 const subtract = math.typed('subtract', {
     'NormMatrix, number': function (a, b) {
         let newMorph = a.morph.scalarMultiplication(b);
@@ -97,7 +110,6 @@ const transpose = math.typed('transpose', {
     }
 })
 
-//TODO: are these the right dims?
 const rowSum = math.typed('rowSum', {
     'Matrix': function (a) {
         return math.reshape(math.apply(a, 1, math.sum), [a.size()[0], 1]);
@@ -141,6 +153,7 @@ math.import({
     sum: sum
 })
 
+// Implement MatrixLib interface in terms of Math.JS operations ==============
 class TensorFromMatrix {
 
     constructor() {
@@ -233,6 +246,8 @@ class TensorFromMatrix {
     }
 }
 
+
+// Algorithm implementations in JS, many remained unused in the paper ==============
 class NormalizedLinearRegression {
 
     constructor(iterations=20, gamma=0.000001){
@@ -358,46 +373,7 @@ class GaussianNMF {
     }
 }
 
-
-function benchmarkIt() {
-    return timeDiff;
-}
-
-
-function genMatrices(numRowsR, numColsS, tupRatio, featRatio) {
-
-    // Computing matrix dims
-    let numRowsS = numRowsR * tupRatio;
-    let numColsR = numColsS * featRatio;
-    let numRowsK = numRowsS;
-    let numColsK = numRowsR;
-
-    let S = math.random(math.matrix([numRowsS, numColsS]));
-    let K = math.zeros(numRowsK, numColsK, 'sparse');
-    for(let i = 0; i < numRowsK; i++) {
-        K.set([i, math.randomInt(0, numColsK)], 1);
-    }
-    let R = math.random(math.matrix([numRowsR, numColsR]));
-    KR = math.multiply(K, R)
-    matMatrix = math.concat(S, KR, 1)
-    Y = math.ones(math.matrix([numRowsS, 1]))
-
-
-    let constructor = Polyglot.eval("morpheusDSL", "");
-
-    // Build the norm matrix
-    let morph = new NormMatrix(S, [K], [R]);
-
-    let matrices = {
-        "matMatrix": matMatrix,
-        "target": Y,
-        "normMatrix": morph
-    }
-    console.log("GM/");
-
-    return matrices;
-}
-
+// Test runners ======================================================================
 function doScalarAddition(x) {
     math.add(x, 42);
     return;
@@ -450,6 +426,45 @@ function doKMeansClustering(x, logRegMaxIter, centerNumber, kCenter, nRows) {
     return;
 }
 
+// Helpers to run the experiments ====================================================
+
+// Generate normalized matrix, its corresponding materialized matrix, and a target vector
+function genMatrices(numRowsR, numColsS, tupRatio, featRatio) {
+
+    // Computing matrix dims
+    let numRowsS = numRowsR * tupRatio;
+    let numColsR = numColsS * featRatio;
+    let numRowsK = numRowsS;
+    let numColsK = numRowsR;
+
+    let S = math.random(math.matrix([numRowsS, numColsS]));
+    let K = math.zeros(numRowsK, numColsK, 'sparse');
+    for(let i = 0; i < numRowsK; i++) {
+        K.set([i, math.randomInt(0, numColsK)], 1);
+    }
+    let R = math.random(math.matrix([numRowsR, numColsR]));
+    KR = math.multiply(K, R)
+    matMatrix = math.concat(S, KR, 1)
+    Y = math.ones(math.matrix([numRowsS, 1]))
+
+
+    let constructor = Polyglot.eval("morpheusDSL", "");
+
+    // Build the norm matrix
+    let morph = new NormMatrix(S, [K], [R]);
+
+    let matrices = {
+        "matMatrix": matMatrix,
+        "target": Y,
+        "normMatrix": morph
+    }
+    console.log("GM/");
+
+    return matrices;
+}
+
+// Exports argument-less functions that execute a chosen benchmark over a given matrix
+// representation. 
 function getTasks(matrices, tasks) {
 
     let matDims = matrices.matMatrix.size();
@@ -519,6 +534,7 @@ function getNanoSecTime() {
 
 }
 
+// compares the runtime difference between the materialized and normalized matrices
 function compare(matrix, action, numTimes, numWarmups, fname) {
 
     let timeStart = 0;
@@ -532,7 +548,7 @@ function compare(matrix, action, numTimes, numWarmups, fname) {
         result = action(matrix);
         timeEnd = getNanoSecTime();
         timeDiff = (timeEnd - timeStart)/1000000000;
-        console.log("it", i,"/", numTimes ,"|","current timeDiff", timeDiff);
+        console.log("iteration: ", i,"/", numTimes ,"|","current timeDiff", timeDiff);
         stream.write(timeDiff.toString() + "\n");
         times.push(timeDiff);
     }
@@ -540,13 +556,14 @@ function compare(matrix, action, numTimes, numWarmups, fname) {
     return result;
 }
 
-
-function compare2(matMat, normMat, action) {
+// aproximate equality check between the results of some operator across matrix representations
+function compareEquality(matMat, normMat, action) {
     let res1 = action(matMat);
     let res2 = action(normMat);
     console.log(math.equal(res1, res2));
 }
 
+// The test driver, parses its cli arguments and runs the tests
 function main () {
     // parse args
     const args = process.argv.slice(2);
@@ -610,8 +627,7 @@ function main () {
        FRs = [FR]
    }
 
-    
-    console.log("Bench Begin!");
+    console.log("Beginning benchmarking loop");
     for(let i = 0; i < TRs.length; i++) {
         for(let j = 0; j < FRs.length; j++) {
             let TR = TRs[i];
@@ -637,15 +653,14 @@ function main () {
                   else {
                       results = compare(matrices.matMatrix, pair.runner, numTimes, 0, fname);
                   }
-                  //fs.writeFile(fname, results, function(err){ if(err){console.log("ERR!");} })
                 }
                 else{
-                    compare2(matrices.matMatrix, matrices.normMatrix, pair.runner);
+                    compareEquality(matrices.matMatrix, matrices.normMatrix, pair.runner);
                     let notLmm = pair.name != "leftMatrixMultiplication";
                     let notRmm = pair.name != "rightMatrixMultiplication";
                     let checkTrans = notLmm && notRmm;
                     if(checkTrans){
-                        compare2(math.transpose(matrices.matMatrix), 
+                        compareEquality(math.transpose(matrices.matMatrix), 
                                  math.transpose(matrices.normMatrix), pair.runner);
                     }
                 }
@@ -657,101 +672,4 @@ function main () {
 
 }
 
-/*
-
-// Testing for correctness
-let matrices = genMatrices(5, 2, 1, 1);
-let res1 = null;
-let res2 = null;
-let m1 = null;
-let m2 = null;
-
-// Simple PK-FK join
-m1 = matrices.matMatrix;
-m2 = matrices.normMatrix;
-res1 = math.rowSum(m1);
-res2 = math.rowSum(m2);
-console.log(res1);
-console.log(res2);
-console.log("=========================");
-res1 = math.colSum(m1);
-res2 = math.colSum(m2);
-console.log(res1);
-console.log(res2);
-console.log("=========================");
-res1 = math.sum(m1);
-res2 = math.sum(m2);
-console.log(res1);
-console.log(res2);
-console.log("=========================");
-
-console.log("$$$$$$$$$$$$$$$$$$$$$$$$$");
-
-// Transposed simple PK-FK join
-m1 = math.transpose(m1);
-m2 = math.transpose(m2);
-res1 = math.rowSum(m1);
-res2 = math.rowSum(m2);
-console.log(res1);
-console.log(res2);
-console.log("=========================");
-res1 = math.colSum(m1);
-res2 = math.colSum(m2);
-console.log(res1);
-console.log(res2);
-console.log("=========================");
-res1 = math.sum(m1);
-res2 = math.sum(m2);
-console.log(res1);
-console.log(res2);
-console.log("=========================");
-*/
-
 main()
-/*
-let test = new NormalizedLinearRegression()
-let Xtest = math.matrix([[0, 1, 2], [3, 4, 5]])
-let ytest = math.matrix([[0], [1]])
-let winit = math.matrix([[0], [1], [1]])
-test.fit(Xtest, ytest, winit)
-
-let test2 = new NormalizedLogisticRegression()
-let Xtest2 = math.matrix([[0, 1, 2], [3, 4, 5]])
-let ytest2 = math.matrix([[0], [1]])
-let winit2 = math.matrix([[0], [1], [1]])
-test2.fit(Xtest2, ytest2, winit2)
-
-//let test3 = new NormalizedKMeans()
-//let Xtest3 = math.matrix([[0, 1, 2], [3, 4, 5]])
-//let kCenterTest = math.matrix([[0, 9, 1], [1, 1, 2], [1, 3, 3]])
-//test3.fit(Xtest3, kCenterTest)
-
-let test4 = new GaussianNMF()
-let Xtest4 = math.matrix([[0, 1, 2], [3, 4, 5]])
-let winitTest = math.matrix([[0, 9, 1, 4, 5], [1, 1, 2, 6, 7]])
-let hinitTest = math.matrix([[0, 9, 1], [1, 1, 2], [1, 3, 3], [1, 1, 2], [1, 3, 3]])
-test4.fit(Xtest4, winitTest, hinitTest)
-*/
-//main()
-
-/*
-let S = math.matrix([[0,1],[1,2]])
-let K = math.matrix([[0,1],[1,2]]) 
-let R = math.matrix([[0,1],[1,2]])
-
-let arg = math.matrix([[0,1],[1,2], [0,1],[1,2]])
-let tfm = new TensorFromMatrix(S)
-let morph = new NormMatrix(S, [K], [R]);
-console.log(math.add(morph, 5));
-console.log(math.add(5, morph));
-console.log(math.subtract(morph, 5));
-console.log(math.subtract(5, morph));
-console.log(math.multiply(morph, 5));
-console.log(math.multiply(5, morph));
-console.log(math.multiply(morph, arg));
-console.log(math.rowSum(morph));
-console.log(math.colSum(morph));
-console.log(math.sum(morph));
-console.log(math.transpose(morph));
-*/
-//main()

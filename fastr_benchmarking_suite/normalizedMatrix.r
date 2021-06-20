@@ -1,3 +1,19 @@
+# Copyright 2021 David Justo, Shaoqing Yi, Nadia Polikarpova,
+#     Lukas Stadler and, Arun Kumar
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file implements the Normalized Matrix interface in R, which in turn
+# delegates its operator semantics to MorpheusDSL.
+
 source("matrixLibAdapter.r")
 
 # Adapter, stores NM as member variable
@@ -12,7 +28,7 @@ asNormalizedMatrix <- function(S, Ks, Rs, Sparse=FALSE) {
     # Obtain NM constructor, execute it, store it in adapter object,
     # return adapter
     morpheusBuilder <- eval.polyglot("morpheusDSL", "")
-    # TODO: check is S is empty
+
     Sempty <- FALSE
     if(nrow(S)*ncol(S) == 0){
         Sempty <- TRUE
@@ -77,7 +93,10 @@ setMethod("/", c("NormalizedMatrix", "numeric"), function(e1, e2) {
     return(newNormalizedMatrix)
 })
 
-# TODO: this is wrong!
+# TODO: In the past, we've encountered a few instances of
+# exponentiation yielding the wrong output shape / datatype.
+# For correctness' sake, this could use further testing,
+# but it isn't used in the paper's evaluation
 setMethod("^", c("NormalizedMatrix", "numeric"), function(e1, e2) {
     result <- e1@morpheus@scalarExponentiation(e2)
     newNormalizedMatrix <- NormalizedMatrix(morpheus=result)
@@ -94,7 +113,6 @@ setMethod("%*%", c("ANY", "NormalizedMatrix"), function(x, y) {
     result <- y@morpheus@rightMatrixMultiplication(x)
     return(result);
 })
-
 
 setMethod("%*%", c("NormalizedMatrix", "ANY"), function(x, y) {
     result <- x@morpheus@leftMatrixMultiplication(y)
@@ -117,13 +135,11 @@ setMethod("colSums", c("NormalizedMatrix"), function(x) {
     return(result)
 })
 
-
 't.NormalizedMatrix' <- function(x) {
     result <- x@morpheus@transpose()
     newNormalizedMatrix <- NormalizedMatrix(morpheus=result)
     return(newNormalizedMatrix)
 }
-
 
 setMethod("crossprod", c("NormalizedMatrix", "ANY"), function(x, y = NULL) {
     result <- x@morpheus@crossProduct();
