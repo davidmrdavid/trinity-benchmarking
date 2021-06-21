@@ -29,6 +29,34 @@ import csv
 import os
 import gc
 
+# Test runners ===========================================================
+
+def do_scalar_addition(x):
+    return x + 42
+
+def do_scalar_multiplication(x):
+    return x * 42
+
+def do_left_matrix_multiplication(x, lmm_arg):
+    return lmm_arg * x
+
+def do_right_matrix_multiplication(x, rmm_arg):
+    return x * rmm_arg
+
+def do_row_wise_sum(x):
+    return np.sum(x, axis=0)
+
+def do_column_wise_sum(x):
+    return np.sum(x, axis=1)
+
+def do_element_wise_sum(x):
+    return np.sum(x)
+
+def do_linear_regression(x, max_iter, winit, gamma, target):
+    m1 = NormalizedLinearRegression()
+    return m1.fit(x, target, winit)
+
+
 # Obtains a normalized matrix, its corresponding materialized matrix, and target vector from R
 def gen_matrices_poly(num_rows_R, num_cols_S, tup_ratio, feat_ratio, mode):
     # Computing matrix dims
@@ -232,29 +260,4 @@ def gen_matrices(mode, num_rows_R, num_cols_S, tup_ratio, feat_ratio):
      
     return matrices
 
-# Test runners ===========================================================
 
-def do_scalar_addition(x):
-    return x + 42
-
-def do_scalar_multiplication(x):
-    return x * 42
-
-def do_left_matrix_multiplication(x, lmm_arg):
-    return lmm_arg * x
-
-def do_right_matrix_multiplication(x, rmm_arg):
-    return x * rmm_arg
-
-def do_row_wise_sum(x):
-    return np.sum(x, axis=0)
-
-def do_column_wise_sum(x):
-    return np.sum(x, axis=1)
-
-def do_element_wise_sum(x):
-    return np.sum(x)
-
-def do_linear_regression(x, max_iter, winit, gamma, target):
-    m1 = NormalizedLinearRegression()
-    return m1.fit(x, target, winit)
