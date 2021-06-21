@@ -55,8 +55,8 @@ setMethod("initialize", "MatrixLibAdapter2",
         .Object@columnSum = function(x) {
             return(columnSum(x));
         }
-        .Object@leftMatrixMultiplication = function(x, y) {
-            z <- leftMatrixMultiplication(x, y)
+        .Object@rightMatrixMultiplication = function(x, y) {
+            z <- rightMatrixMultiplication(x, y)
             
             if(!Sparse & (toString(class(x)) == "ngCMatrix" | toString(class(y)) == "ngCMatrix")){ #SPARSE check
                 z <- as.matrix(z)
@@ -78,8 +78,8 @@ setMethod("initialize", "MatrixLibAdapter2",
         .Object@scalarExponentiation = function(x, y){
             return(scalarExponentiation(x, y))
         }
-        .Object@rightMatrixMultiplication = function(x, y) {
-            z <- rightMatrixMultiplication(x, y)
+        .Object@leftMatrixMultiplication = function(x, y) {
+            z <- leftMatrixMultiplication(x, y)
             
             if(!Sparse & (toString(class(x)) == "ngCMatrix" | toString(class(y)) == "ngCMatrix")){ #SPARSE check
                 z <- as.matrix(z)
@@ -162,11 +162,11 @@ setMethod("initialize", "MatrixLibAdapter2",
 
 # Mapping the MatrixLib interface to concrete R operators =====================================
 
-setGeneric("rightMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {    
+setGeneric("leftMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {    
     return(tensor %*% otherMatrix);
 })
 
-setGeneric("leftMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {
+setGeneric("rightMatrixMultiplication", function(tensor, otherMatrix, foreignBackendOpt=FALSE) {
     return(otherMatrix %*% tensor);
 })
 

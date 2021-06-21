@@ -174,12 +174,12 @@ class TensorFromMatrix {
         return res;
     }
 
-    rightMatrixMultiplication(matrix, otherMatrix) {
+    leftMatrixMultiplication(matrix, otherMatrix) {
         let res = math.multiply(matrix, otherMatrix);
         return res;
     }
 
-    leftMatrixMultiplication(matrix, otherMatrix) {
+    rightMatrixMultiplication(matrix, otherMatrix) {
         let res = math.multiply(otherMatrix, matrix);
         return res; 
     }
@@ -458,7 +458,6 @@ function genMatrices(numRowsR, numColsS, tupRatio, featRatio) {
         "target": Y,
         "normMatrix": morph
     }
-    console.log("GM/");
 
     return matrices;
 }
@@ -548,7 +547,7 @@ function compare(matrix, action, numTimes, numWarmups, fname) {
         result = action(matrix);
         timeEnd = getNanoSecTime();
         timeDiff = (timeEnd - timeStart)/1000000000;
-        console.log("iteration: ", i,"/", numTimes ,"|","current timeDiff", timeDiff);
+        console.log("iteration: ", i,"/ 25 |","current timeDiff", timeDiff);
         stream.write(timeDiff.toString() + "\n");
         times.push(timeDiff);
     }
