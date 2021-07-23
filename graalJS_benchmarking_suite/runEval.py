@@ -18,7 +18,7 @@
 import subprocess
 import sys
 
-TR = 10
+TR = 1 # 10
 FR = [
 1,
 2,
